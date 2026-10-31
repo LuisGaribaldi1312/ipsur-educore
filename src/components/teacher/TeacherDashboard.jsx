@@ -1,0 +1,217 @@
+import React, { useState } from 'react';
+import { useApp } from '../../context/AppContext';
+import CriteriaConfigModal from './CriteriaConfigModal';
+import { 
+  BookOpen, 
+  Users, 
+  CheckSquare, 
+  Clock, 
+  AlertTriangle, 
+  CheckCircle2, 
+  ChevronRight, 
+  Sparkles,
+  ShieldAlert,
+  Percent,
+  PlusCircle
+} from 'lucide-react';
+
+export default function TeacherDashboard({ onSelectClassroom }) {
+  const { classrooms, currentUser } = useApp();
+
+  // Find classrooms assigned to this teacher
+  const myClassrooms = classrooms.filter(c => c.teacherId === currentUser.id);
+
+  // Fallback to all if user is testing with another teacher
+  const displayClassrooms = myClassrooms.length > 0 ? myClassrooms : classrooms;
+
+  const [configuringClassroom, setConfiguringClassroom] = useState(null);
+
+  // Count pending unassigned criteria
+  const unconfiguredCount = displayClassrooms.filter(c => !c.criteriaConfigured).length;
+
+  // Calculate total pending submissions to grade
+  let totalPendingGrading = 0;
+  displayClassrooms.forEach(c => {
+    const subs = c.submissions || [];
+    totalPendingGrading += subs.filter(s => s.grade === null || s.grade === undefined).length;
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Teacher Hero Banner */}
+      <div className="bg-gradient-to-r from-indigo-900 via-ipsur-navy-800 to-ipsur-pink-800 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+        <div className="relative z-10 max-w-2xl">
+          <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-xs font-semibold text-pink-200 mb-2">
+            <BookOpen className="w-4 h-4 text-ipsur-pink-400" />
+            <span>Portal del Docente Titular · IPSUR Prepa en Línea</span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            Bienvenida, {currentUser.name}
+          </h1>
+          <p className="text-xs sm:text-sm text-indigo-100 mt-2 leading-relaxed">
+            {currentUser.title}. Administra tus aulas virtuales, establece los porcentajes de evaluación obligatorios al 100%, sube materiales didácticos y califica las tareas en el rango de 0 a 100.
+          </p>
+
+          <div className="mt-4 flex flex-wrap items-center gap-4 text-xs">
+            <span className="bg-white/15 px-3 py-1 rounded-lg">
+              Salas a tu cargo: <strong className="text-white">{displayClassrooms.length}</strong>
+            </span>
+            <span className="bg-white/15 px-3 py-1 rounded-lg">
+              Tareas por calificar: <strong className="text-pink-300">{totalPendingGrading}</strong>
+            </span>
+          </div>
+        </div>
+
+        {/* Decorative Watermark */}
+        <div className="absolute -right-6 -bottom-8 opacity-10 pointer-events-none hidden md:block">
+          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-64 h-auto object-contain filter brightness-200" />
+        </div>
+      </div>
+
+      {/* Warning Banner if any classroom has unconfigured criteria */}
+      {unconfiguredCount > 0 && (
+        <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-amber-100 text-amber-700 rounded-xl">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-amber-900">
+                Ponderaciones Pendientes de Asignar ({unconfiguredCount} {unconfiguredCount === 1 ? 'sala' : 'salas'})
+              </h4>
+              <p className="text-xs text-amber-800 mt-0.5">
+                Por política del sistema IPSUR, debes fijar la ponderación (Actividades, Examen/Proyecto, Asistencia y Participación = 100%) antes de que la plataforma te permita crear actividades.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Classrooms Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-ipsur-navy-700" />
+            <span>Mis Salas de Clases Virtuales</span>
+          </h3>
+          <span className="text-xs text-slate-500">
+            Ciclo: 1er Bimestre 2026
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {displayClassrooms.map(cls => {
+            const isConfigured = cls.criteriaConfigured;
+            const activitiesCount = cls.activities?.length || 0;
+            const studentsCount = cls.enrolledStudentIds?.length || 0;
+
+            return (
+              <div
+                key={cls.id}
+                className="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between"
+              >
+                {/* Header */}
+                <div className="p-5 bg-gradient-to-r from-ipsur-navy-800 to-indigo-900 text-white">
+                  <div className="flex items-center justify-between text-xs mb-2">
+                    <span className="font-mono bg-white/20 px-2 py-0.5 rounded font-bold">
+                      {cls.code}
+                    </span>
+                    <span className="bg-ipsur-pink-500 text-white font-bold px-2 py-0.5 rounded-full text-[10px]">
+                      {cls.periodName}
+                    </span>
+                  </div>
+
+                  <h3 className="text-base font-bold text-white line-clamp-1">
+                    {cls.name}
+                  </h3>
+                  <p className="text-xs text-indigo-200 mt-1">
+                    Grupo: {cls.group} · {studentsCount} Alumnos
+                  </p>
+                </div>
+
+                {/* Criteria Pill & Status */}
+                <div className="p-4 space-y-3 text-xs flex-1">
+                  {isConfigured ? (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 space-y-1.5">
+                      <div className="flex items-center justify-between text-emerald-800 font-bold">
+                        <span className="flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          Ponderación 100% Configurada
+                        </span>
+                        <button
+                          onClick={() => setConfiguringClassroom(cls)}
+                          className="text-[11px] underline text-emerald-700 hover:text-emerald-900"
+                        >
+                          Editar
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-1 text-[11px] text-emerald-900 font-medium">
+                        <span>• Actividades: {cls.criteria.activities}%</span>
+                        <span>• Examen: {cls.criteria.examProject}%</span>
+                        <span>• Asistencia: {cls.criteria.attendance}%</span>
+                        <span>• Participación: {cls.criteria.participation}%</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 space-y-2">
+                      <div className="flex items-center gap-1.5 text-rose-800 font-bold">
+                        <AlertTriangle className="w-4 h-4 text-rose-600" />
+                        <span>Ponderación Pendiente (Bloqueada)</span>
+                      </div>
+                      <p className="text-[11px] text-rose-700">
+                        Configura el 100% reglamentario para poder asignar actividades y tareas.
+                      </p>
+                      <button
+                        onClick={() => setConfiguringClassroom(cls)}
+                        className="w-full text-center py-1.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition"
+                      >
+                        Configurar Criterios Ahora
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Summary of items */}
+                  <div className="flex items-center justify-between pt-1 text-slate-600">
+                    <span>Actividades asignadas:</span>
+                    <strong className="text-slate-800 font-bold">{activitiesCount}</strong>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span>Recursos didácticos:</span>
+                    <strong className="text-slate-800 font-bold">{cls.materials?.length || 0}</strong>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-400 font-mono">
+                    IPSUR Prepa
+                  </span>
+
+                  <button
+                    onClick={() => onSelectClassroom(cls.id)}
+                    className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-ipsur-navy-700 hover:bg-ipsur-navy-800 rounded-xl shadow-sm transition"
+                  >
+                    <span>Abrir Classroom</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Criteria Modal */}
+      {configuringClassroom && (
+        <CriteriaConfigModal
+          isOpen={Boolean(configuringClassroom)}
+          onClose={() => setConfiguringClassroom(null)}
+          classroom={configuringClassroom}
+        />
+      )}
+    </div>
+  );
+}
