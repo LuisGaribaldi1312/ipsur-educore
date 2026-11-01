@@ -379,6 +379,24 @@ export function AppProvider({ children }) {
     showToast('Registro Actualizado', 'Evaluación de asistencia, participación y examen guardada con éxito.');
   };
 
+  // Update Virtual Session configuration (Meet, Zoom, Teams, Aula Virtual)
+  const updateVirtualSession = (classroomId, sessionData) => {
+    setClassrooms(prev => prev.map(cls => {
+      if (cls.id !== classroomId) return cls;
+      return {
+        ...cls,
+        virtualSession: {
+          ...(cls.virtualSession || {}),
+          ...sessionData
+        },
+        roomLink: sessionData.link || cls.roomLink
+      };
+    }));
+
+    showToast('Sesión Virtual Actualizada', 'La configuración de la videoconferencia ha sido guardada.');
+    return true;
+  };
+
   // Reset demo data
   const resetDemoData = () => {
     localStorage.removeItem(STORAGE_KEY_CLASSROOMS);
@@ -410,6 +428,7 @@ export function AppProvider({ children }) {
         submitActivity,
         gradeSubmission,
         updateStudentAssessment,
+        updateVirtualSession,
         resetDemoData,
         showToast
       }}

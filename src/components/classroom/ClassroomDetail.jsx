@@ -9,6 +9,7 @@ import AttendanceAssessmentModal from '../teacher/AttendanceAssessmentModal';
 import SubmitActivityModal from '../student/SubmitActivityModal';
 import RubricModal from '../coordinator/RubricModal';
 import InstitutionalActaModal from '../reports/InstitutionalActaModal';
+import VirtualSessionPortalModal from './VirtualSessionPortalModal';
 import { calculateStudentGrades } from '../../utils/calculations';
 import { formatDateTime } from '../../utils/dateFormatter';
 import {
@@ -56,6 +57,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
   const [rubricModalOpen, setRubricModalOpen] = useState(false);
   const [attendanceModalOpen, setAttendanceModalOpen] = useState(false);
   const [actaModalOpen, setActaModalOpen] = useState(false);
+  const [virtualPortalOpen, setVirtualPortalOpen] = useState(false);
 
   // Activity-specific modals
   const [gradingActivity, setGradingActivity] = useState(null);
@@ -136,18 +138,16 @@ export default function ClassroomDetail({ classroomId, onBack }) {
             </span>
           </div>
 
-          {/* Quick link to videoconference */}
+          {/* Portal de Videoconferencias Sincrónicas (Google Meet, Zoom, Teams, Aula Virtual) */}
           <div className="mt-4 pt-4 border-t border-white/15 flex flex-wrap items-center gap-3">
-            <a
-              href={classroom.roomLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => { e.preventDefault(); alert(`Accediendo a la sala de videoconferencias IPSUR Meet: ${classroom.roomLink}`); }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold text-ipsur-navy-900 bg-white hover:bg-slate-100 rounded-lg shadow transition"
+            <button
+              onClick={() => setVirtualPortalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-ipsur-navy-900 bg-white hover:bg-slate-100 rounded-xl shadow-md transition group"
             >
-              <Video className="w-3.5 h-3.5 text-ipsur-pink-600" />
-              <span>Unirse a Sesión Virtual (Meet)</span>
-            </a>
+              <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+              <Video className="w-4 h-4 text-ipsur-pink-600 transition-transform group-hover:scale-110" />
+              <span>Portal de Sesión Virtual ({classroom.virtualSession?.platform || 'Meet / Zoom / Aula'})</span>
+            </button>
 
             {/* Quick button to view official rubric loaded by coordinator */}
             <button
@@ -891,6 +891,12 @@ export default function ClassroomDetail({ classroomId, onBack }) {
       <InstitutionalActaModal
         isOpen={actaModalOpen}
         onClose={() => setActaModalOpen(false)}
+        classroom={classroom}
+      />
+
+      <VirtualSessionPortalModal
+        isOpen={virtualPortalOpen}
+        onClose={() => setVirtualPortalOpen(false)}
         classroom={classroom}
       />
 
