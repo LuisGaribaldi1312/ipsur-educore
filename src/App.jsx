@@ -21,8 +21,8 @@ function MainLayout() {
       {/* Top Navbar */}
       <Navbar />
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Main Container: Full width on computer screens, dynamically responsive on tablets & phones */}
+      <main className="flex-1 w-full px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 py-4 sm:py-6 max-w-[1920px] mx-auto">
         {activeClassroomId ? (
           <ClassroomDetail
             classroomId={activeClassroomId}
@@ -39,7 +39,7 @@ function MainLayout() {
 
       {/* Institutional Footer */}
       <footer className="bg-white border-t border-slate-200 mt-12 py-8 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="w-full px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 max-w-[1920px] mx-auto space-y-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <img

@@ -72,68 +72,68 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+      {/* KPI Cards: Responsive on phones (2 cols), tablets (2 cols), and computers (4 cols) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Salas Activas</span>
-            <School className="w-5 h-5 text-ipsur-navy-600" />
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Salas Activas</span>
+            <School className="w-4 h-4 sm:w-5 sm:h-5 text-ipsur-navy-600" />
           </div>
-          <p className="text-2xl font-black text-slate-800">{classrooms.length}</p>
-          <span className="text-[11px] text-emerald-600 font-semibold mt-1 block">
+          <p className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800">{classrooms.length}</p>
+          <span className="text-[10px] sm:text-[11px] text-emerald-600 font-semibold mt-1 block">
             100% Disponibles en línea
           </span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Estudiantes</span>
-            <Users className="w-5 h-5 text-ipsur-pink-500" />
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Estudiantes</span>
+            <Users className="w-4 h-4 sm:w-5 sm:h-5 text-ipsur-pink-500" />
           </div>
-          <p className="text-2xl font-black text-slate-800">{totalStudents}</p>
-          <span className="text-[11px] text-slate-500 mt-1 block font-mono">
-            Grupo PREPA-101-ONLINE
+          <p className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800">{totalStudents}</p>
+          <span className="text-[10px] sm:text-[11px] text-slate-500 mt-1 block font-mono truncate">
+            PREPA-101-ONLINE
           </span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Docentes</span>
-            <BookOpen className="w-5 h-5 text-indigo-600" />
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Docentes</span>
+            <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
           </div>
-          <p className="text-2xl font-black text-slate-800">{totalTeachers}</p>
-          <span className="text-[11px] text-indigo-600 font-semibold mt-1 block">
+          <p className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800">{totalTeachers}</p>
+          <span className="text-[10px] sm:text-[11px] text-indigo-600 font-semibold mt-1 block">
             Asignados a salas
           </span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Ciclo Activo</span>
-            <Calendar className="w-5 h-5 text-purple-600" />
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Ciclo Activo</span>
+            <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
           </div>
-          <p className="text-lg font-black text-slate-800 truncate">1er Bimestre 2026</p>
-          <span className="text-[11px] text-emerald-600 font-semibold mt-1 block">
+          <p className="text-base sm:text-lg md:text-xl font-black text-slate-800 truncate">1er Bimestre 2026</p>
+          <span className="text-[10px] sm:text-[11px] text-emerald-600 font-semibold mt-1 block">
             Modalidad Virtual SEP
           </span>
         </div>
       </div>
 
       {/* Classrooms Management Header & Filters */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-4">
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-bold text-slate-800">
+            <h3 className="text-sm sm:text-base font-bold text-slate-800">
               Salas de Clases Virtuales Registradas
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 mt-0.5">
               Cada sala contiene la rúbrica y temario cargados por Coordinación, el docente titular y los alumnos matriculados.
             </p>
           </div>
 
           <button
             onClick={() => setCreateModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow transition"
+            className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow transition"
           >
             <Plus className="w-4 h-4" />
             <span>Crear Nueva Sala</span>
@@ -141,7 +141,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
         </div>
 
         {/* Filter controls */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-slate-100">
+        <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 pt-2 border-t border-slate-100">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
             <input
@@ -149,14 +149,14 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
               placeholder="Buscar por materia, clave o profesor titular..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-ipsur-navy-500 outline-none"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-ipsur-navy-500 outline-none"
             />
           </div>
 
           <select
             value={selectedPeriod}
             onChange={e => setSelectedPeriod(e.target.value)}
-            className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-ipsur-navy-500 outline-none"
+            className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-ipsur-navy-500 outline-none"
           >
             <option value="all">Todos los Periodos</option>
             {periods.map(p => (
@@ -166,8 +166,8 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
         </div>
       </div>
 
-      {/* Classrooms Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* Classrooms Grid: Full Width on Desktops, 2 columns on tablets, 1 column on phones */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
         {filteredClassrooms.map(cls => {
           const rubricCount = cls.rubric?.topics?.length || 0;
           const studentsCount = cls.enrolledStudentIds?.length || 0;

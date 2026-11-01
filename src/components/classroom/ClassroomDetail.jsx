@@ -186,37 +186,37 @@ export default function ClassroomDetail({ classroomId, onBack }) {
         </div>
       )}
 
-      {/* Criteria Breakdown Pill for all users when configured */}
+      {/* Criteria Breakdown: 2x2 grid on mobile phones, inline flex on tablets and widescreen computers */}
       {classroom.criteriaConfigured && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-3.5 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="bg-white rounded-2xl border border-slate-200 p-3.5 sm:p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg">
+            <span className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg flex-shrink-0">
               <CheckCircle2 className="w-4 h-4" />
             </span>
             <div>
-              <span className="font-bold text-slate-800 block">Criterios de Evaluación Oficiales:</span>
+              <span className="font-bold text-slate-800 block text-xs sm:text-sm">Criterios de Evaluación Oficiales:</span>
               <span className="text-[11px] text-slate-500">Ponderación institucional validada al 100%</span>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="bg-blue-50 text-blue-800 border border-blue-200 px-2.5 py-1 rounded-lg font-semibold">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full md:w-auto">
+            <span className="bg-blue-50 text-blue-800 border border-blue-200 px-2.5 py-1.5 rounded-lg font-semibold text-center sm:text-left">
               Actividades: <strong>{classroom.criteria.activities}%</strong>
             </span>
-            <span className="bg-purple-50 text-purple-800 border border-purple-200 px-2.5 py-1 rounded-lg font-semibold">
-              Examen/Proyecto: <strong>{classroom.criteria.examProject}%</strong>
+            <span className="bg-purple-50 text-purple-800 border border-purple-200 px-2.5 py-1.5 rounded-lg font-semibold text-center sm:text-left">
+              Examen: <strong>{classroom.criteria.examProject}%</strong>
             </span>
-            <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold">
+            <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1.5 rounded-lg font-semibold text-center sm:text-left">
               Asistencia: <strong>{classroom.criteria.attendance}%</strong>
             </span>
-            <span className="bg-pink-50 text-pink-800 border border-pink-200 px-2.5 py-1 rounded-lg font-semibold">
+            <span className="bg-pink-50 text-pink-800 border border-pink-200 px-2.5 py-1.5 rounded-lg font-semibold text-center sm:text-left">
               Participación: <strong>{classroom.criteria.participation}%</strong>
             </span>
 
             {isTeacher && (
               <button
                 onClick={() => setCriteriaModalOpen(true)}
-                className="text-xs text-ipsur-navy-600 hover:text-ipsur-navy-800 underline font-semibold ml-2"
+                className="col-span-2 sm:col-auto text-xs text-center text-ipsur-navy-600 hover:text-ipsur-navy-800 underline font-bold py-1 sm:ml-2"
               >
                 Modificar
               </button>
@@ -225,9 +225,9 @@ export default function ClassroomDetail({ classroomId, onBack }) {
         </div>
       )}
 
-      {/* Classroom Navigation Tabs */}
-      <div className="border-b border-slate-200 bg-white rounded-2xl p-1.5 shadow-sm flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-1">
+      {/* Classroom Navigation Tabs: Swipeable on mobile, fluid on desktop */}
+      <div className="border-b border-slate-200 bg-white rounded-2xl p-1.5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full md:w-auto">
           {[
             { id: 'actividades', label: 'Actividades y Tareas', icon: CheckSquare, count: classroom.activities?.length || 0 },
             { id: 'materiales', label: 'Material de Clase', icon: BookOpen, count: classroom.materials?.length || 0 },
@@ -240,7 +240,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                className={`flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition flex-shrink-0 whitespace-nowrap ${
                   isActive
                     ? 'bg-ipsur-navy-700 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -261,7 +261,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
         </div>
 
         {/* Quick action buttons depending on active tab & role */}
-        <div className="flex items-center gap-2 pr-1">
+        <div className="flex items-center gap-2 w-full md:w-auto justify-end pr-1">
           {isTeacher && activeTab === 'actividades' && (
             <button
               onClick={() => {
@@ -725,7 +725,59 @@ export default function ClassroomDetail({ classroomId, onBack }) {
               </span>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Mobile Card View (phones): Clean spacious cards so nothing is crowded */}
+            <div className="block md:hidden divide-y divide-slate-100">
+              {enrolledStudents.map(student => {
+                const gradeData = calculateStudentGrades(classroom, student.id);
+                return (
+                  <div key={student.id} className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <img src={student.avatar} alt={student.name} className="w-9 h-9 rounded-full object-cover" />
+                        <div>
+                          <p className="font-bold text-slate-800 text-xs">{student.name}</p>
+                          <p className="text-[10px] text-slate-400 font-mono">{student.matricula}</p>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-base font-black text-ipsur-navy-800">{gradeData.finalAverage}</span>
+                        <span className="text-[10px] text-slate-400 font-bold block">/ 100</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">Actividades:</span>
+                        <strong className="text-slate-700">{gradeData.activitiesAvg} pts</strong>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">Examen:</span>
+                        <strong className="text-slate-700">{gradeData.examScore} pts</strong>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">Asistencia:</span>
+                        <strong className="text-slate-700">{gradeData.attendanceScore} pts</strong>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">Participación:</span>
+                        <strong className="text-slate-700">{gradeData.participationScore} pts</strong>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-[11px] text-slate-500 font-medium">Estatus del alumno:</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${gradeData.statusColor}`}>
+                        {gradeData.statusText}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop and Tablet Table View: Expands fully across wide screens */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-100 text-slate-700 uppercase font-bold text-[11px] border-b border-slate-200">
                   <tr>

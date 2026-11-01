@@ -45,8 +45,8 @@ export default function Modal({ isOpen, onClose, title, subtitle, children, maxW
             </button>
           </div>
 
-          {/* Body */}
-          <div className="p-5 sm:p-6 max-h-[80vh] overflow-y-auto">
+          {/* Body with responsive padding */}
+          <div className="p-4 sm:p-6 max-h-[85vh] sm:max-h-[80vh] overflow-y-auto">
             {children}
           </div>
         </div>

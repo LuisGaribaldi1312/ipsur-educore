@@ -52,22 +52,22 @@ export default function Navbar() {
   return (
     <>
       {/* Institutional Top Header */}
-      <div className="bg-gradient-to-r from-ipsur-navy-900 via-ipsur-navy-700 to-ipsur-pink-700 text-white text-xs py-1.5 px-4 shadow-sm">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div className="bg-gradient-to-r from-ipsur-navy-900 via-ipsur-navy-700 to-ipsur-pink-700 text-white text-xs py-1.5 px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 shadow-sm">
+        <div className="w-full max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="font-semibold tracking-wide">INSTITUTO PENINSULAR DEL SUR</span>
+            <span className="font-semibold tracking-wide text-[11px] sm:text-xs">INSTITUTO PENINSULAR DEL SUR</span>
             <span className="hidden sm:inline text-white/50">|</span>
-            <span className="hidden sm:inline italic text-pink-100">"La educación es el camino"</span>
-            <span className="hidden md:inline bg-white/20 text-[10px] px-2 py-0.5 rounded-full font-mono">Prepa en Línea</span>
+            <span className="hidden md:inline italic text-pink-100">"La educación es el camino"</span>
+            <span className="hidden lg:inline bg-white/20 text-[10px] px-2 py-0.5 rounded-full font-mono">Prepa en Línea</span>
           </div>
 
           <div className="flex items-center gap-3 ml-auto text-[11px]">
-            <span className="text-white/80 hidden lg:inline">
+            <span className="text-white/80 hidden xl:inline">
               Toda tu institución. Un solo sistema.
             </span>
             <div className="flex items-center gap-1.5 bg-black/25 px-2.5 py-0.5 rounded-md border border-white/10">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="font-medium text-white">{activePeriod.name}</span>
+              <span className="font-medium text-white text-[10px] sm:text-xs">{activePeriod.name}</span>
             </div>
           </div>
         </div>
@@ -75,35 +75,35 @@ export default function Navbar() {
 
       {/* Main Navbar */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+        <div className="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
+          <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo and Brand Title */}
             <div 
-              className="flex items-center gap-3 sm:gap-4 cursor-pointer select-none"
+              className="flex items-center gap-2.5 sm:gap-4 cursor-pointer select-none min-w-0"
               onClick={() => setActiveClassroomId(null)}
               title="Ir al inicio de IPSUR EDUCORE"
             >
-              <div className="relative group">
+              <div className="relative group flex-shrink-0">
                 <img 
                   src="/ipsur-logo.png" 
                   alt="IPSUR Logo Oficial" 
-                  className="h-14 sm:h-16 w-auto object-contain transition-transform group-hover:scale-105"
+                  className="h-11 sm:h-16 w-auto object-contain transition-transform group-hover:scale-105"
                 />
               </div>
 
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-black tracking-tight text-ipsur-navy-800">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <h1 className="text-lg sm:text-2xl font-black tracking-tight text-ipsur-navy-800 truncate">
                     IPSUR <span className="text-ipsur-pink-500">EDUCORE</span>
                   </h1>
-                  <span className="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider bg-ipsur-navy-50 text-ipsur-navy-700 border border-ipsur-navy-200 px-2 py-0.5 rounded-full">
+                  <span className="hidden md:inline-block text-[10px] font-bold uppercase tracking-wider bg-ipsur-navy-50 text-ipsur-navy-700 border border-ipsur-navy-200 px-2 py-0.5 rounded-full flex-shrink-0">
                     Academic MS
                   </span>
                 </div>
-                <p className="text-[11px] sm:text-xs font-medium text-slate-500 tracking-tight leading-tight hidden xs:block">
+                <p className="text-[10px] sm:text-xs font-semibold text-slate-500 tracking-tight leading-tight truncate">
                   ACADEMIC MANAGEMENT SYSTEM
                 </p>
-                <p className="text-[10px] text-slate-400 hidden md:block">
+                <p className="text-[10px] text-slate-400 hidden xl:block">
                   Gestión académica · Administración · Control escolar · Tecnología
                 </p>
               </div>
