@@ -118,9 +118,21 @@ export const INITIAL_CLASSROOMS = [
     bannerGradient: 'bg-gradient-to-r from-ipsur-navy-800 to-indigo-900',
     teacherId: 'usr-prof-1',
     teacherName: 'Mtra. Sofía Valenzuela Castro',
-    roomLink: 'https://meet.ipsur.edu.mx/clase-mat-101',
+    roomLink: 'https://meet.google.com/new',
     createdAt: '2026-10-01T08:00:00Z',
     coordinatorNote: 'Sala habilitada oficialmente por Coordinación Académica IPSUR. Rúbrica y temario aprobados por SEP/DGB.',
+    
+    // Virtual Session Configuration (Google Meet, Zoom, Aula Virtual)
+    virtualSession: {
+      platform: 'Google Meet',
+      link: 'https://meet.google.com/new',
+      meetingId: '845 2100 101',
+      passcode: 'IPSUR-MAT101',
+      schedule: 'Lunes y Miércoles 18:00 - 19:30 hrs',
+      status: 'live',
+      channelName: 'IPSUR_Matematicas_I_Virtual',
+      topic: 'Clase Sincrónica: Álgebra y Ecuaciones Lineales'
+    },
     
     // Evaluation Criteria configured by teacher (MUST sum to 100)
     criteriaConfigured: true,
@@ -379,9 +391,21 @@ export const INITIAL_CLASSROOMS = [
     bannerGradient: 'bg-gradient-to-r from-ipsur-pink-700 to-pink-900',
     teacherId: 'usr-prof-3',
     teacherName: 'Dr. Fernando Aguilar Cano',
-    roomLink: 'https://meet.ipsur.edu.mx/clase-qui-101',
+    roomLink: 'https://meet.google.com/new',
     createdAt: '2026-10-02T10:00:00Z',
     coordinatorNote: 'Sala habilitada. Pendiente que el docente configure sus criterios de ponderación al 100%.',
+    
+    // Virtual Session Configuration (Simultaneous Class 2)
+    virtualSession: {
+      platform: 'Google Meet',
+      link: 'https://meet.google.com/new',
+      meetingId: '845 2100 102',
+      passcode: 'IPSUR-QUI101',
+      schedule: 'Lunes y Miércoles 18:00 - 19:30 hrs (En Simultáneo)',
+      status: 'live',
+      channelName: 'IPSUR_Quimica_I_Virtual',
+      topic: 'Clase Sincrónica: Estructura Atómica y Tabla Periódica'
+    },
     
     // DEMO OF TEACHER RESTRICTION: Not configured yet!
     criteriaConfigured: false,
@@ -467,9 +491,21 @@ export const INITIAL_CLASSROOMS = [
     bannerGradient: 'bg-gradient-to-r from-purple-900 to-indigo-950',
     teacherId: 'usr-prof-2',
     teacherName: 'Lic. Roberto Garza Treviño',
-    roomLink: 'https://meet.ipsur.edu.mx/clase-tlr-101',
+    roomLink: 'https://meet.google.com/new',
     createdAt: '2026-10-01T09:00:00Z',
     coordinatorNote: 'Curso clave de desarrollo lingüístico y comunicativo para el bachillerato.',
+    
+    // Virtual Session Configuration (Simultaneous Class 3)
+    virtualSession: {
+      platform: 'Google Meet',
+      link: 'https://meet.google.com/new',
+      meetingId: '845 2100 103',
+      passcode: 'IPSUR-TLR101',
+      schedule: 'Lunes y Miércoles 18:00 - 19:30 hrs (En Simultáneo)',
+      status: 'live',
+      channelName: 'IPSUR_Taller_Lectura_I_Virtual',
+      topic: 'Clase Sincrónica: Redacción y Ensayo Académico'
+    },
     
     criteriaConfigured: true,
     criteria: {
