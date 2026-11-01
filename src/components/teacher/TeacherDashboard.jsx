@@ -20,9 +20,7 @@ export default function TeacherDashboard({ onSelectClassroom }) {
 
   // Find classrooms assigned to this teacher
   const myClassrooms = classrooms.filter(c => c.teacherId === currentUser.id);
-
-  // Fallback to all if user is testing with another teacher
-  const displayClassrooms = myClassrooms.length > 0 ? myClassrooms : classrooms;
+  const displayClassrooms = myClassrooms;
 
   const [configuringClassroom, setConfiguringClassroom] = useState(null);
 
@@ -108,108 +106,118 @@ export default function TeacherDashboard({ onSelectClassroom }) {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-          {displayClassrooms.map(cls => {
-            const isConfigured = cls.criteriaConfigured;
-            const activitiesCount = cls.activities?.length || 0;
-            const studentsCount = cls.enrolledStudentIds?.length || 0;
+        {displayClassrooms.length === 0 ? (
+          <div className="bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center space-y-2">
+            <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+            <h4 className="text-sm font-bold text-slate-700">Sin materias asignadas actualmente</h4>
+            <p className="text-xs text-slate-400 max-w-md mx-auto">
+              Tu Coordinación Escolar o Dirección te asignarán las salas virtuales del periodo en cuanto la programación académica esté formalizada.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+            {displayClassrooms.map(cls => {
+              const isConfigured = cls.criteriaConfigured;
+              const activitiesCount = cls.activities?.length || 0;
+              const studentsCount = cls.enrolledStudentIds?.length || 0;
 
-            return (
-              <div
-                key={cls.id}
-                className="executive-card rounded-2xl overflow-hidden flex flex-col justify-between group hover:-translate-y-1"
-              >
-                {/* Header */}
-                <div className="p-5 bg-gradient-to-r from-[#0E1229] via-[#1E1B4B] to-[#500030] text-white">
-                  <div className="flex items-center justify-between text-xs mb-2.5">
-                    <span className="font-mono bg-white/15 px-2.5 py-0.5 rounded-md font-bold tracking-wider text-[10px] border border-white/10">
-                      {cls.code}
-                    </span>
-                    <span className="bg-gradient-to-r from-ipsur-pink-500 to-rose-600 text-white font-bold px-2.5 py-0.5 rounded-full text-[10px] shadow-sm">
-                      {cls.periodName}
-                    </span>
+              return (
+                <div
+                  key={cls.id}
+                  className="executive-card rounded-2xl overflow-hidden flex flex-col justify-between group hover:-translate-y-1"
+                >
+                  {/* Header */}
+                  <div className="p-5 bg-gradient-to-r from-[#0E1229] via-[#1E1B4B] to-[#500030] text-white">
+                    <div className="flex items-center justify-between text-xs mb-2.5">
+                      <span className="font-mono bg-white/15 px-2.5 py-0.5 rounded-md font-bold tracking-wider text-[10px] border border-white/10">
+                        {cls.code}
+                      </span>
+                      <span className="bg-gradient-to-r from-ipsur-pink-500 to-rose-600 text-white font-bold px-2.5 py-0.5 rounded-full text-[10px] shadow-sm">
+                        {cls.periodName}
+                      </span>
+                    </div>
+
+                    <h3 className="font-display text-base font-bold text-white line-clamp-1 group-hover:text-pink-200 transition-colors">
+                      {cls.name}
+                    </h3>
+                    <p className="text-xs text-indigo-200/90 mt-1 font-medium">
+                      Grupo: {cls.group} · {studentsCount} Alumnos
+                    </p>
                   </div>
 
-                  <h3 className="font-display text-base font-bold text-white line-clamp-1 group-hover:text-pink-200 transition-colors">
-                    {cls.name}
-                  </h3>
-                  <p className="text-xs text-indigo-200/90 mt-1 font-medium">
-                    Grupo: {cls.group} · {studentsCount} Alumnos
-                  </p>
-                </div>
+                  {/* Criteria Pill & Status */}
+                  <div className="p-4 space-y-3 text-xs flex-1">
+                    {isConfigured ? (
+                      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 space-y-1.5">
+                        <div className="flex items-center justify-between text-emerald-800 font-bold">
+                          <span className="flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            Ponderación 100% Configurada
+                          </span>
+                          <button
+                            onClick={() => setConfiguringClassroom(cls)}
+                            className="text-[11px] underline text-emerald-700 hover:text-emerald-900"
+                          >
+                            Editar
+                          </button>
+                        </div>
 
-                {/* Criteria Pill & Status */}
-                <div className="p-4 space-y-3 text-xs flex-1">
-                  {isConfigured ? (
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 space-y-1.5">
-                      <div className="flex items-center justify-between text-emerald-800 font-bold">
-                        <span className="flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          Ponderación 100% Configurada
-                        </span>
+                        <div className="grid grid-cols-2 gap-1 text-[11px] text-emerald-900 font-medium">
+                          <span>• Actividades: {cls.criteria.activities}%</span>
+                          <span>• Examen: {cls.criteria.examProject}%</span>
+                          <span>• Asistencia: {cls.criteria.attendance}%</span>
+                          <span>• Participación: {cls.criteria.participation}%</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 space-y-2">
+                        <div className="flex items-center gap-1.5 text-rose-800 font-bold">
+                          <AlertTriangle className="w-4 h-4 text-rose-600" />
+                          <span>Ponderación Pendiente (Bloqueada)</span>
+                        </div>
+                        <p className="text-[11px] text-rose-700">
+                          Configura el 100% reglamentario para poder asignar actividades y tareas.
+                        </p>
                         <button
                           onClick={() => setConfiguringClassroom(cls)}
-                          className="text-[11px] underline text-emerald-700 hover:text-emerald-900"
+                          className="w-full text-center py-1.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition"
                         >
-                          Editar
+                          Configurar Criterios Ahora
                         </button>
                       </div>
+                    )}
 
-                      <div className="grid grid-cols-2 gap-1 text-[11px] text-emerald-900 font-medium">
-                        <span>• Actividades: {cls.criteria.activities}%</span>
-                        <span>• Examen: {cls.criteria.examProject}%</span>
-                        <span>• Asistencia: {cls.criteria.attendance}%</span>
-                        <span>• Participación: {cls.criteria.participation}%</span>
-                      </div>
+                    {/* Summary of items */}
+                    <div className="flex items-center justify-between pt-1 text-slate-600">
+                      <span>Actividades asignadas:</span>
+                      <strong className="text-slate-800 font-bold">{activitiesCount}</strong>
                     </div>
-                  ) : (
-                    <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 space-y-2">
-                      <div className="flex items-center gap-1.5 text-rose-800 font-bold">
-                        <AlertTriangle className="w-4 h-4 text-rose-600" />
-                        <span>Ponderación Pendiente (Bloqueada)</span>
-                      </div>
-                      <p className="text-[11px] text-rose-700">
-                        Configura el 100% reglamentario para poder asignar actividades y tareas.
-                      </p>
-                      <button
-                        onClick={() => setConfiguringClassroom(cls)}
-                        className="w-full text-center py-1.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition"
-                      >
-                        Configurar Criterios Ahora
-                      </button>
-                    </div>
-                  )}
 
-                  {/* Summary of items */}
-                  <div className="flex items-center justify-between pt-1 text-slate-600">
-                    <span>Actividades asignadas:</span>
-                    <strong className="text-slate-800 font-bold">{activitiesCount}</strong>
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Recursos didácticos:</span>
+                      <strong className="text-slate-800 font-bold">{cls.materials?.length || 0}</strong>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-slate-600">
-                    <span>Recursos didácticos:</span>
-                    <strong className="text-slate-800 font-bold">{cls.materials?.length || 0}</strong>
+                  {/* Footer */}
+                  <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      IPSUR Prepa
+                    </span>
+
+                    <button
+                      onClick={() => onSelectClassroom(cls.id)}
+                      className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-ipsur-navy-700 hover:bg-ipsur-navy-800 rounded-xl shadow-sm transition"
+                    >
+                      <span>Abrir Classroom</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
-
-                {/* Footer */}
-                <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-400 font-mono">
-                    IPSUR Prepa
-                  </span>
-
-                  <button
-                    onClick={() => onSelectClassroom(cls.id)}
-                    className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-ipsur-navy-700 hover:bg-ipsur-navy-800 rounded-xl shadow-sm transition"
-                  >
-                    <span>Abrir Classroom</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Criteria Modal */}

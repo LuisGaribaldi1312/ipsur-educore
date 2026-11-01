@@ -5,14 +5,48 @@ import { getDeadlineStatus } from '../utils/dateFormatter';
 
 const AppContext = createContext();
 
-const STORAGE_KEY_CLASSROOMS = 'ipsur_educore_classrooms_v1';
-const STORAGE_KEY_USER = 'ipsur_educore_current_user_v1';
+const STORAGE_KEY_CLASSROOMS = 'ipsur_educore_classrooms_v2';
+const STORAGE_KEY_USERS = 'ipsur_educore_users_v2';
+const STORAGE_KEY_USER = 'ipsur_educore_current_user_v2';
 
 export function AppProvider({ children }) {
-  // Load current user
+  // Purge legacy demo keys if present
+  useEffect(() => {
+    try {
+      localStorage.removeItem('ipsur_educore_classrooms_v1');
+      localStorage.removeItem('ipsur_educore_current_user_v1');
+    } catch (e) {
+      // Ignore
+    }
+  }, []);
+
+  // Load and manage users in state with localStorage persistence
+  const [users, setUsers] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_USERS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Guarantee that the superadmin account is always present with its secret flag
+          const hasSuperAdmin = parsed.some(u => u.isSuperAdmin || u.role === 'superadmin');
+          if (!hasSuperAdmin) {
+            return [USERS[0], ...parsed];
+          }
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.error('Error loading users from localStorage', e);
+    }
+    return USERS;
+  });
+
+  // Current authenticated user ID
   const [currentUserId, setCurrentUserId] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY_USER);
-    return saved || 'usr-coord-1'; // Default as Coordinador Escolar
+    if (saved) return saved;
+    // Default to Super Admin so platform owner can immediately operate
+    return 'usr-superadmin';
   });
 
   // Load classrooms with localStorage fallback
@@ -28,6 +62,9 @@ export function AppProvider({ children }) {
 
   const [activeClassroomId, setActiveClassroomId] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [userManagerModalOpen, setUserManagerModalOpen] = useState(false);
+
   const toastTimerRef = useRef(null);
 
   const clearNotification = () => {
@@ -41,14 +78,26 @@ export function AppProvider({ children }) {
   // Sync to localStorage
   useEffect(() => {
     try {
+      localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+    } catch (e) {
+      console.error('Error saving users to localStorage', e);
+    }
+  }, [users]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(STORAGE_KEY_CLASSROOMS, JSON.stringify(classrooms));
     } catch (e) {
-      console.error('Error saving to localStorage', e);
+      console.error('Error saving classrooms to localStorage', e);
     }
   }, [classrooms]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_USER, currentUserId);
+    if (currentUserId) {
+      localStorage.setItem(STORAGE_KEY_USER, currentUserId);
+    } else {
+      localStorage.removeItem(STORAGE_KEY_USER);
+    }
   }, [currentUserId]);
 
   // Clean up timer on unmount
@@ -74,20 +123,208 @@ export function AppProvider({ children }) {
     }, 3000);
   };
 
-  const currentUser = USERS.find(u => u.id === currentUserId) || USERS[0];
+  // Current User Object
+  const currentUser = users.find(u => u.id === currentUserId) || users[0] || USERS[0];
+  const isSuperAdmin = currentUser?.role === 'superadmin' || currentUser?.isSuperAdmin;
 
-  // Helper: Switch user role
-  const switchUser = (userId) => {
-    setCurrentUserId(userId);
-    const user = USERS.find(u => u.id === userId);
+  // STRICT HIDDEN USER FILTER:
+  // Non-superadmin users CANNOT see the Super Usuario in any list, table, or directory
+  const visibleUsers = users.filter(u => {
+    if (u.hidden || u.isSuperAdmin || u.role === 'superadmin') {
+      return isSuperAdmin && currentUser.id === u.id;
+    }
+    return true;
+  });
+
+  // Authentication: Login with Email or Matrícula + Password
+  const login = (identifier, password) => {
+    if (!identifier || !password) {
+      showToast('Credenciales Requeridas', 'Por favor ingresa usuario y contraseña.', 'error');
+      return { success: false, message: 'Campos requeridos' };
+    }
+
+    const cleanIdentifier = identifier.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
+    const foundUser = users.find(u => 
+      (u.email?.toLowerCase() === cleanIdentifier || u.matricula?.toLowerCase() === cleanIdentifier) &&
+      u.password === cleanPassword
+    );
+
+    if (!foundUser) {
+      showToast('Acceso Denegado', 'Correo, matrícula o contraseña incorrectos.', 'error');
+      return { success: false, message: 'Credenciales inválidas' };
+    }
+
+    if (foundUser.status === 'inactive') {
+      showToast('Usuario Desactivado', 'Tu cuenta se encuentra inactiva. Contacta a la Dirección.', 'error');
+      return { success: false, message: 'Cuenta desactivada' };
+    }
+
+    setCurrentUserId(foundUser.id);
+    setLoginModalOpen(false);
+
     showToast(
-      `Rol cambiado a ${user?.role === 'coordinator' ? 'Coordinador' : user?.role === 'teacher' ? 'Profesor' : 'Estudiante'}`,
-      `Iniciaste sesión como ${user?.name}`,
+      'Acceso Autorizado',
+      `Bienvenido(a) a IPSUR EDUCORE, ${foundUser.name}`,
+      'success'
+    );
+    return { success: true, user: foundUser };
+  };
+
+  // Logout
+  const logout = () => {
+    setCurrentUserId(null);
+    setActiveClassroomId(null);
+    setLoginModalOpen(true);
+    showToast('Sesión Concluida', 'Has salido del sistema de forma segura.', 'info');
+  };
+
+  // Switch User (Role Simulator / Fast Testing)
+  const switchUser = (userId) => {
+    const targetUser = users.find(u => u.id === userId);
+    if (!targetUser) return;
+    
+    // Non-superadmins cannot switch into superadmin
+    if ((targetUser.isSuperAdmin || targetUser.role === 'superadmin') && !isSuperAdmin) {
+      showToast('Acceso Prohibido', 'No tienes autorización para acceder a esta cuenta de seguridad.', 'error');
+      return;
+    }
+
+    setCurrentUserId(userId);
+    setActiveClassroomId(null);
+    showToast(
+      `Perfil Activo: ${targetUser.name}`,
+      `Rol: ${targetUser.title || targetUser.role}`,
       'info'
     );
   };
 
-  // Coordinator: Create Classroom
+  // User Management: Create User
+  const createUser = ({
+    name,
+    email,
+    password,
+    role,
+    matricula,
+    title,
+    specialty,
+    shift,
+    phone
+  }) => {
+    // Permission checks
+    if (currentUser.role === 'coordinator' && (role === 'director' || role === 'superadmin')) {
+      showToast('Permiso Denegado', 'Un Coordinador no tiene permisos para crear Directores o Administradores.', 'error');
+      return false;
+    }
+    if (currentUser.role === 'director' && role === 'superadmin') {
+      showToast('Permiso Denegado', 'El Super Administrador es un rol reservado del sistema.', 'error');
+      return false;
+    }
+
+    // Email validation
+    const emailExists = users.some(u => u.email?.toLowerCase() === email.trim().toLowerCase());
+    if (emailExists) {
+      showToast('Correo Duplicado', 'Ya existe un usuario registrado con este correo electrónico.', 'error');
+      return false;
+    }
+
+    const newId = `usr-${role}-${Date.now()}`;
+    const newUser = {
+      id: newId,
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      password: password ? password.trim() : 'Ipsur2026*',
+      role, // 'director' | 'coordinator' | 'teacher' | 'student'
+      isSuperAdmin: false,
+      hidden: false,
+      title: title?.trim() || (
+        role === 'director' ? 'Director General Institucional' :
+        role === 'coordinator' ? 'Coordinador Académico' :
+        role === 'teacher' ? 'Docente Titular' :
+        'Estudiante de Bachillerato Virtual'
+      ),
+      avatar: `https://images.unsplash.com/photo-${role === 'student' ? '1539571696357-5a69c17a67c6' : '1573496359142-b8d87734a5a2'}?w=150&auto=format&fit=crop&q=80`,
+      matricula: matricula?.trim() || `IPS-${role.substring(0, 3).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`,
+      specialty: specialty || 'General',
+      shift: shift || 'En Línea',
+      phone: phone || '+52 (998) 845-2100',
+      createdAt: new Date().toISOString(),
+      status: 'active'
+    };
+
+    setUsers(prev => [newUser, ...prev]);
+    showToast('Usuario Creado', `El usuario ${newUser.name} ha sido dado de alta exitosamente con rol de ${newUser.title}.`);
+    return newUser;
+  };
+
+  // User Management: Update User
+  const updateUser = (userId, updatedFields) => {
+    const target = users.find(u => u.id === userId);
+    if (!target) return false;
+
+    // Security: non-superadmin cannot update superadmin
+    if ((target.isSuperAdmin || target.role === 'superadmin') && !isSuperAdmin) {
+      showToast('Acceso Denegado', 'No puedes modificar la cuenta del Super Administrador.', 'error');
+      return false;
+    }
+
+    setUsers(prev => prev.map(u => {
+      if (u.id !== userId) return u;
+      return {
+        ...u,
+        ...updatedFields
+      };
+    }));
+
+    showToast('Usuario Actualizado', 'Los datos del usuario han sido guardados.');
+    return true;
+  };
+
+  // User Management: Delete User
+  const deleteUser = (userId) => {
+    const target = users.find(u => u.id === userId);
+    if (!target) return false;
+
+    if (target.isSuperAdmin || target.role === 'superadmin') {
+      showToast('Operación Bloqueada', 'El Super Administrador no puede ser eliminado.', 'error');
+      return false;
+    }
+
+    if (target.id === currentUser.id) {
+      showToast('Operación Bloqueada', 'No puedes eliminar tu propio usuario en sesión activa.', 'error');
+      return false;
+    }
+
+    setUsers(prev => prev.filter(u => u.id !== userId));
+    showToast('Usuario Eliminado', `El usuario ${target.name} ha sido eliminado permanentemente.`);
+    return true;
+  };
+
+  // User Management: Toggle Status (Active / Inactive)
+  const toggleUserStatus = (userId) => {
+    const target = users.find(u => u.id === userId);
+    if (!target) return false;
+
+    if (target.isSuperAdmin || target.role === 'superadmin') {
+      showToast('Operación Bloqueada', 'El Super Administrador no puede ser desactivado.', 'error');
+      return false;
+    }
+
+    const newStatus = target.status === 'inactive' ? 'active' : 'inactive';
+    setUsers(prev => prev.map(u => {
+      if (u.id !== userId) return u;
+      return { ...u, status: newStatus };
+    }));
+
+    showToast(
+      'Estado Actualizado',
+      `El usuario ${target.name} ahora se encuentra ${newStatus === 'active' ? 'ACTIVO' : 'INACTIVO'}.`
+    );
+    return true;
+  };
+
+  // Coordinator/Director: Create Classroom
   const createClassroom = ({
     name,
     code,
@@ -98,34 +335,36 @@ export function AppProvider({ children }) {
     rubricTopics,
     enrolledStudentIds
   }) => {
-    const teacher = USERS.find(u => u.id === teacherId);
+    const teacher = users.find(u => u.id === teacherId);
     const period = PERIODS.find(p => p.id === periodId) || PERIODS[0];
+
+    const cleanCode = code ? code.trim() : `IPS-${Math.floor(100 + Math.random() * 900)}`;
 
     const newClassroom = {
       id: `cls-${Date.now()}`,
-      code: code || `IPS-${Math.floor(100 + Math.random() * 900)}`,
-      name,
+      code: cleanCode,
+      name: name.trim(),
       group: group || 'PREPA-101-ONLINE',
       periodId: period.id,
       periodName: period.name,
       modality: 'Prepa en Línea',
       color: 'from-blue-700 via-indigo-800 to-ipsur-navy-700',
       bannerGradient: 'bg-gradient-to-r from-ipsur-navy-800 to-indigo-900',
-      teacherId: teacher?.id || 'usr-prof-1',
-      teacherName: teacher?.name || 'Docente Asignado',
-      roomLink: `https://meet.jit.si/IPSUR_${code.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
+      teacherId: teacher?.id || '',
+      teacherName: teacher?.name || 'Docente Pendiente de Asignación',
+      roomLink: `https://meet.jit.si/IPSUR_${cleanCode.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
       virtualSession: {
         platform: 'Aula Virtual IPSUR',
-        link: `https://meet.jit.si/IPSUR_${code.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
-        meetingId: code,
+        link: `https://meet.jit.si/IPSUR_${cleanCode.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
+        meetingId: cleanCode,
         passcode: 'IPSUR2026',
         schedule: 'Lunes y Miércoles 18:00 - 19:30 hrs',
         status: 'live',
-        channelName: `IPSUR_${code.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
+        channelName: `IPSUR_${cleanCode.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
         topic: `Clase Virtual en Vivo · ${name}`
       },
       createdAt: new Date().toISOString(),
-      coordinatorNote: 'Sala habilitada oficialmente por Coordinación Académica IPSUR.',
+      coordinatorNote: `Sala habilitada oficialmente por ${currentUser.name} (${currentUser.title}).`,
       criteriaConfigured: false,
       criteria: {
         activities: 0,
@@ -134,10 +373,10 @@ export function AppProvider({ children }) {
         participation: 0
       },
       rubric: {
-        uploadedBy: `${currentUser.name} (Coordinación Escolar)`,
+        uploadedBy: `${currentUser.name} (${currentUser.title})`,
         uploadedAt: new Date().toISOString(),
         periodDuration: period.type,
-        generalObjective: rubricObjective || 'Desarrollar competencias disciplinares y de aprendizaje autónomo en la materia.',
+        generalObjective: rubricObjective || 'Desarrollar competencias disciplinares y de aprendizaje autónomo en la materia conforme al plan SEP/IPSUR.',
         competencies: [
           'Aplica el pensamiento crítico y analítico en los problemas del área.',
           'Demuestra dominio de los conceptos esenciales del plan de estudios IPSUR.',
@@ -171,7 +410,7 @@ export function AppProvider({ children }) {
         ],
         evaluationNote: 'El profesor titular asignará los porcentajes de evaluación (Actividades, Examen/Proyecto, Asistencia, Participación) sumando exactamente 100%.'
       },
-      enrolledStudentIds: enrolledStudentIds && enrolledStudentIds.length > 0 ? enrolledStudentIds : USERS.filter(u => u.role === 'student').map(s => s.id),
+      enrolledStudentIds: enrolledStudentIds && enrolledStudentIds.length > 0 ? enrolledStudentIds : users.filter(u => u.role === 'student').map(s => s.id),
       materials: [],
       activities: [],
       submissions: [],
@@ -179,7 +418,7 @@ export function AppProvider({ children }) {
     };
 
     setClassrooms(prev => [newClassroom, ...prev]);
-    showToast('Sala creada con éxito', `La sala "${name}" ha sido creada y asignada a ${teacher?.name || 'el docente'}.`);
+    showToast('Sala creada con éxito', `La sala "${name}" ha sido creada con código ${cleanCode}.`);
     return newClassroom;
   };
 
@@ -192,7 +431,7 @@ export function AppProvider({ children }) {
         rubric: {
           ...cls.rubric,
           ...updatedRubric,
-          uploadedBy: `${currentUser.name} (Coordinación Escolar)`,
+          uploadedBy: `${currentUser.name} (${currentUser.title})`,
           uploadedAt: new Date().toISOString()
         }
       };
@@ -432,21 +671,14 @@ export function AppProvider({ children }) {
     return true;
   };
 
-  // Reset demo data
-  const resetDemoData = () => {
-    localStorage.removeItem(STORAGE_KEY_CLASSROOMS);
-    localStorage.removeItem(STORAGE_KEY_USER);
-    setClassrooms(INITIAL_CLASSROOMS);
-    setCurrentUserId('usr-coord-1');
-    showToast('Datos reiniciados', 'Se han restaurado los datos originales de IPSUR EDUCORE.');
-  };
-
   return (
     <AppContext.Provider
       value={{
         currentUser,
         currentUserId,
-        users: USERS,
+        users: visibleUsers,      // Strictly filtered: non-superadmin NEVER sees Super Admin
+        allUsers: users,          // Raw list for Super Admin only
+        isSuperAdmin,
         periods: PERIODS,
         institutionalInfo: INSTITUTIONAL_INFO,
         classrooms,
@@ -454,7 +686,17 @@ export function AppProvider({ children }) {
         setActiveClassroomId,
         notification,
         clearNotification,
+        loginModalOpen,
+        setLoginModalOpen,
+        userManagerModalOpen,
+        setUserManagerModalOpen,
+        login,
+        logout,
         switchUser,
+        createUser,
+        updateUser,
+        deleteUser,
+        toggleUserStatus,
         createClassroom,
         updateClassroomRubric,
         updateClassroomEnrollment,
@@ -465,7 +707,6 @@ export function AppProvider({ children }) {
         gradeSubmission,
         updateStudentAssessment,
         updateVirtualSession,
-        resetDemoData,
         showToast
       }}
     >

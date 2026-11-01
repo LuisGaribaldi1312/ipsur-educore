@@ -713,8 +713,17 @@ export default function StudentDashboard({ onSelectClassroom }) {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-            {enrolledClassrooms.map(cls => {
+          {enrolledClassrooms.length === 0 ? (
+            <div className="bg-white rounded-3xl border-2 border-dashed border-slate-200 p-12 text-center space-y-2">
+              <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-2" />
+              <h4 className="text-sm font-bold text-slate-700">Sin asignaturas matriculadas actualmente</h4>
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
+                Tu Coordinación Escolar registrará tus materias del ciclo escolar. En cuanto estén asignadas aparecerán aquí con su temario y actividades.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+              {enrolledClassrooms.map(cls => {
               const grades = calculateStudentGrades(cls, currentUser.id);
               const pendingTasks = (cls.activities || []).filter(act => {
                 const sub = (cls.submissions || []).find(s => s.activityId === act.id && s.studentId === currentUser.id);
@@ -804,7 +813,8 @@ export default function StudentDashboard({ onSelectClassroom }) {
               );
             })}
           </div>
-        </div>
+        )}
+      </div>
       )}
 
       {/* TAB 3: MI BOLETA DE CALIFICACIONES OFICIAL */}
@@ -948,7 +958,14 @@ export default function StudentDashboard({ onSelectClassroom }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {enrolledClassrooms.map(cls => {
+                  {enrolledClassrooms.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" className="p-8 text-center text-slate-400">
+                        No hay materias inscritas en este ciclo escolar actualmente.
+                      </td>
+                    </tr>
+                  ) : (
+                    enrolledClassrooms.map(cls => {
                     const gradeData = calculateStudentGrades(cls, currentUser.id);
                     const isConf = gradeData?.isConfigured;
 
@@ -1026,7 +1043,8 @@ export default function StudentDashboard({ onSelectClassroom }) {
                         </td>
                       </tr>
                     );
-                  })}
+                  })
+                )}
                 </tbody>
               </table>
             </div>

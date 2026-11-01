@@ -298,20 +298,28 @@ export default function CreateClassroomModal({ isOpen, onClose }) {
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-                    Profesor Titular Asignado *
+                    Profesor Titular Asignado
                   </label>
                   <select
-                    required
                     value={teacherId}
                     onChange={e => setTeacherId(e.target.value)}
                     className="w-full px-3.5 py-2.5 text-xs font-bold bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-ipsur-navy-500 outline-none text-slate-900"
                   >
-                    {teachers.map(t => (
-                      <option key={t.id} value={t.id}>
-                        {t.name} — {t.title}
-                      </option>
-                    ))}
+                    {teachers.length === 0 ? (
+                      <option value="">-- Sin docentes registrados aún --</option>
+                    ) : (
+                      teachers.map(t => (
+                        <option key={t.id} value={t.id}>
+                          {t.name} — {t.title}
+                        </option>
+                      ))
+                    )}
                   </select>
+                  {teachers.length === 0 && (
+                    <p className="text-[11px] text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-200 mt-2 font-medium">
+                      ⚠️ Aún no has registrado docentes en el sistema. Puedes dar de alta profesores desde el módulo de <strong>Gestión de Usuarios</strong>.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -322,18 +330,24 @@ export default function CreateClassroomModal({ isOpen, onClose }) {
                     Ficha del Docente Titular
                   </span>
 
-                  <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                    <img 
-                      src={selectedTeacher?.avatar} 
-                      alt={selectedTeacher?.name} 
-                      className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-ipsur-navy-100 flex-shrink-0"
-                    />
-                    <div className="min-w-0">
-                      <h5 className="text-xs font-bold text-slate-900 truncate">{selectedTeacher?.name}</h5>
-                      <p className="text-[11px] text-ipsur-pink-600 font-semibold truncate">{selectedTeacher?.title}</p>
-                      <p className="text-[10px] text-slate-400 font-mono truncate">{selectedTeacher?.email}</p>
+                  {selectedTeacher ? (
+                    <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                      <img 
+                        src={selectedTeacher?.avatar} 
+                        alt={selectedTeacher?.name} 
+                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-ipsur-navy-100 flex-shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <h5 className="text-xs font-bold text-slate-900 truncate">{selectedTeacher?.name}</h5>
+                        <p className="text-[11px] text-ipsur-pink-600 font-semibold truncate">{selectedTeacher?.title}</p>
+                        <p className="text-[10px] text-slate-400 font-mono truncate">{selectedTeacher?.email}</p>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="bg-white p-3.5 rounded-xl border border-dashed border-slate-300 text-center text-slate-400 text-xs">
+                      Pendiente de asignación docente
+                    </div>
+                  )}
 
                   <p className="text-[11px] text-slate-500 leading-relaxed">
                     Al guardar la sala, este docente recibirá acceso titular para configurar su ponderación al 100%, publicar materiales y calificar a los alumnos matriculados.
@@ -540,7 +554,15 @@ export default function CreateClassroomModal({ isOpen, onClose }) {
 
             {/* Students Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[260px] overflow-y-auto pr-1">
-              {filteredStudents.map(s => {
+              {filteredStudents.length === 0 ? (
+                <div className="col-span-1 sm:col-span-2 p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-300 text-slate-500 text-xs space-y-1">
+                  <p className="font-bold text-slate-700">Sin estudiantes registrados para matricular</p>
+                  <p className="text-[11px] text-slate-400">
+                    Puedes dar de alta alumnos desde el módulo de <strong>Gestión de Usuarios</strong> y asignarlos posteriormente a esta sala.
+                  </p>
+                </div>
+              ) : (
+                filteredStudents.map(s => {
                 const isChecked = selectedStudentIds.includes(s.id);
                 return (
                   <div
@@ -573,7 +595,8 @@ export default function CreateClassroomModal({ isOpen, onClose }) {
                     </div>
                   </div>
                 );
-              })}
+              })
+              )}
             </div>
 
             {/* Summary Box before finalizing */}

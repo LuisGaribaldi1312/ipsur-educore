@@ -28,7 +28,7 @@ function MainLayout() {
             classroomId={activeClassroomId}
             onBack={() => setActiveClassroomId(null)}
           />
-        ) : currentUser.role === 'coordinator' ? (
+        ) : (currentUser.role === 'coordinator' || currentUser.role === 'director' || currentUser.role === 'superadmin') ? (
           <CoordinatorDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
         ) : currentUser.role === 'teacher' ? (
           <TeacherDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
