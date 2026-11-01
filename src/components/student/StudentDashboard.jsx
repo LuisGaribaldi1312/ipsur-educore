@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import CountdownBadge from '../common/CountdownBadge';
-import LiveClock from '../common/LiveClock';
 import StudentGeneralBoletaModal from './StudentGeneralBoletaModal';
 import { calculateStudentGrades } from '../../utils/calculations';
 import { getDeadlineStatus, formatDateTime } from '../../utils/dateFormatter';
@@ -180,9 +179,6 @@ export default function StudentDashboard({ onSelectClassroom }) {
           </p>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            {/* Real-time Clock in Student Banner */}
-            <LiveClock variant="hero" />
-
             <button
               onClick={() => setMainTab('boleta')}
               className="bg-white/15 hover:bg-white/25 border border-white/20 px-4 py-2 rounded-2xl flex items-center gap-3 shadow-sm transition text-left group"

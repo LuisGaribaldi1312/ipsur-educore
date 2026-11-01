@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import CreateClassroomModal from './CreateClassroomModal';
 import RubricModal from './RubricModal';
-import LiveClock from '../common/LiveClock';
 import { 
   Plus, 
   School, 
@@ -65,9 +64,6 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            {/* Real-time Clock in Coordinator Banner */}
-            <LiveClock variant="hero" />
-
             <button
               onClick={() => setCreateModalOpen(true)}
               className="flex items-center gap-2 px-6 py-3 text-xs sm:text-sm font-bold text-ipsur-navy-900 bg-white hover:bg-slate-100 rounded-xl shadow-lg transition active:scale-95"

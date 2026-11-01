@@ -119,9 +119,6 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Central Executive Real-time Clock Widget */}
-            <LiveClock variant="executive" />
-
             {/* Right Controls: Navigation, Role Switcher, User Avatar */}
             <div className="flex items-center gap-2 sm:gap-3.5">
               {/* Back to dashboard button when inside a classroom */}
