@@ -37,7 +37,11 @@ import {
   Percent,
   AlertTriangle,
   ShieldCheck,
-  Info
+  Info,
+  Filter,
+  Search,
+  Download,
+  GraduationCap
 } from 'lucide-react';
 
 export default function ClassroomDetail({ classroomId, onBack }) {
@@ -51,6 +55,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
 
   // Active tab inside classroom
   const [activeTab, setActiveTab] = useState('actividades'); // 'novedades' | 'rubrica' | 'materiales' | 'actividades' | 'calificaciones'
+  const [activityFilter, setActivityFilter] = useState('all'); // 'all' | 'pending' | 'submitted' | 'graded'
 
   // Modal controls
   const [criteriaModalOpen, setCriteriaModalOpen] = useState(false);
@@ -87,36 +92,41 @@ export default function ClassroomDetail({ classroomId, onBack }) {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
-      {/* Top Breadcrumb & Return */}
-      <div className="flex items-center justify-between">
+      {/* Top Breadcrumb & Return Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 sm:px-4 rounded-2xl border border-slate-200 shadow-xs">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-ipsur-navy-700 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm transition"
+          className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-ipsur-navy-800 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3.5 py-2 rounded-xl shadow-xs transition group"
+          title="Regresar al panel principal de salas"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 text-slate-500 group-hover:-translate-x-0.5 transition-transform" />
           <span>Volver a Mis Salas</span>
         </button>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500 font-mono hidden sm:inline">
-            Código: <strong className="text-slate-700">{classroom.code}</strong>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">
+            Código: <strong className="text-slate-900">{classroom.code}</strong>
           </span>
-          <span className="text-xs bg-ipsur-pink-50 text-ipsur-pink-700 font-bold px-2.5 py-0.5 rounded-full border border-ipsur-pink-200">
+          <span className="bg-gradient-to-r from-ipsur-pink-500 to-rose-600 text-white font-bold px-3 py-1 rounded-lg shadow-xs">
             {classroom.periodName}
+          </span>
+          <span className="hidden sm:inline-flex items-center gap-1.5 bg-ipsur-navy-50 text-ipsur-navy-800 font-bold px-3 py-1 rounded-lg border border-ipsur-navy-200">
+            <Sparkles className="w-3.5 h-3.5 text-ipsur-pink-500" />
+            <span>{classroom.modality || 'Prepa en Línea'}</span>
           </span>
         </div>
       </div>
 
       {/* Classroom Hero Banner with enlarged executive emblem */}
-      <div className="rounded-3xl overflow-hidden shadow-xl border border-white/10 bg-gradient-to-r from-[#0A0D1B] via-[#141B41] to-[#750042] text-white p-6 sm:p-8 md:p-9 relative">
+      <div className="rounded-3xl overflow-hidden shadow-xl border border-white/10 bg-gradient-to-r from-[#090C1B] via-[#131742] to-[#69003B] text-white p-6 sm:p-8 md:p-9 relative">
         <div className="relative z-10 max-w-3xl">
           <div className="flex items-center gap-3.5 mb-3.5">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-md p-2 flex items-center justify-center border border-white/20 shadow-2xl flex-shrink-0">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-md p-2 flex items-center justify-center border border-white/20 shadow-2xl flex-shrink-0">
               <img src="/ipsur-logo.png" alt="IPSUR Logo" className="w-full h-full object-contain filter drop-shadow-[0_2px_10px_rgba(255,255,255,0.25)]" />
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest bg-gradient-to-r from-ipsur-pink-500 to-rose-600 text-white px-3 py-0.5 rounded-full shadow-sm">
-                Prepa en Línea IPSUR
+                Bachillerato Virtual Oficial
               </span>
               <span className="text-[10px] sm:text-[11px] font-bold bg-white/15 text-indigo-100 px-3 py-0.5 rounded-full border border-white/10">
                 Grupo: {classroom.group}
@@ -124,23 +134,22 @@ export default function ClassroomDetail({ classroomId, onBack }) {
             </div>
           </div>
 
-          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
             {classroom.name}
           </h1>
 
           <div className="mt-3.5 flex flex-wrap items-center gap-4 text-xs sm:text-sm text-indigo-100/90 font-medium">
-            <span className="flex items-center gap-1.5">
-              <span className="text-white/60">Profesor Titular:</span>
+            <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-xl border border-white/10">
+              <span className="text-white/70">Profesor Titular:</span>
               <strong className="text-white font-bold">{classroom.teacherName}</strong>
             </span>
-            <span className="hidden sm:inline text-white/30">•</span>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-xl border border-white/10">
               <Users className="w-4 h-4 text-pink-300" />
-              <span>{enrolledStudents.length} Estudiantes Matriculados</span>
+              <span>{enrolledStudents.length} Alumnos Inscritos</span>
             </span>
           </div>
 
-          {/* Portal de Videoconferencias Sincrónicas */}
+          {/* Portal de Videoconferencias Sincrónicas & Acciones */}
           <div className="mt-5 pt-4 border-t border-white/15 flex flex-wrap items-center gap-3">
             <button
               onClick={() => setVirtualPortalOpen(true)}
@@ -193,41 +202,63 @@ export default function ClassroomDetail({ classroomId, onBack }) {
         </div>
       )}
 
-      {/* Criteria Breakdown: 2x2 grid on mobile phones, inline flex on tablets and widescreen computers */}
+      {/* Criteria Breakdown & 100% Visual Gauge */}
       {classroom.criteriaConfigured && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-3.5 sm:p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg flex-shrink-0">
-              <CheckCircle2 className="w-4 h-4" />
-            </span>
-            <div>
-              <span className="font-bold text-slate-800 block text-xs sm:text-sm">Criterios de Evaluación Oficiales:</span>
-              <span className="text-[11px] text-slate-500">Ponderación institucional validada al 100%</span>
+        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 bg-emerald-100 text-emerald-700 rounded-xl flex-shrink-0 shadow-xs">
+                <CheckCircle2 className="w-4 h-4" />
+              </span>
+              <div>
+                <span className="font-bold text-slate-900 text-xs sm:text-sm block">Criterios Oficiales de Evaluación (100% Reglamentario)</span>
+                <span className="text-[11px] text-slate-500">Ponderación institucional validada para el promedio bimestral</span>
+              </div>
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full md:w-auto">
-            <span className="bg-blue-50 text-blue-800 border border-blue-200 px-2.5 py-1.5 rounded-lg font-semibold text-center sm:text-left">
-              Actividades: <strong>{classroom.criteria.activities}%</strong>
-            </span>
-            <span className="bg-purple-50 text-purple-800 border border-purple-200 px-2.5 py-1.5 rounded-lg font-semibold text-center sm:text-left">
-              Examen: <strong>{classroom.criteria.examProject}%</strong>
-            </span>
-            <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1.5 rounded-lg font-semibold text-center sm:text-left">
-              Asistencia: <strong>{classroom.criteria.attendance}%</strong>
-            </span>
-            <span className="bg-pink-50 text-pink-800 border border-pink-200 px-2.5 py-1.5 rounded-lg font-semibold text-center sm:text-left">
-              Participación: <strong>{classroom.criteria.participation}%</strong>
-            </span>
 
             {isTeacher && (
               <button
                 onClick={() => setCriteriaModalOpen(true)}
-                className="col-span-2 sm:col-auto text-xs text-center text-ipsur-navy-600 hover:text-ipsur-navy-800 underline font-bold py-1 sm:ml-2"
+                className="text-xs text-ipsur-navy-700 hover:text-ipsur-navy-900 font-bold bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition self-start sm:self-auto"
               >
-                Modificar
+                Modificar Criterios
               </button>
             )}
+          </div>
+
+          {/* Visual Percentage Distribution Gauge */}
+          <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden flex shadow-inner">
+            <div style={{ width: `${classroom.criteria.activities}%` }} className="bg-blue-500 h-full transition-all" title={`Actividades: ${classroom.criteria.activities}%`}></div>
+            <div style={{ width: `${classroom.criteria.examProject}%` }} className="bg-purple-500 h-full transition-all" title={`Examen: ${classroom.criteria.examProject}%`}></div>
+            <div style={{ width: `${classroom.criteria.attendance}%` }} className="bg-emerald-500 h-full transition-all" title={`Asistencia: ${classroom.criteria.attendance}%`}></div>
+            <div style={{ width: `${classroom.criteria.participation}%` }} className="bg-pink-500 h-full transition-all" title={`Participación: ${classroom.criteria.participation}%`}></div>
+          </div>
+
+          {/* 4 Cards Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 text-xs">
+            <div className="bg-blue-50/70 border border-blue-200/80 p-2.5 rounded-xl text-left">
+              <span className="text-[10px] font-bold uppercase text-blue-700 block">1. Actividades</span>
+              <span className="text-base font-black text-blue-950 mt-0.5 block">{classroom.criteria.activities}%</span>
+              <span className="text-[10px] text-blue-800/80 font-medium">Tareas y talleres</span>
+            </div>
+
+            <div className="bg-purple-50/70 border border-purple-200/80 p-2.5 rounded-xl text-left">
+              <span className="text-[10px] font-bold uppercase text-purple-700 block">2. Examen / Proy.</span>
+              <span className="text-base font-black text-purple-950 mt-0.5 block">{classroom.criteria.examProject}%</span>
+              <span className="text-[10px] text-purple-800/80 font-medium">Evaluación bimestral</span>
+            </div>
+
+            <div className="bg-emerald-50/70 border border-emerald-200/80 p-2.5 rounded-xl text-left">
+              <span className="text-[10px] font-bold uppercase text-emerald-700 block">3. Asistencia</span>
+              <span className="text-base font-black text-emerald-950 mt-0.5 block">{classroom.criteria.attendance}%</span>
+              <span className="text-[10px] text-emerald-800/80 font-medium">Sesiones en vivo</span>
+            </div>
+
+            <div className="bg-pink-50/70 border border-pink-200/80 p-2.5 rounded-xl text-left">
+              <span className="text-[10px] font-bold uppercase text-pink-700 block">4. Participación</span>
+              <span className="text-base font-black text-pink-950 mt-0.5 block">{classroom.criteria.participation}%</span>
+              <span className="text-[10px] text-pink-800/80 font-medium">Foros y dinámicas</span>
+            </div>
           </div>
         </div>
       )}
@@ -319,169 +350,291 @@ export default function ClassroomDetail({ classroomId, onBack }) {
       </div>
 
       {/* TAB 1: ACTIVIDADES Y TAREAS */}
-      {activeTab === 'actividades' && (
-        <div className="space-y-4">
-          {classroom.activities?.length === 0 ? (
-            <div className="bg-white rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center">
-              <CheckSquare className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <h3 className="text-base font-bold text-slate-700">No hay actividades publicadas todavía</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
-                {isTeacher 
-                  ? 'Como docente titular, primero asegúrate de tener tus criterios de evaluación al 100% y luego asigna tareas para el bimestre.'
-                  : 'Tu profesor aún no ha publicado actividades en esta sala virtual. Consulta el temario y materiales de estudio.'
-                }
-              </p>
-              {isTeacher && (
-                <button
-                  onClick={() => {
-                    if (!classroom.criteriaConfigured) setCriteriaModalOpen(true);
-                    else setCreateActivityModalOpen(true);
-                  }}
-                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-ipsur-navy-700 hover:bg-ipsur-navy-800 rounded-lg shadow"
-                >
-                  <PlusCircle className="w-4 h-4 text-ipsur-pink-400" />
-                  <span>{classroom.criteriaConfigured ? 'Crear Primera Actividad' : 'Configurar Criterios Primero'}</span>
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {classroom.activities.map((activity, idx) => {
-                const submissions = classroom.submissions?.filter(s => s.activityId === activity.id) || [];
-                const studentSub = isStudent ? submissions.find(s => s.studentId === currentUser.id) : null;
-                const gradedCount = submissions.filter(s => s.grade !== null).length;
+      {activeTab === 'actividades' && (() => {
+        const activities = classroom.activities || [];
+        
+        // Calculate counts
+        const counts = {
+          all: activities.length,
+          pending: 0,
+          submitted: 0,
+          graded: 0
+        };
 
-                return (
-                  <div 
-                    key={activity.id}
-                    className="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 p-5 shadow-sm transition space-y-4"
+        activities.forEach(act => {
+          const subs = classroom.submissions?.filter(s => s.activityId === act.id) || [];
+          if (isStudent) {
+            const mySub = subs.find(s => s.studentId === currentUser.id);
+            if (!mySub) counts.pending++;
+            else if (mySub.grade !== null && mySub.grade !== undefined) counts.graded++;
+            else counts.submitted++;
+          } else {
+            const gradedCount = subs.filter(s => s.grade !== null && s.grade !== undefined).length;
+            if (subs.length < enrolledStudents.length) counts.pending++;
+            if (subs.some(s => s.grade === null || s.grade === undefined)) counts.submitted++;
+            if (subs.length > 0 && gradedCount === subs.length) counts.graded++;
+          }
+        });
+
+        // Filtered activities list
+        const filteredActivities = activities.filter(act => {
+          if (activityFilter === 'all') return true;
+          const subs = classroom.submissions?.filter(s => s.activityId === act.id) || [];
+          if (isStudent) {
+            const mySub = subs.find(s => s.studentId === currentUser.id);
+            if (activityFilter === 'pending') return !mySub;
+            if (activityFilter === 'submitted') return mySub && (mySub.grade === null || mySub.grade === undefined);
+            if (activityFilter === 'graded') return mySub && mySub.grade !== null && mySub.grade !== undefined;
+          } else {
+            const gradedCount = subs.filter(s => s.grade !== null && s.grade !== undefined).length;
+            if (activityFilter === 'pending') return subs.length < enrolledStudents.length;
+            if (activityFilter === 'submitted') return subs.some(s => s.grade === null || s.grade === undefined);
+            if (activityFilter === 'graded') return subs.length > 0 && gradedCount === subs.length;
+          }
+          return true;
+        });
+
+        return (
+          <div className="space-y-4">
+            {/* Filter pills & search/info bar */}
+            {activities.length > 0 && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 mr-1">
+                    <Filter className="w-3.5 h-3.5 text-slate-400" />
+                    Filtrar:
+                  </span>
+                  {[
+                    { id: 'all', label: 'Todas', count: counts.all, color: 'text-slate-700' },
+                    { id: 'pending', label: isStudent ? 'Pendientes' : 'Con Entregas Pendientes', count: counts.pending, color: 'text-amber-700' },
+                    { id: 'submitted', label: isStudent ? 'En Revisión' : 'Por Calificar', count: counts.submitted, color: 'text-blue-700' },
+                    { id: 'graded', label: isStudent ? 'Calificadas' : 'Completamente Calificadas', count: counts.graded, color: 'text-emerald-700' },
+                  ].map(filter => {
+                    const active = activityFilter === filter.id;
+                    return (
+                      <button
+                        key={filter.id}
+                        onClick={() => setActivityFilter(filter.id)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition flex-shrink-0 ${
+                          active
+                            ? 'bg-ipsur-navy-700 text-white shadow-xs'
+                            : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200'
+                        }`}
+                      >
+                        <span>{filter.label}</span>
+                        <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                          active ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                        }`}>
+                          {filter.count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="text-[11px] text-slate-500 font-medium sm:text-right">
+                  Mostrando <strong className="text-slate-800">{filteredActivities.length}</strong> de {activities.length} actividades
+                </div>
+              </div>
+            )}
+
+            {activities.length === 0 ? (
+              <div className="bg-white rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center">
+                <CheckSquare className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <h3 className="text-base font-bold text-slate-800">No hay actividades publicadas todavía</h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                  {isTeacher 
+                    ? 'Como docente titular, primero asegúrate de tener tus criterios de evaluación al 100% y luego asigna tareas para el bimestre.'
+                    : 'Tu profesor aún no ha publicado actividades en esta sala virtual. Consulta el temario y materiales de estudio.'
+                  }
+                </p>
+                {isTeacher && (
+                  <button
+                    onClick={() => {
+                      if (!classroom.criteriaConfigured) setCriteriaModalOpen(true);
+                      else setCreateActivityModalOpen(true);
+                    }}
+                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-ipsur-navy-700 hover:bg-ipsur-navy-800 rounded-xl shadow-sm transition"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
-                            {activity.unitTitle || 'Tema'}
-                          </span>
-                          <span className="text-[10px] font-semibold text-slate-400">
-                            Publicado: {formatDateTime(activity.createdAt)}
-                          </span>
-                        </div>
+                    <PlusCircle className="w-4 h-4 text-ipsur-pink-400" />
+                    <span>{classroom.criteriaConfigured ? 'Crear Primera Actividad' : 'Configurar Criterios Primero'}</span>
+                  </button>
+                )}
+              </div>
+            ) : filteredActivities.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500">
+                <Filter className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                <p className="text-xs font-semibold">No se encontraron actividades con el filtro "{activityFilter}".</p>
+                <button
+                  onClick={() => setActivityFilter('all')}
+                  className="mt-2 text-xs font-bold text-ipsur-pink-600 hover:underline"
+                >
+                  Ver todas las actividades
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3.5">
+                {filteredActivities.map((activity) => {
+                  const submissions = classroom.submissions?.filter(s => s.activityId === activity.id) || [];
+                  const studentSub = isStudent ? submissions.find(s => s.studentId === currentUser.id) : null;
+                  const gradedCount = submissions.filter(s => s.grade !== null && s.grade !== undefined).length;
+                  const isPastDue = new Date(activity.dueDate) < new Date();
 
-                        <h3 className="text-base font-bold text-slate-800 tracking-tight">
-                          {activity.title}
-                        </h3>
-
-                        <p className="text-xs text-slate-600 mt-2 leading-relaxed whitespace-pre-line">
-                          {activity.description}
-                        </p>
-
-                        {activity.attachment && (
-                          <div className="mt-3 flex items-center gap-2">
-                            <span className="text-[11px] font-bold text-slate-500">Recurso anexo:</span>
-                            <span className="inline-flex items-center gap-1.5 text-xs text-ipsur-navy-700 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md font-mono">
-                              <FileText className="w-3.5 h-3.5 text-ipsur-pink-500" />
-                              {activity.attachment}
+                  return (
+                    <div 
+                      key={activity.id}
+                      className="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 p-4 sm:p-5 shadow-xs transition hover:shadow-sm space-y-4"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-lg border border-slate-200">
+                              {activity.unitTitle || 'Tema Formativo'}
+                            </span>
+                            <span className="text-[10px] font-semibold text-slate-400 flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-slate-400" />
+                              Publicado: {formatDateTime(activity.createdAt)}
                             </span>
                           </div>
-                        )}
-                      </div>
 
-                      {/* Right: Deadline with strict status */}
-                      <div className="flex flex-col sm:items-end gap-1.5 flex-shrink-0">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Control de Plazo
-                        </span>
-                        <CountdownBadge dueDate={activity.dueDate} size="sm" />
-                        <span className="text-xs font-black text-slate-700 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded">
-                          Valor: 100 Pts
-                        </span>
-                      </div>
-                    </div>
+                          <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                            {activity.title}
+                          </h3>
 
-                    {/* Bottom Status & Action Bar */}
-                    <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
-                      {/* Left: Summary for Teacher or Grade for Student */}
-                      {isTeacher || isCoordinator ? (
-                        <div className="flex items-center gap-3">
-                          <span className="text-slate-600">
-                            Entregas: <strong className="text-slate-800">{submissions.length}</strong> de {enrolledStudents.length} alumnos
-                          </span>
-                          <span className="text-slate-400">•</span>
-                          <span className="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                            {gradedCount} Calificadas
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          {studentSub ? (
-                            studentSub.grade !== null && studentSub.grade !== undefined ? (
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold text-slate-600">Tu Calificación:</span>
-                                <span className="text-sm font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg">
-                                  {studentSub.grade} / 100 Pts
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-blue-700 font-semibold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                                ⏳ Entregado - En revisión por docente
+                          <p className="text-xs text-slate-600 mt-2 leading-relaxed whitespace-pre-line">
+                            {activity.description}
+                          </p>
+
+                          {activity.attachment && (
+                            <div className="mt-3.5 flex flex-wrap items-center gap-2">
+                              <span className="text-[11px] font-bold text-slate-500">Recurso complementario anexo:</span>
+                              <span className="inline-flex items-center gap-1.5 text-xs text-ipsur-navy-800 bg-slate-50 border border-slate-200 px-3 py-1 rounded-xl font-mono shadow-2xs">
+                                <FileText className="w-3.5 h-3.5 text-ipsur-pink-500" />
+                                {activity.attachment}
                               </span>
-                            )
-                          ) : (
-                            <span className="text-amber-800 font-medium bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                              ⚠️ Actividad sin entregar
-                            </span>
+                            </div>
                           )}
                         </div>
-                      )}
 
-                      {/* Right: Actions */}
-                      <div className="flex items-center gap-2 ml-auto">
-                        {isTeacher && (
-                          <button
-                            onClick={() => setGradingActivity(activity)}
-                            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-white bg-ipsur-navy-700 hover:bg-ipsur-navy-800 rounded-lg shadow-sm transition"
-                          >
-                            <Award className="w-3.5 h-3.5 text-pink-300" />
-                            <span>Calificar Entregas (0 - 100)</span>
-                          </button>
+                        {/* Right: Deadline & Score */}
+                        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 flex-shrink-0 bg-slate-50 sm:bg-transparent p-2.5 sm:p-0 rounded-xl border sm:border-0 border-slate-200">
+                          <div className="text-left sm:text-right">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                              Fecha Límite
+                            </span>
+                            <CountdownBadge dueDate={activity.dueDate} size="sm" />
+                          </div>
+                          <span className="text-xs font-black text-slate-800 bg-white sm:bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg">
+                            Ponderación: 100 Pts
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Bottom Status & Action Bar */}
+                      <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                        {/* Status for Teacher/Coordinator or Student */}
+                        {isTeacher || isCoordinator ? (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-slate-600 font-medium">
+                              Entregas de alumnos: <strong className="text-slate-900 font-bold">{submissions.length}</strong> de {enrolledStudents.length}
+                            </span>
+                            <span className="text-slate-300">•</span>
+                            <span className={`font-semibold px-2.5 py-0.5 rounded-lg border text-[11px] ${
+                              gradedCount === submissions.length && submissions.length > 0
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : submissions.length > gradedCount
+                                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                : 'bg-slate-100 text-slate-600 border-slate-200'
+                            }`}>
+                              {gradedCount} Calificadas
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            {studentSub ? (
+                              studentSub.grade !== null && studentSub.grade !== undefined ? (
+                                <div className="flex items-center gap-2">
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                    Calificada: {studentSub.grade} / 100 Pts
+                                  </span>
+                                  {studentSub.feedback && (
+                                    <span className="text-[11px] text-slate-500 italic hidden md:inline">
+                                      "{studentSub.feedback.length > 50 ? studentSub.feedback.substring(0, 50) + '...' : studentSub.feedback}"
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="inline-flex items-center gap-1.5 text-blue-700 font-bold bg-blue-50 px-2.5 py-1 rounded-xl border border-blue-200 text-xs">
+                                  <Clock className="w-3.5 h-3.5 text-blue-600" />
+                                  Entregado · En revisión por el docente titular
+                                </span>
+                              )
+                            ) : (
+                              <span className={`inline-flex items-center gap-1.5 font-bold px-2.5 py-1 rounded-xl border text-xs ${
+                                isPastDue 
+                                  ? 'text-rose-700 bg-rose-50 border-rose-200' 
+                                  : 'text-amber-800 bg-amber-50 border-amber-200'
+                              }`}>
+                                <AlertTriangle className="w-3.5 h-3.5" />
+                                {isPastDue ? 'Plazo de entrega concluido' : 'Pendiente de entrega'}
+                              </span>
+                            )}
+                          </div>
                         )}
 
-                        {isStudent && (
-                          <button
-                            onClick={() => setSubmittingActivity(activity)}
-                            className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition shadow-sm ${
-                              studentSub
-                                ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
-                                : 'bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white'
-                            }`}
-                          >
-                            <FileText className="w-3.5 h-3.5" />
-                            <span>{studentSub ? 'Ver Entrega / Retroalimentación' : 'Subir y Entregar Tarea'}</span>
-                          </button>
-                        )}
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-2 sm:ml-auto">
+                          {isTeacher && (
+                            <button
+                              onClick={() => setGradingActivity(activity)}
+                              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-white bg-ipsur-navy-700 hover:bg-ipsur-navy-800 rounded-xl shadow-xs transition"
+                            >
+                              <Award className="w-3.5 h-3.5 text-pink-300" />
+                              <span>Calificar Entregas ({submissions.length})</span>
+                            </button>
+                          )}
+
+                          {isStudent && (
+                            <button
+                              onClick={() => setSubmittingActivity(activity)}
+                              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl transition shadow-xs ${
+                                studentSub
+                                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300'
+                                  : 'bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white'
+                              }`}
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              <span>{studentSub ? 'Ver Mi Entrega / Retroalimentación' : 'Subir y Entregar Tarea'}</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* TAB 2: MATERIAL DE CLASE */}
       {activeTab === 'materiales' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-slate-500">
-              Repositorio de recursos, lecturas y grabaciones de clase subidas por el profesor titular.
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 sm:px-4 rounded-2xl border border-slate-200 shadow-xs">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">Repositorio Didáctico y Recursos de Estudio</h3>
+              <p className="text-xs text-slate-500">
+                Materiales oficiales, lecturas complementarias y grabaciones compartidas por la cátedra.
+              </p>
+            </div>
             {isTeacher && (
               <button
                 onClick={() => setUploadMaterialModalOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-ipsur-pink-600 hover:bg-ipsur-pink-700 rounded-lg shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-ipsur-pink-600 hover:bg-ipsur-pink-700 rounded-xl shadow-xs transition self-start sm:self-auto"
               >
-                <UploadCloud className="w-3.5 h-3.5" />
+                <UploadCloud className="w-4 h-4" />
                 <span>Subir Nuevo Material</span>
               </button>
             )}
@@ -490,8 +643,8 @@ export default function ClassroomDetail({ classroomId, onBack }) {
           {classroom.materials?.length === 0 ? (
             <div className="bg-white rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center">
               <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-2" />
-              <h4 className="text-sm font-bold text-slate-700">Sin materiales didácticos publicados</h4>
-              <p className="text-xs text-slate-400 mt-1">El docente irá agregando guías y recursos a lo largo del periodo.</p>
+              <h4 className="text-sm font-bold text-slate-800">Sin materiales didácticos publicados</h4>
+              <p className="text-xs text-slate-400 mt-1">El docente irá agregando guías y recursos a lo largo del periodo lectivo.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -501,45 +654,48 @@ export default function ClassroomDetail({ classroomId, onBack }) {
                 const Icon = isVideo ? Video : isPresentation ? Presentation : FileText;
 
                 return (
-                  <div key={mat.id} className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:border-slate-300 transition space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className={`p-3 rounded-xl flex-shrink-0 ${
-                        isVideo ? 'bg-red-50 text-red-600' :
-                        isPresentation ? 'bg-amber-50 text-amber-600' :
-                        'bg-blue-50 text-blue-600'
-                      }`}>
-                        <Icon className="w-6 h-6" />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <span className="text-[10px] font-bold uppercase bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
-                            {mat.unitTitle}
-                          </span>
-                          <span className="text-[10px] text-slate-400">
-                            {formatDateTime(mat.uploadedAt)}
-                          </span>
+                  <div key={mat.id} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs hover:border-slate-300 hover:shadow-sm transition space-y-3.5 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className={`p-3 rounded-2xl flex-shrink-0 shadow-xs ${
+                          isVideo ? 'bg-red-50 text-red-600 border border-red-100' :
+                          isPresentation ? 'bg-amber-50 text-amber-600 border border-amber-100' :
+                          'bg-blue-50 text-blue-600 border border-blue-100'
+                        }`}>
+                          <Icon className="w-6 h-6" />
                         </div>
 
-                        <h4 className="text-xs font-bold text-slate-800 leading-snug">
-                          {mat.title}
-                        </h4>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded-lg border border-slate-200">
+                              {mat.unitTitle || 'Material General'}
+                            </span>
+                            <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {formatDateTime(mat.uploadedAt)}
+                            </span>
+                          </div>
 
-                        <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                          {mat.description}
-                        </p>
+                          <h4 className="text-sm font-bold text-slate-900 leading-snug">
+                            {mat.title}
+                          </h4>
+
+                          <p className="text-xs text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
+                            {mat.description}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                      <span className="text-[11px] text-slate-400 font-mono">
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <span className="text-[11px] text-slate-500 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
                         {mat.fileName} ({mat.fileSize})
                       </span>
 
                       <a
                         href={mat.fileUrl}
-                        onClick={(e) => { e.preventDefault(); alert(`Descargando o abriendo material didáctico: ${mat.fileName}`); }}
-                        className="inline-flex items-center gap-1 font-bold text-ipsur-navy-700 hover:text-ipsur-navy-900 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded transition"
+                        onClick={(e) => { e.preventDefault(); alert(`Descargando o visualizando recurso: ${mat.fileName}`); }}
+                        className="inline-flex items-center gap-1.5 font-bold text-ipsur-navy-700 hover:text-ipsur-navy-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition shadow-2xs"
                       >
                         <ExternalLink className="w-3.5 h-3.5 text-ipsur-pink-500" />
                         <span>Abrir Recurso</span>
@@ -555,24 +711,24 @@ export default function ClassroomDetail({ classroomId, onBack }) {
 
       {/* TAB 3: TEMARIO Y RÚBRICA OFICIAL (COORDINADOR) */}
       {activeTab === 'rubrica' && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 shadow-xs space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-ipsur-pink-600 bg-pink-50 px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-ipsur-pink-600 bg-pink-50 px-2.5 py-0.5 rounded-full border border-pink-100">
                 Control y Supervisión Académica
               </span>
-              <h2 className="text-lg font-black text-ipsur-navy-800 mt-1">
+              <h2 className="text-lg font-black text-slate-900 mt-1">
                 Rúbrica Oficial y Temario del Periodo
               </h2>
               <p className="text-xs text-slate-500">
-                Cargada por {classroom.rubric?.uploadedBy} el {formatDateTime(classroom.rubric?.uploadedAt)}
+                Aprobada por {classroom.rubric?.uploadedBy} el {formatDateTime(classroom.rubric?.uploadedAt)}
               </p>
             </div>
 
             {isCoordinator && (
               <button
                 onClick={() => setRubricModalOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-ipsur-navy-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition"
+                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-ipsur-navy-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl transition shadow-xs"
               >
                 <Edit className="w-3.5 h-3.5 text-ipsur-pink-500" />
                 <span>Editar Temario / Rúbrica</span>
@@ -582,10 +738,11 @@ export default function ClassroomDetail({ classroomId, onBack }) {
 
           {/* General Objective */}
           <div>
-            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-ipsur-pink-500" />
               Objetivo General y Propósito Formativo
             </h4>
-            <p className="text-xs sm:text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-200 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-200 leading-relaxed font-normal">
               {classroom.rubric?.generalObjective}
             </p>
           </div>
@@ -593,34 +750,34 @@ export default function ClassroomDetail({ classroomId, onBack }) {
           {/* Topics & Units Breakdown */}
           <div>
             <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
-              Desglose de Unidades y Temas que se verán en el Bimestre / Cuatrimestre
+              Desglose de Unidades y Temas del Periodo Lectivo
             </h4>
 
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               {classroom.rubric?.topics?.map((topic, i) => (
-                <div key={topic.id || i} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2 mb-2">
+                <div key={topic.id || i} className="border border-slate-200 rounded-2xl p-4 sm:p-5 bg-slate-50/60 hover:bg-slate-50 hover:border-slate-300 transition shadow-2xs">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 pb-2.5 mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold bg-ipsur-navy-700 text-white px-2 py-0.5 rounded">
+                      <span className="text-xs font-bold bg-ipsur-navy-700 text-white px-2.5 py-0.5 rounded-lg shadow-2xs">
                         {topic.unit}
                       </span>
-                      <h5 className="text-sm font-bold text-slate-800">
+                      <h5 className="text-sm font-bold text-slate-900">
                         {topic.title}
                       </h5>
                     </div>
-                    <span className="text-xs font-semibold text-slate-500 bg-white px-2.5 py-0.5 rounded-full border border-slate-200">
+                    <span className="text-xs font-semibold text-slate-600 bg-white px-3 py-0.5 rounded-full border border-slate-200 shadow-2xs">
                       {topic.weeks}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <span className="font-semibold text-slate-700 block mb-0.5">Metas de Aprendizaje:</span>
-                      <p className="text-slate-600">{topic.learningGoals}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+                    <div className="bg-white p-3 rounded-xl border border-slate-200/80">
+                      <span className="font-bold text-slate-800 block mb-1">🎯 Metas de Aprendizaje:</span>
+                      <p className="text-slate-600 leading-relaxed">{topic.learningGoals}</p>
                     </div>
-                    <div>
-                      <span className="font-semibold text-slate-700 block mb-0.5">Recursos Recomendados:</span>
-                      <p className="text-slate-600">{topic.keyReadings}</p>
+                    <div className="bg-white p-3 rounded-xl border border-slate-200/80">
+                      <span className="font-bold text-slate-800 block mb-1">📚 Recursos Clave:</span>
+                      <p className="text-slate-600 leading-relaxed">{topic.keyReadings}</p>
                     </div>
                   </div>
                 </div>

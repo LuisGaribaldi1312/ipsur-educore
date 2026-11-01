@@ -54,7 +54,7 @@ function MainLayout() {
                   {institutionalInfo.name} <span className="text-slate-400 font-normal text-xs">| {institutionalInfo.tagline}</span>
                 </p>
                 <p className="text-xs text-slate-600 font-semibold mt-0.5">
-                  {institutionalInfo.schoolName} — <span className="italic text-ipsur-pink-600 font-serif font-medium">"{institutionalInfo.schoolMotto}"</span>
+                  {institutionalInfo.schoolName} — <span className="italic text-ipsur-pink-600 font-medium">"{institutionalInfo.schoolMotto}"</span>
                 </p>
               </div>
             </div>

@@ -61,7 +61,7 @@ export default function StudentGeneralBoletaModal({ isOpen, onClose }) {
                 <h2 className="text-base font-black tracking-tight text-ipsur-navy-900 uppercase">
                   {institutionalInfo.schoolName}
                 </h2>
-                <p className="text-xs italic text-ipsur-pink-600 font-serif">
+                <p className="text-xs italic text-ipsur-pink-600">
                   "{institutionalInfo.schoolMotto}"
                 </p>
                 <p className="text-[10px] text-slate-500 font-semibold tracking-wide mt-0.5">

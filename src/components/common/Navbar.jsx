@@ -60,7 +60,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2.5">
             <span className="font-bold tracking-wider text-[11px] sm:text-xs text-white">INSTITUTO PENINSULAR DEL SUR</span>
             <span className="hidden sm:inline text-white/40">•</span>
-            <span className="hidden md:inline italic text-pink-200 text-xs font-serif font-light">"La educación es el camino"</span>
+            <span className="hidden md:inline italic text-pink-200 text-xs font-light">"La educación es el camino"</span>
             <span className="hidden lg:inline-flex items-center gap-1 bg-white/15 text-[10px] font-bold px-2.5 py-0.5 rounded-full text-white border border-white/20">
               <Sparkles className="w-3 h-3 text-pink-300" />
               <span>Campus Virtual Oficial</span>
