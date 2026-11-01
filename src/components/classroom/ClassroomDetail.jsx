@@ -237,7 +237,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
             { id: 'actividades', label: 'Actividades y Tareas', icon: CheckSquare, count: classroom.activities?.length || 0 },
             { id: 'materiales', label: 'Material de Clase', icon: BookOpen, count: classroom.materials?.length || 0 },
             { id: 'rubrica', label: 'Temario y Rúbrica Oficial', icon: FileText },
-            { id: 'calificaciones', label: 'Acta de Calificaciones', icon: Award }
+            { id: 'calificaciones', label: isStudent ? 'Mi Boleta de Calificaciones' : 'Acta de Calificaciones', icon: Award }
           ].map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -309,7 +309,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-sm transition"
               >
                 <Printer className="w-3.5 h-3.5 text-slate-500" />
-                <span>Imprimir Boleta / Acta Oficial</span>
+                <span>{isStudent ? 'Descargar / Imprimir Mi Boleta Personal' : 'Imprimir Acta General'}</span>
               </button>
             </div>
           )}
@@ -713,146 +713,275 @@ export default function ClassroomDetail({ classroomId, onBack }) {
             </div>
           )}
 
-          {/* Master Gradebook Table (Visible to Teacher and Coordinator) */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h3 className="text-sm font-bold text-slate-800">
-                  Acta General de Evaluación Bimestral / Cuatrimestral
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Cálculo automático de promedio según los 4 criterios de evaluación establecidos.
-                </p>
+          {/* Private Student Activities & Submissions Breakdown (ONLY visible to this student) */}
+          {isStudent && (
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+                    <CheckSquare className="w-4 h-4 text-ipsur-pink-600" />
+                    <span>Registro Privado de Mis Actividades Realizadas en esta Materia</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Historial personal de entregas, calificaciones y retroalimentación docente en {classroom.name}.
+                  </p>
+                </div>
+                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1.5 self-start sm:self-auto">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Expediente Personal Protegido</span>
+                </span>
               </div>
 
-              <span className="text-xs bg-white border border-slate-300 text-slate-700 px-3 py-1 rounded-lg font-mono">
-                {enrolledStudents.length} Alumnos Registrados
-              </span>
-            </div>
+              {/* Notice of Privacy */}
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 flex items-center gap-2">
+                <span className="text-base">🔒</span>
+                <span>
+                  <strong>Privacidad Estricta IPSUR:</strong> Por normativa institucional, ningún alumno puede visualizar las tareas, entregas ni notas de sus compañeros. Este apartado muestra únicamente tus actividades personales.
+                </span>
+              </div>
 
-            {/* Mobile Card View (phones): Clean spacious cards so nothing is crowded */}
-            <div className="block md:hidden divide-y divide-slate-100">
-              {enrolledStudents.map(student => {
-                const gradeData = calculateStudentGrades(classroom, student.id);
-                return (
-                  <div key={student.id} className="p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <img src={student.avatar} alt={student.name} className="w-9 h-9 rounded-full object-cover" />
-                        <div>
-                          <p className="font-bold text-slate-800 text-xs">{student.name}</p>
-                          <p className="text-[10px] text-slate-400 font-mono">{student.matricula}</p>
+              {/* List of activities and this student's submissions */}
+              <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                {(classroom.activities || []).map((act, index) => {
+                  const mySub = (classroom.submissions || []).find(
+                    s => s.activityId === act.id && s.studentId === currentUser.id
+                  );
+                  const deadline = getDeadlineStatus(act.dueDate);
+
+                  return (
+                    <div key={act.id} className="p-4 hover:bg-slate-50 transition space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                              {act.unitTitle || `Actividad ${index + 1}`}
+                            </span>
+                            <span className="text-[10px] font-bold text-ipsur-pink-600">
+                              Valor: 100 Pts
+                            </span>
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-900">{act.title}</h4>
+                        </div>
+
+                        {/* Submission status badge */}
+                        <div className="flex items-center gap-2 self-start sm:self-auto">
+                          {mySub ? (
+                            mySub.grade !== null && mySub.grade !== undefined ? (
+                              <span className="inline-flex items-center gap-1 text-xs font-black text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-300">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>Calificación: {mySub.grade} / 100 Pts</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-xs font-bold text-blue-800 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                                <Clock className="w-3.5 h-3.5 text-blue-600" />
+                                <span>Entregada (En revisión)</span>
+                              </span>
+                            )
+                          ) : deadline.isClosed ? (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-800 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200">
+                              <Lock className="w-3.5 h-3.5 text-rose-600" />
+                              <span>No entregada (Plazo vencido)</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                              <span>Pendiente de entrega</span>
+                            </span>
+                          )}
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <span className="text-base font-black text-ipsur-navy-800">{gradeData.finalAverage}</span>
-                        <span className="text-[10px] text-slate-400 font-bold block">/ 100</span>
-                      </div>
-                    </div>
+                      {/* Delivery Details & Feedback */}
+                      {mySub ? (
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-2">
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-slate-500 text-[11px]">
+                            <span>📎 Archivo entregado: <strong className="text-slate-800 font-mono">{mySub.fileName || 'Documento_IPSUR.pdf'}</strong></span>
+                            {mySub.submittedAt && (
+                              <span>Fecha de envío: <strong>{formatDateTime(mySub.submittedAt)}</strong></span>
+                            )}
+                          </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <div>
-                        <span className="text-slate-400 block text-[10px]">Actividades:</span>
-                        <strong className="text-slate-700">{gradeData.activitiesAvg} pts</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block text-[10px]">Examen:</span>
-                        <strong className="text-slate-700">{gradeData.examScore} pts</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block text-[10px]">Asistencia:</span>
-                        <strong className="text-slate-700">{gradeData.attendanceScore} pts</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block text-[10px]">Participación:</span>
-                        <strong className="text-slate-700">{gradeData.participationScore} pts</strong>
-                      </div>
-                    </div>
+                          {mySub.notes && (
+                            <p className="text-slate-600 text-[11px]">
+                              <strong>Tus comentarios:</strong> "{mySub.notes}"
+                            </p>
+                          )}
 
-                    <div className="flex items-center justify-between pt-1">
-                      <span className="text-[11px] text-slate-500 font-medium">Estatus del alumno:</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${gradeData.statusColor}`}>
-                        {gradeData.statusText}
-                      </span>
+                          {mySub.feedback && (
+                            <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900">
+                              <span className="text-[10px] font-bold uppercase tracking-wider block text-emerald-800">
+                                💬 Retroalimentación oficial del docente ({classroom.teacherName}):
+                              </span>
+                              <p className="text-xs italic mt-0.5 font-medium">"{mySub.feedback}"</p>
+                            </div>
+                          )}
+                        </div>
+                      ) : !deadline.isClosed ? (
+                        <div className="flex items-center justify-between text-xs pt-1">
+                          <span className="text-slate-500">
+                            Límite de entrega: <strong>{formatDateTime(act.dueDate)}</strong>
+                          </span>
+                          <button
+                            onClick={() => setSubmittingActivity(act)}
+                            className="px-3 py-1.5 text-xs font-bold text-white bg-ipsur-pink-600 hover:bg-ipsur-pink-700 rounded-lg shadow-sm transition"
+                          >
+                            Entregar Ahora
+                          </button>
+                        </div>
+                      ) : (
+                        <p className="text-[11px] text-slate-400 italic">
+                          El apartado cerró automáticamente el {formatDateTime(act.dueDate)}.
+                        </p>
+                      )}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
+          )}
 
-            {/* Desktop and Tablet Table View: Expands fully across wide screens */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-100 text-slate-700 uppercase font-bold text-[11px] border-b border-slate-200">
-                  <tr>
-                    <th className="p-3">Estudiante</th>
-                    <th className="p-3 text-center">
-                      Actividades ({classroom.criteria?.activities || 0}%)
-                    </th>
-                    <th className="p-3 text-center">
-                      Examen/Proyecto ({classroom.criteria?.examProject || 0}%)
-                    </th>
-                    <th className="p-3 text-center">
-                      Asistencia ({classroom.criteria?.attendance || 0}%)
-                    </th>
-                    <th className="p-3 text-center">
-                      Participación ({classroom.criteria?.participation || 0}%)
-                    </th>
-                    <th className="p-3 text-center bg-indigo-50/60 font-black text-ipsur-navy-900">
-                      Promedio Final
-                    </th>
-                    <th className="p-3 text-center">Estatus</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {enrolledStudents.map(student => {
-                    const gradeData = calculateStudentGrades(classroom, student.id);
-                    return (
-                      <tr key={student.id} className="hover:bg-slate-50/80 transition">
-                        <td className="p-3 flex items-center gap-2.5">
-                          <img src={student.avatar} alt={student.name} className="w-7 h-7 rounded-full object-cover" />
+          {/* Master Gradebook Table: ONLY Visible to Teacher and Coordinator */}
+          {!isStudent && (
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800">
+                    Acta General de Evaluación Bimestral / Cuatrimestral
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Cálculo automático de promedio según los 4 criterios de evaluación establecidos.
+                  </p>
+                </div>
+
+                <span className="text-xs bg-white border border-slate-300 text-slate-700 px-3 py-1 rounded-lg font-mono">
+                  {enrolledStudents.length} Alumnos Registrados
+                </span>
+              </div>
+
+              {/* Mobile Card View (phones): Clean spacious cards so nothing is crowded */}
+              <div className="block md:hidden divide-y divide-slate-100">
+                {enrolledStudents.map(student => {
+                  const gradeData = calculateStudentGrades(classroom, student.id);
+                  return (
+                    <div key={student.id} className="p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <img src={student.avatar} alt={student.name} className="w-9 h-9 rounded-full object-cover" />
                           <div>
-                            <p className="font-bold text-slate-800">{student.name}</p>
+                            <p className="font-bold text-slate-800 text-xs">{student.name}</p>
                             <p className="text-[10px] text-slate-400 font-mono">{student.matricula}</p>
                           </div>
-                        </td>
+                        </div>
 
-                        <td className="p-3 text-center">
-                          <span className="font-bold text-slate-800">{gradeData.activitiesAvg}</span>
-                          <span className="text-[10px] text-slate-400 block font-mono">
-                            ({gradeData.gradedActivitiesCount}/{gradeData.totalActivities} calif)
-                          </span>
-                        </td>
+                        <div className="text-right">
+                          <span className="text-base font-black text-ipsur-navy-800">{gradeData.finalAverage}</span>
+                          <span className="text-[10px] text-slate-400 font-bold block">/ 100</span>
+                        </div>
+                      </div>
 
-                        <td className="p-3 text-center font-bold text-slate-800">
-                          {gradeData.examScore}
-                        </td>
+                      <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div>
+                          <span className="text-slate-400 block text-[10px]">Actividades:</span>
+                          <strong className="text-slate-700">{gradeData.activitiesAvg} pts</strong>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 block text-[10px]">Examen:</span>
+                          <strong className="text-slate-700">{gradeData.examScore} pts</strong>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 block text-[10px]">Asistencia:</span>
+                          <strong className="text-slate-700">{gradeData.attendanceScore} pts</strong>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 block text-[10px]">Participación:</span>
+                          <strong className="text-slate-700">{gradeData.participationScore} pts</strong>
+                        </div>
+                      </div>
 
-                        <td className="p-3 text-center font-bold text-slate-800">
-                          {gradeData.attendanceScore}
-                        </td>
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[11px] text-slate-500 font-medium">Estatus del alumno:</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${gradeData.statusColor}`}>
+                          {gradeData.statusText}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-                        <td className="p-3 text-center font-bold text-slate-800">
-                          {gradeData.participationScore}
-                        </td>
+              {/* Desktop and Tablet Table View: Expands fully across wide screens */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-100 text-slate-700 uppercase font-bold text-[11px] border-b border-slate-200">
+                    <tr>
+                      <th className="p-3">Estudiante</th>
+                      <th className="p-3 text-center">
+                        Actividades ({classroom.criteria?.activities || 0}%)
+                      </th>
+                      <th className="p-3 text-center">
+                        Examen/Proyecto ({classroom.criteria?.examProject || 0}%)
+                      </th>
+                      <th className="p-3 text-center">
+                        Asistencia ({classroom.criteria?.attendance || 0}%)
+                      </th>
+                      <th className="p-3 text-center">
+                        Participación ({classroom.criteria?.participation || 0}%)
+                      </th>
+                      <th className="p-3 text-center bg-indigo-50/60 font-black text-ipsur-navy-900">
+                        Promedio Final
+                      </th>
+                      <th className="p-3 text-center">Estatus</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {enrolledStudents.map(student => {
+                      const gradeData = calculateStudentGrades(classroom, student.id);
+                      return (
+                        <tr key={student.id} className="hover:bg-slate-50/80 transition">
+                          <td className="p-3 flex items-center gap-2.5">
+                            <img src={student.avatar} alt={student.name} className="w-7 h-7 rounded-full object-cover" />
+                            <div>
+                              <p className="font-bold text-slate-800">{student.name}</p>
+                              <p className="text-[10px] text-slate-400 font-mono">{student.matricula}</p>
+                            </div>
+                          </td>
 
-                        <td className="p-3 text-center bg-indigo-50/60 font-black text-sm text-ipsur-navy-800">
-                          {gradeData.finalAverage}
-                        </td>
+                          <td className="p-3 text-center">
+                            <span className="font-bold text-slate-800">{gradeData.activitiesAvg}</span>
+                            <span className="text-[10px] text-slate-400 block font-mono">
+                              ({gradeData.gradedActivitiesCount}/{gradeData.totalActivities} calif)
+                            </span>
+                          </td>
 
-                        <td className="p-3 text-center">
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${gradeData.statusColor}`}>
-                            {gradeData.statusText}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          <td className="p-3 text-center font-bold text-slate-800">
+                            {gradeData.examScore}
+                          </td>
+
+                          <td className="p-3 text-center font-bold text-slate-800">
+                            {gradeData.attendanceScore}
+                          </td>
+
+                          <td className="p-3 text-center font-bold text-slate-800">
+                            {gradeData.participationScore}
+                          </td>
+
+                          <td className="p-3 text-center bg-indigo-50/60 font-black text-sm text-ipsur-navy-800">
+                            {gradeData.finalAverage}
+                          </td>
+
+                          <td className="p-3 text-center">
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${gradeData.statusColor}`}>
+                              {gradeData.statusText}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
