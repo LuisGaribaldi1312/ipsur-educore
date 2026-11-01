@@ -33,7 +33,7 @@ export default function InstitutionalActaModal({ isOpen, onClose, classroom }) {
               <img 
                 src="/ipsur-logo.png" 
                 alt="IPSUR Logo Oficial" 
-                className="h-16 w-auto object-contain"
+                className="h-16 w-auto object-contain filter drop-shadow-sm"
               />
               <div>
                 <h2 className="text-base font-black tracking-tight text-ipsur-navy-900 uppercase">

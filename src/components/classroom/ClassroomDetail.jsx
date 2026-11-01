@@ -103,19 +103,24 @@ export default function ClassroomDetail({ classroomId, onBack }) {
         </div>
       </div>
 
-      {/* Classroom Hero Banner */}
-      <div className="rounded-3xl overflow-hidden shadow-md border border-slate-200 bg-gradient-to-r from-ipsur-navy-900 via-indigo-900 to-ipsur-navy-800 text-white p-6 sm:p-8 relative">
+      {/* Classroom Hero Banner with integrated logo */}
+      <div className="rounded-3xl overflow-hidden shadow-md border border-slate-200 bg-gradient-to-r from-ipsur-navy-900 via-indigo-900 to-ipsur-navy-800 text-white p-5 sm:p-7 md:p-8 relative">
         <div className="relative z-10 max-w-3xl">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest bg-ipsur-pink-500 text-white px-2.5 py-0.5 rounded-full shadow-sm">
-              Prepa en Línea IPSUR
-            </span>
-            <span className="text-[11px] font-semibold bg-white/15 text-indigo-100 px-2.5 py-0.5 rounded-full">
-              Grupo: {classroom.group}
-            </span>
+          <div className="flex items-center gap-3 mb-2.5">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/10 backdrop-blur-md p-1.5 flex items-center justify-center border border-white/20 shadow-inner flex-shrink-0">
+              <img src="/ipsur-logo.png" alt="IPSUR Logo" className="w-full h-full object-contain filter drop-shadow" />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest bg-ipsur-pink-500 text-white px-2.5 py-0.5 rounded-full shadow-sm">
+                Prepa en Línea IPSUR
+              </span>
+              <span className="text-[10px] sm:text-[11px] font-semibold bg-white/15 text-indigo-100 px-2.5 py-0.5 rounded-full">
+                Grupo: {classroom.group}
+              </span>
+            </div>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white">
             {classroom.name}
           </h1>
 
@@ -156,8 +161,8 @@ export default function ClassroomDetail({ classroomId, onBack }) {
         </div>
 
         {/* Decorative Watermark Emblem */}
-        <div className="absolute right-4 bottom-2 opacity-15 pointer-events-none hidden md:block">
-          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-48 h-auto object-contain filter brightness-200" />
+        <div className="absolute right-2 bottom-0 opacity-20 pointer-events-none hidden md:block">
+          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-64 h-auto object-contain filter brightness-150 drop-shadow-2xl" />
         </div>
       </div>
 

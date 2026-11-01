@@ -77,17 +77,17 @@ export default function Navbar() {
       <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div className="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Logo and Brand Title */}
+            {/* Logo and Brand Title with transparent logo integration */}
             <div 
-              className="flex items-center gap-2.5 sm:gap-4 cursor-pointer select-none min-w-0"
+              className="flex items-center gap-3 sm:gap-4 cursor-pointer select-none min-w-0 py-1"
               onClick={() => setActiveClassroomId(null)}
               title="Ir al inicio de IPSUR EDUCORE"
             >
-              <div className="relative group flex-shrink-0">
+              <div className="relative group flex-shrink-0 flex items-center justify-center">
                 <img 
                   src="/ipsur-logo.png" 
                   alt="IPSUR Logo Oficial" 
-                  className="h-11 sm:h-16 w-auto object-contain transition-transform group-hover:scale-105"
+                  className="h-12 sm:h-16 w-auto object-contain filter drop-shadow-[0_2px_6px_rgba(46,48,146,0.15)] transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
 

@@ -43,9 +43,17 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-ipsur-navy-900 via-indigo-900 to-ipsur-pink-800 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
         <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-xs font-semibold text-pink-200 mb-3">
-            <ShieldCheck className="w-4 h-4 text-ipsur-pink-400" />
-            <span>Módulo de Control y Coordinación Escolar</span>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md p-1.5 flex items-center justify-center border border-white/20 shadow-inner flex-shrink-0">
+              <img src="/ipsur-logo.png" alt="IPSUR Emblem" className="w-full h-full object-contain filter drop-shadow" />
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-2 bg-white/10 px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-pink-200">
+                <ShieldCheck className="w-3.5 h-3.5 text-ipsur-pink-400" />
+                <span>Módulo de Control y Coordinación Escolar</span>
+              </div>
+              <p className="text-[11px] text-indigo-200 mt-0.5 font-medium">Instituto Peninsular del Sur · "La educación es el camino"</p>
+            </div>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
@@ -66,9 +74,9 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
           </div>
         </div>
 
-        {/* Background decorative watermark */}
-        <div className="absolute -right-6 -bottom-8 opacity-10 pointer-events-none hidden md:block">
-          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-64 h-auto object-contain filter brightness-200" />
+        {/* Background decorative watermark with pure transparent emblem */}
+        <div className="absolute -right-4 -bottom-10 opacity-20 pointer-events-none hidden md:block">
+          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-72 h-auto object-contain filter brightness-150 drop-shadow-2xl" />
         </div>
       </div>
 
