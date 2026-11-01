@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import CriteriaConfigModal from './CriteriaConfigModal';
+import LiveClock from '../common/LiveClock';
 import { 
   BookOpen, 
   Users, 
@@ -62,10 +63,13 @@ export default function TeacherDashboard({ onSelectClassroom }) {
           </p>
 
           <div className="mt-5 flex flex-wrap items-center gap-3 text-xs">
-            <span className="bg-white/15 px-3.5 py-1.5 rounded-xl border border-white/10 shadow-sm">
+            {/* Real-time Clock */}
+            <LiveClock variant="hero" />
+
+            <span className="bg-white/15 px-3.5 py-2 rounded-xl border border-white/10 shadow-sm">
               Salas a tu cargo: <strong className="text-white font-bold">{displayClassrooms.length}</strong>
             </span>
-            <span className="bg-white/15 px-3.5 py-1.5 rounded-xl border border-white/10 shadow-sm">
+            <span className="bg-white/15 px-3.5 py-2 rounded-xl border border-white/10 shadow-sm">
               Tareas por calificar: <strong className="text-pink-300 font-bold">{totalPendingGrading}</strong>
             </span>
           </div>

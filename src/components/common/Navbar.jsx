@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import LiveClock from './LiveClock';
 import { 
   GraduationCap, 
   Users, 
@@ -66,8 +67,11 @@ export default function Navbar() {
             </span>
           </div>
 
-          <div className="flex items-center gap-3.5 ml-auto text-[11px]">
-            <span className="text-white/80 hidden xl:inline font-medium tracking-wide">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 ml-auto text-[11px]">
+            {/* Real-time Clock on Institutional Top Strip */}
+            <LiveClock variant="topbar" />
+
+            <span className="text-white/80 hidden 2xl:inline font-medium tracking-wide">
               Toda tu institución. Un solo sistema.
             </span>
             <div className="flex items-center gap-2 bg-black/30 px-3 py-1 rounded-full border border-white/15 shadow-inner">
@@ -114,6 +118,9 @@ export default function Navbar() {
                 </p>
               </div>
             </div>
+
+            {/* Central Executive Real-time Clock Widget */}
+            <LiveClock variant="executive" />
 
             {/* Right Controls: Navigation, Role Switcher, User Avatar */}
             <div className="flex items-center gap-2 sm:gap-3.5">

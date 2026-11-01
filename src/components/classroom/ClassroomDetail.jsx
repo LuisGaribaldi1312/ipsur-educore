@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import CountdownBadge from '../common/CountdownBadge';
+import LiveClock from '../common/LiveClock';
 import CriteriaConfigModal from '../teacher/CriteriaConfigModal';
 import CreateActivityModal from '../teacher/CreateActivityModal';
 import UploadMaterialModal from '../teacher/UploadMaterialModal';
@@ -140,8 +141,11 @@ export default function ClassroomDetail({ classroomId, onBack }) {
             </span>
           </div>
 
-          {/* Portal de Videoconferencias Sincrónicas */}
+          {/* Portal de Videoconferencias Sincrónicas & Clock */}
           <div className="mt-5 pt-4 border-t border-white/15 flex flex-wrap items-center gap-3">
+            {/* Live Real-time Clock inside Classroom */}
+            <LiveClock variant="hero" />
+
             <button
               onClick={() => setVirtualPortalOpen(true)}
               className="inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-bold text-ipsur-navy-900 bg-white hover:bg-slate-100 rounded-xl shadow-lg transition active:scale-95 group"
