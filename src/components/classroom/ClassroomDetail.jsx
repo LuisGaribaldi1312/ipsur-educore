@@ -35,7 +35,9 @@ import {
   Sparkles,
   Lock,
   Percent,
-  AlertTriangle
+  AlertTriangle,
+  ShieldCheck,
+  Info
 } from 'lucide-react';
 
 export default function ClassroomDetail({ classroomId, onBack }) {
@@ -650,7 +652,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
                 <div className="text-right">
                   <span className="text-xs text-slate-500 block">Promedio Bimestral Ponderado</span>
                   <span className="text-2xl font-black text-ipsur-navy-800">
-                    {myStudentGrade.finalAverage} <span className="text-sm font-bold text-slate-400">/ 100</span>
+                    {myStudentGrade.isConfigured ? myStudentGrade.finalAverage : '—'} <span className="text-sm font-bold text-slate-400">/ 100</span>
                   </span>
                   <div className="mt-1">
                     <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${myStudentGrade.statusColor}`}>
@@ -659,6 +661,19 @@ export default function ClassroomDetail({ classroomId, onBack }) {
                   </div>
                 </div>
               </div>
+
+              {/* Informative banner if criteria not yet configured by teacher */}
+              {!myStudentGrade.isConfigured && (
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl flex items-start gap-3">
+                  <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-xs text-blue-900 space-y-1">
+                    <h4 className="font-bold">Ponderación en Proceso de Configuración Docente</h4>
+                    <p className="text-blue-800 leading-relaxed">
+                      El docente titular ({classroom.teacherName}) se encuentra definiendo los criterios oficiales de evaluación al 100%. Tu promedio bimestral y aportaciones se calcularán automáticamente en cuanto los porcentajes queden formalmente aprobados.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* 4 Cards Breakdown */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -713,6 +728,17 @@ export default function ClassroomDetail({ classroomId, onBack }) {
             </div>
           )}
 
+          {/* Student enrollment fallback if not found */}
+          {isStudent && !myStudentGrade && (
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-3">
+              <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto" />
+              <h3 className="text-base font-bold text-slate-800">Expediente de Calificaciones en Verificación</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                No se encontró un registro académico para tu matrícula en esta sala. Si estás formalmente inscrito, contacta a Coordinación Escolar para verificar tu asignación.
+              </p>
+            </div>
+          )}
+
           {/* Private Student Activities & Submissions Breakdown (ONLY visible to this student) */}
           {isStudent && (
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
@@ -740,103 +766,113 @@ export default function ClassroomDetail({ classroomId, onBack }) {
                 </span>
               </div>
 
-              {/* List of activities and this student's submissions */}
-              <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
-                {(classroom.activities || []).map((act, index) => {
-                  const mySub = (classroom.submissions || []).find(
-                    s => s.activityId === act.id && s.studentId === currentUser.id
-                  );
-                  const deadline = getDeadlineStatus(act.dueDate);
+              {/* List of activities and this student's submissions OR empty state */}
+              {(classroom.activities || []).length === 0 ? (
+                <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                  <FileText className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                  <h4 className="text-sm font-bold text-slate-700">Aún no hay actividades publicadas en esta materia</h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                    En cuanto el profesor titular ({classroom.teacherName}) asigne tareas o proyectos y realices tus entregas, aquí podrás consultar tus calificaciones y retroalimentación oficial.
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                  {(classroom.activities || []).map((act, index) => {
+                    const mySub = (classroom.submissions || []).find(
+                      s => s.activityId === act.id && s.studentId === currentUser.id
+                    );
+                    const deadline = getDeadlineStatus(act.dueDate);
 
-                  return (
-                    <div key={act.id} className="p-4 hover:bg-slate-50 transition space-y-3">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
-                              {act.unitTitle || `Actividad ${index + 1}`}
-                            </span>
-                            <span className="text-[10px] font-bold text-ipsur-pink-600">
-                              Valor: 100 Pts
-                            </span>
+                    return (
+                      <div key={act.id} className="p-4 hover:bg-slate-50 transition space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                                {act.unitTitle || `Actividad ${index + 1}`}
+                              </span>
+                              <span className="text-[10px] font-bold text-ipsur-pink-600">
+                                Valor: 100 Pts
+                              </span>
+                            </div>
+                            <h4 className="text-sm font-bold text-slate-900">{act.title}</h4>
                           </div>
-                          <h4 className="text-sm font-bold text-slate-900">{act.title}</h4>
-                        </div>
 
-                        {/* Submission status badge */}
-                        <div className="flex items-center gap-2 self-start sm:self-auto">
-                          {mySub ? (
-                            mySub.grade !== null && mySub.grade !== undefined ? (
-                              <span className="inline-flex items-center gap-1 text-xs font-black text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-300">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                                <span>Calificación: {mySub.grade} / 100 Pts</span>
+                          {/* Submission status badge */}
+                          <div className="flex items-center gap-2 self-start sm:self-auto">
+                            {mySub ? (
+                              mySub.grade !== null && mySub.grade !== undefined ? (
+                                <span className="inline-flex items-center gap-1 text-xs font-black text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-300">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span>Calificación: {mySub.grade} / 100 Pts</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-xs font-bold text-blue-800 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                                  <Clock className="w-3.5 h-3.5 text-blue-600" />
+                                  <span>Entregada (En revisión)</span>
+                                </span>
+                              )
+                            ) : deadline.isClosed ? (
+                              <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-800 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200">
+                                <Lock className="w-3.5 h-3.5 text-rose-600" />
+                                <span>No entregada (Plazo vencido)</span>
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-xs font-bold text-blue-800 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
-                                <Clock className="w-3.5 h-3.5 text-blue-600" />
-                                <span>Entregada (En revisión)</span>
+                              <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                                <span>Pendiente de entrega</span>
                               </span>
-                            )
-                          ) : deadline.isClosed ? (
-                            <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-800 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200">
-                              <Lock className="w-3.5 h-3.5 text-rose-600" />
-                              <span>No entregada (Plazo vencido)</span>
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
-                              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                              <span>Pendiente de entrega</span>
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Delivery Details & Feedback */}
-                      {mySub ? (
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-2">
-                          <div className="flex flex-wrap items-center justify-between gap-2 text-slate-500 text-[11px]">
-                            <span>📎 Archivo entregado: <strong className="text-slate-800 font-mono">{mySub.fileName || 'Documento_IPSUR.pdf'}</strong></span>
-                            {mySub.submittedAt && (
-                              <span>Fecha de envío: <strong>{formatDateTime(mySub.submittedAt)}</strong></span>
                             )}
                           </div>
+                        </div>
 
-                          {mySub.notes && (
-                            <p className="text-slate-600 text-[11px]">
-                              <strong>Tus comentarios:</strong> "{mySub.notes}"
-                            </p>
-                          )}
-
-                          {mySub.feedback && (
-                            <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900">
-                              <span className="text-[10px] font-bold uppercase tracking-wider block text-emerald-800">
-                                💬 Retroalimentación oficial del docente ({classroom.teacherName}):
-                              </span>
-                              <p className="text-xs italic mt-0.5 font-medium">"{mySub.feedback}"</p>
+                        {/* Delivery Details & Feedback */}
+                        {mySub ? (
+                          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-2">
+                            <div className="flex flex-wrap items-center justify-between gap-2 text-slate-500 text-[11px]">
+                              <span>📎 Archivo entregado: <strong className="text-slate-800 font-mono">{mySub.fileName || 'Documento_IPSUR.pdf'}</strong></span>
+                              {mySub.submittedAt && (
+                                <span>Fecha de envío: <strong>{formatDateTime(mySub.submittedAt)}</strong></span>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      ) : !deadline.isClosed ? (
-                        <div className="flex items-center justify-between text-xs pt-1">
-                          <span className="text-slate-500">
-                            Límite de entrega: <strong>{formatDateTime(act.dueDate)}</strong>
-                          </span>
-                          <button
-                            onClick={() => setSubmittingActivity(act)}
-                            className="px-3 py-1.5 text-xs font-bold text-white bg-ipsur-pink-600 hover:bg-ipsur-pink-700 rounded-lg shadow-sm transition"
-                          >
-                            Entregar Ahora
-                          </button>
-                        </div>
-                      ) : (
-                        <p className="text-[11px] text-slate-400 italic">
-                          El apartado cerró automáticamente el {formatDateTime(act.dueDate)}.
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+
+                            {mySub.notes && (
+                              <p className="text-slate-600 text-[11px]">
+                                <strong>Tus comentarios:</strong> "{mySub.notes}"
+                              </p>
+                            )}
+
+                            {mySub.feedback && (
+                              <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900">
+                                <span className="text-[10px] font-bold uppercase tracking-wider block text-emerald-800">
+                                  💬 Retroalimentación oficial del docente ({classroom.teacherName}):
+                                </span>
+                                <p className="text-xs italic mt-0.5 font-medium">"{mySub.feedback}"</p>
+                              </div>
+                            )}
+                          </div>
+                        ) : !deadline.isClosed ? (
+                          <div className="flex items-center justify-between text-xs pt-1">
+                            <span className="text-slate-500">
+                              Límite de entrega: <strong>{formatDateTime(act.dueDate)}</strong>
+                            </span>
+                            <button
+                              onClick={() => setSubmittingActivity(act)}
+                              className="px-3 py-1.5 text-xs font-bold text-white bg-ipsur-pink-600 hover:bg-ipsur-pink-700 rounded-lg shadow-sm transition"
+                            >
+                              Entregar Ahora
+                            </button>
+                          </div>
+                        ) : (
+                          <p className="text-[11px] text-slate-400 italic">
+                            El apartado cerró automáticamente el {formatDateTime(act.dueDate)}.
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 

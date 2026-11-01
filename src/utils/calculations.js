@@ -74,14 +74,16 @@ export function calculateStudentGrades(classroom, studentId) {
   const attendanceScore = Number(studentAssessments.attendanceScore) || 100;
   const participationScore = Number(studentAssessments.participationScore) || 100;
 
-  const criteria = classroom.criteria || {
-    activities: 40,
-    examProject: 30,
-    attendance: 15,
-    participation: 15
+  const criteria = {
+    activities: Number(classroom.criteria?.activities) || 0,
+    examProject: Number(classroom.criteria?.examProject) || 0,
+    attendance: Number(classroom.criteria?.attendance) || 0,
+    participation: Number(classroom.criteria?.participation) || 0
   };
 
-  const isConfigured = Boolean(classroom.criteriaConfigured);
+  const isConfigured = Boolean(classroom.criteriaConfigured) && (
+    (criteria.activities + criteria.examProject + criteria.attendance + criteria.participation) === 100
+  );
 
   let finalAverage = 0;
   let weightedActivities = 0;
@@ -98,12 +100,20 @@ export function calculateStudentGrades(classroom, studentId) {
     finalAverage = Number((weightedActivities + weightedExam + weightedAttendance + weightedParticipation).toFixed(1));
   }
 
-  // Academic status based on Mexican high school standards (passing grade >= 70 or >= 60 depending on model, standard is 70)
+  // Academic status based on Mexican high school standards (passing grade >= 70)
   let statusText = 'En Curso';
-  let statusColor = 'text-blue-600 bg-blue-50 border-blue-200';
+  let statusColor = 'text-indigo-700 bg-indigo-50 border-indigo-200';
   let badgeType = 'info';
 
-  if (finalAverage >= 70) {
+  if (!isConfigured) {
+    statusText = 'En Configuración Docente';
+    statusColor = 'text-blue-700 bg-blue-50 border-blue-200';
+    badgeType = 'info';
+  } else if (gradedSubs.length === 0 && examScore === 0) {
+    statusText = 'En Curso';
+    statusColor = 'text-indigo-700 bg-indigo-50 border-indigo-200';
+    badgeType = 'info';
+  } else if (finalAverage >= 70) {
     statusText = 'Aprobado';
     statusColor = 'text-emerald-700 bg-emerald-50 border-emerald-200';
     badgeType = 'success';

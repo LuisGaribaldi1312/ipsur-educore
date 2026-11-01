@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import CountdownBadge from '../common/CountdownBadge';
+import StudentGeneralBoletaModal from './StudentGeneralBoletaModal';
 import { calculateStudentGrades } from '../../utils/calculations';
 import { getDeadlineStatus, formatDateTime } from '../../utils/dateFormatter';
 import { 
@@ -24,7 +25,10 @@ import {
   XCircle,
   HelpCircle,
   MessageSquare,
-  School
+  School,
+  Printer,
+  ShieldCheck,
+  Info
 } from 'lucide-react';
 
 export default function StudentDashboard({ onSelectClassroom }) {
@@ -38,8 +42,9 @@ export default function StudentDashboard({ onSelectClassroom }) {
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Tab between "Monitoreo de Actividades" and "Mis Aulas Virtuales"
-  const [mainTab, setMainTab] = useState('monitoreo'); // 'monitoreo' | 'materias'
+  // Tab between "Monitoreo de Actividades", "Mis Aulas Virtuales", and "Mi Boleta de Calificaciones"
+  const [mainTab, setMainTab] = useState('monitoreo'); // 'monitoreo' | 'materias' | 'boleta'
+  const [isPrintBoletaOpen, setIsPrintBoletaOpen] = useState(false);
 
   // Find enrolled classrooms for this student
   const enrolledClassrooms = classrooms.filter(c => 
@@ -174,10 +179,19 @@ export default function StudentDashboard({ onSelectClassroom }) {
           </p>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <div className="bg-white/15 border border-white/15 px-4 py-2 rounded-2xl flex items-center gap-3 shadow-sm">
-              <span className="text-xs text-indigo-200 font-medium">Promedio General Ponderado:</span>
-              <span className="font-display text-xl font-black text-white">{overallAverage} <span className="text-xs font-normal text-pink-200">/ 100</span></span>
-            </div>
+            <button
+              onClick={() => setMainTab('boleta')}
+              className="bg-white/15 hover:bg-white/25 border border-white/20 px-4 py-2 rounded-2xl flex items-center gap-3 shadow-sm transition text-left group"
+              title="Click para ver Mi Boleta Oficial Completa"
+            >
+              <div>
+                <span className="text-[11px] text-indigo-200 font-medium block">Promedio General Ponderado:</span>
+                <span className="font-display text-xl font-black text-white group-hover:text-pink-200 transition">{overallAverage} <span className="text-xs font-normal text-pink-200">/ 100</span></span>
+              </div>
+              <span className="text-[10px] bg-gradient-to-r from-ipsur-pink-500 to-rose-600 text-white font-bold px-2 py-0.5 rounded-full ml-1">
+                Ver Boleta
+              </span>
+            </button>
 
             <div className="bg-white/15 border border-white/15 px-4 py-2 rounded-2xl flex items-center gap-3 shadow-sm">
               <span className="text-xs text-indigo-200 font-medium">Materias Activas:</span>
@@ -227,6 +241,23 @@ export default function StudentDashboard({ onSelectClassroom }) {
           >
             <BookOpen className={`w-4 h-4 ${mainTab === 'materias' ? 'text-pink-300' : 'text-slate-400'}`} />
             <span>Mis Aulas Virtuales ({enrolledClassrooms.length} Asignaturas)</span>
+          </button>
+
+          <button
+            onClick={() => setMainTab('boleta')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+              mainTab === 'boleta'
+                ? 'bg-gradient-to-r from-ipsur-navy-800 to-indigo-900 text-white shadow-md'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Award className={`w-4 h-4 ${mainTab === 'boleta' ? 'text-pink-300' : 'text-slate-400'}`} />
+            <span>Mi Boleta de Calificaciones</span>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+              mainTab === 'boleta' ? 'bg-white/20 text-white' : 'bg-pink-50 text-pink-700 border border-pink-200'
+            }`}>
+              {overallAverage} pts
+            </span>
           </button>
         </div>
 
@@ -775,6 +806,322 @@ export default function StudentDashboard({ onSelectClassroom }) {
           </div>
         </div>
       )}
+
+      {/* TAB 3: MI BOLETA DE CALIFICACIONES OFICIAL */}
+      {mainTab === 'boleta' && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          {/* Executive Boleta Header */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-ipsur-pink-600 bg-pink-50 px-2.5 py-0.5 rounded-full border border-pink-200">
+                  Expediente Escolar Personal
+                </span>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  <span>Calificaciones Certificadas</span>
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 font-display">
+                Boleta Integral de Calificaciones
+              </h2>
+              <p className="text-xs text-slate-500">
+                Instituto Peninsular del Sur · Bachillerato Virtual Oficial · Ciclo: 1er Bimestre 2026
+              </p>
+            </div>
+
+            <button
+              onClick={() => setIsPrintBoletaOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-ipsur-navy-800 hover:bg-ipsur-navy-900 rounded-xl shadow-md transition self-start md:self-auto"
+            >
+              <Printer className="w-4 h-4 text-pink-400" />
+              <span>Descargar / Imprimir Boleta Oficial (PDF)</span>
+            </button>
+          </div>
+
+          {/* Student Credentials Strip */}
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 text-xs">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-ipsur-navy-800 text-white flex items-center justify-center font-bold font-display text-sm shadow">
+                {currentUser.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
+              </div>
+              <div>
+                <p className="font-bold text-slate-900 text-sm">{currentUser.name}</p>
+                <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 mt-0.5 font-mono">
+                  <span>Matrícula: <strong className="text-slate-800">{currentUser.matricula}</strong></span>
+                  <span>•</span>
+                  <span>Grupo: <strong className="text-slate-800">{currentUser.grupo || 'PREPA-101-ONLINE'}</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 text-right">
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Estatus en Plataforma</span>
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100/70 px-2.5 py-0.5 rounded-full border border-emerald-300">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Alumno Regular Acreditado</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 4 Summary KPIs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-1">
+              <span className="text-[11px] text-slate-500 font-semibold block">Promedio General Ponderado</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black text-ipsur-navy-900 font-display">{overallAverage}</span>
+                <span className="text-xs text-slate-400 font-bold">/ 100</span>
+              </div>
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 inline-block mt-1">
+                Acreditación Aprobatoria
+              </span>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-1">
+              <span className="text-[11px] text-slate-500 font-semibold block">Asignaturas en Curso</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black text-slate-800 font-display">{enrolledClassrooms.length}</span>
+                <span className="text-xs text-slate-400 font-bold">Materias</span>
+              </div>
+              <span className="text-[11px] text-slate-500 block mt-1">
+                100% inscritas en el ciclo
+              </span>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-1">
+              <span className="text-[11px] text-slate-500 font-semibold block">Tareas Evaluadas</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black text-indigo-700 font-display">{stats.gradedCount}</span>
+                <span className="text-xs text-slate-400 font-bold">de {stats.total} actividades</span>
+              </div>
+              <span className="text-[11px] text-slate-500 block mt-1">
+                {stats.pendingCount > 0 ? `${stats.pendingCount} tareas por entregar` : 'Sin tareas pendientes'}
+              </span>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-1">
+              <span className="text-[11px] text-slate-500 font-semibold block">Promedio de Actividades</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black text-pink-700 font-display">{stats.avgScore || '—'}</span>
+                <span className="text-xs text-slate-400 font-bold">pts</span>
+              </div>
+              <span className="text-[11px] text-slate-500 block mt-1">
+                Sobre actividades calificadas
+              </span>
+            </div>
+          </div>
+
+          {/* Official Subject-by-Subject Gradebook Table */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden space-y-0">
+            <div className="p-4 sm:p-5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Award className="w-4 h-4 text-ipsur-pink-600" />
+                  <span>Relación Oficial de Calificaciones por Asignatura</span>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Cálculo ponderado oficial conforme a las 4 áreas reglamentarias de evaluación.
+                </p>
+              </div>
+
+              <span className="text-xs bg-white border border-slate-300 text-slate-700 px-3 py-1 rounded-lg font-mono self-start sm:self-auto">
+                {enrolledClassrooms.length} Materias Registradas
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-100/80 text-slate-700 uppercase font-bold text-[10px] border-b border-slate-200">
+                  <tr>
+                    <th className="p-3.5 border-r border-slate-200">Clave</th>
+                    <th className="p-3.5 border-r border-slate-200">Asignatura</th>
+                    <th className="p-3.5 border-r border-slate-200">Docente Titular</th>
+                    <th className="p-3.5 text-center border-r border-slate-200">Actividades</th>
+                    <th className="p-3.5 text-center border-r border-slate-200">Examen</th>
+                    <th className="p-3.5 text-center border-r border-slate-200">Asistencia</th>
+                    <th className="p-3.5 text-center border-r border-slate-200">Participación</th>
+                    <th className="p-3.5 text-center border-r border-slate-200 bg-slate-200/70 font-black">Promedio Bimestral</th>
+                    <th className="p-3.5 text-center border-r border-slate-200">Estatus</th>
+                    <th className="p-3.5 text-center">Acción</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {enrolledClassrooms.map(cls => {
+                    const gradeData = calculateStudentGrades(cls, currentUser.id);
+                    const isConf = gradeData?.isConfigured;
+
+                    return (
+                      <tr key={cls.id} className="hover:bg-slate-50/80 transition">
+                        <td className="p-3.5 font-mono font-bold text-slate-700 border-r border-slate-100">
+                          {cls.code}
+                        </td>
+                        <td className="p-3.5 font-bold text-slate-900 border-r border-slate-100">
+                          {cls.name}
+                        </td>
+                        <td className="p-3.5 text-slate-600 border-r border-slate-100">
+                          {cls.teacherName}
+                        </td>
+                        <td className="p-3.5 text-center border-r border-slate-100">
+                          {isConf ? (
+                            <div>
+                              <span className="font-mono font-bold text-slate-800">{gradeData.activitiesAvg} pts</span>
+                              <span className="text-[10px] text-slate-400 block">({cls.criteria?.activities}%)</span>
+                            </div>
+                          ) : (
+                            <span className="text-slate-400 italic">En config.</span>
+                          )}
+                        </td>
+                        <td className="p-3.5 text-center border-r border-slate-100">
+                          {isConf ? (
+                            <div>
+                              <span className="font-mono font-bold text-slate-800">{gradeData.examScore} pts</span>
+                              <span className="text-[10px] text-slate-400 block">({cls.criteria?.examProject}%)</span>
+                            </div>
+                          ) : (
+                            <span className="text-slate-400 italic">En config.</span>
+                          )}
+                        </td>
+                        <td className="p-3.5 text-center border-r border-slate-100">
+                          {isConf ? (
+                            <div>
+                              <span className="font-mono font-bold text-slate-800">{gradeData.attendanceScore} pts</span>
+                              <span className="text-[10px] text-slate-400 block">({cls.criteria?.attendance}%)</span>
+                            </div>
+                          ) : (
+                            <span className="text-slate-400 italic">En config.</span>
+                          )}
+                        </td>
+                        <td className="p-3.5 text-center border-r border-slate-100">
+                          {isConf ? (
+                            <div>
+                              <span className="font-mono font-bold text-slate-800">{gradeData.participationScore} pts</span>
+                              <span className="text-[10px] text-slate-400 block">({cls.criteria?.participation}%)</span>
+                            </div>
+                          ) : (
+                            <span className="text-slate-400 italic">En config.</span>
+                          )}
+                        </td>
+                        <td className="p-3.5 text-center font-black bg-slate-50 border-r border-slate-100 text-ipsur-navy-900 text-base">
+                          {isConf ? (
+                            <span>{gradeData.finalAverage} <span className="text-[10px] font-normal text-slate-400">/ 100</span></span>
+                          ) : (
+                            <span className="text-slate-400 text-xs font-normal">Por definir</span>
+                          )}
+                        </td>
+                        <td className="p-3.5 text-center border-r border-slate-100">
+                          <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${gradeData?.statusColor || 'text-slate-600 bg-slate-50 border-slate-200'}`}>
+                            {gradeData?.statusText || 'En Curso'}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-center">
+                          <button
+                            onClick={() => onSelectClassroom(cls.id)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-ipsur-navy-700 hover:text-ipsur-navy-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                          >
+                            <span>Ir a Sala</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Detailed Activities Log with Teacher Feedback */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+                  <CheckSquare className="w-4 h-4 text-ipsur-pink-600" />
+                  <span>Historial Detallado de Mis Tareas Evaluadas y Retroalimentación</span>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Evidencia curricular de actividades entregadas con la calificación y comentarios otorgados por tus docentes.
+                </p>
+              </div>
+
+              <span className="text-xs text-slate-500 font-mono">
+                {stats.gradedCount} de {stats.submittedCount} entregas calificadas
+              </span>
+            </div>
+
+            {/* Submissions list */}
+            {allActivities.filter(a => a.isSubmitted).length === 0 ? (
+              <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                <FileText className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                <h4 className="text-sm font-bold text-slate-700">Aún no registras tareas entregadas</h4>
+                <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                  Visita la pestaña de "Monitoreo de Actividades" o entra a tus salas para realizar tus primeras entregas académicas.
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                {allActivities
+                  .filter(a => a.isSubmitted)
+                  .map(act => (
+                    <div key={act.id} className="p-4 hover:bg-slate-50 transition space-y-2.5">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                        <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider bg-ipsur-navy-100 text-ipsur-navy-800 px-2 py-0.5 rounded font-mono">
+                              {act.classroomCode} · {act.classroomName}
+                            </span>
+                            <span className="text-[10px] text-slate-500">
+                              Prof. {act.teacherName}
+                            </span>
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-900">{act.title}</h4>
+                        </div>
+
+                        <div>
+                          {act.grade !== null && act.grade !== undefined ? (
+                            <span className="inline-flex items-center gap-1 text-xs font-black text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-300">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>{act.grade} / 100 Pts</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-blue-800 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                              <Clock className="w-3.5 h-3.5 text-blue-600" />
+                              <span>En revisión docente</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Feedback from teacher */}
+                      {act.feedback && (
+                        <div className="p-2.5 bg-emerald-50/70 border border-emerald-200 rounded-lg text-emerald-900 text-xs">
+                          <span className="text-[10px] font-bold uppercase tracking-wider block text-emerald-800">
+                            💬 Retroalimentación Oficial del Docente ({act.teacherName}):
+                          </span>
+                          <p className="italic mt-0.5 font-medium">"{act.feedback}"</p>
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-400 pt-1">
+                        <span>Archivo enviado: <strong className="text-slate-600 font-mono">{act.submission?.fileName || 'Documento_Entregado.pdf'}</strong></span>
+                        {act.submittedAt && (
+                          <span>Entregado el: {formatDateTime(act.submittedAt)}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Official General Boleta Modal for Printing / PDF */}
+      <StudentGeneralBoletaModal
+        isOpen={isPrintBoletaOpen}
+        onClose={() => setIsPrintBoletaOpen(false)}
+      />
     </div>
   );
 }
