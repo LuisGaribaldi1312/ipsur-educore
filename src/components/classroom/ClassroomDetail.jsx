@@ -146,7 +146,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
             >
               <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
               <Video className="w-4 h-4 text-ipsur-pink-600 transition-transform group-hover:scale-110" />
-              <span>Portal de Sesión Virtual ({classroom.virtualSession?.platform || 'Meet / Zoom / Aula'})</span>
+              <span>Aula Virtual en Vivo y Clases Simultáneas</span>
             </button>
 
             {/* Quick button to view official rubric loaded by coordinator */}

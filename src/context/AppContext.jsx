@@ -88,7 +88,17 @@ export function AppProvider({ children }) {
       bannerGradient: 'bg-gradient-to-r from-ipsur-navy-800 to-indigo-900',
       teacherId: teacher?.id || 'usr-prof-1',
       teacherName: teacher?.name || 'Docente Asignado',
-      roomLink: `https://meet.ipsur.edu.mx/clase-${code.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+      roomLink: `https://meet.jit.si/IPSUR_${code.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
+      virtualSession: {
+        platform: 'Aula Virtual IPSUR',
+        link: `https://meet.jit.si/IPSUR_${code.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
+        meetingId: code,
+        passcode: 'IPSUR2026',
+        schedule: 'Lunes y Miércoles 18:00 - 19:30 hrs',
+        status: 'live',
+        channelName: `IPSUR_${code.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
+        topic: `Clase Virtual en Vivo · ${name}`
+      },
       createdAt: new Date().toISOString(),
       coordinatorNote: 'Sala habilitada oficialmente por Coordinación Académica IPSUR.',
       criteriaConfigured: false,

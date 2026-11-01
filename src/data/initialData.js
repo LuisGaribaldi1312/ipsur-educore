@@ -122,12 +122,12 @@ export const INITIAL_CLASSROOMS = [
     createdAt: '2026-10-01T08:00:00Z',
     coordinatorNote: 'Sala habilitada oficialmente por Coordinación Académica IPSUR. Rúbrica y temario aprobados por SEP/DGB.',
     
-    // Virtual Session Configuration (Google Meet, Zoom, Aula Virtual)
+    // Virtual Session Configuration (Aula Virtual IPSUR)
     virtualSession: {
-      platform: 'Google Meet',
-      link: 'https://meet.google.com/new',
-      meetingId: '845 2100 101',
-      passcode: 'IPSUR-MAT101',
+      platform: 'Aula Virtual IPSUR',
+      link: 'https://meet.jit.si/IPSUR_Matematicas_I_Virtual',
+      meetingId: 'IPSUR-MAT101',
+      passcode: 'IPSUR2026',
       schedule: 'Lunes y Miércoles 18:00 - 19:30 hrs',
       status: 'live',
       channelName: 'IPSUR_Matematicas_I_Virtual',
@@ -397,10 +397,10 @@ export const INITIAL_CLASSROOMS = [
     
     // Virtual Session Configuration (Simultaneous Class 2)
     virtualSession: {
-      platform: 'Google Meet',
-      link: 'https://meet.google.com/new',
-      meetingId: '845 2100 102',
-      passcode: 'IPSUR-QUI101',
+      platform: 'Aula Virtual IPSUR',
+      link: 'https://meet.jit.si/IPSUR_Quimica_I_Virtual',
+      meetingId: 'IPSUR-QUI101',
+      passcode: 'IPSUR2026',
       schedule: 'Lunes y Miércoles 18:00 - 19:30 hrs (En Simultáneo)',
       status: 'live',
       channelName: 'IPSUR_Quimica_I_Virtual',
@@ -497,10 +497,10 @@ export const INITIAL_CLASSROOMS = [
     
     // Virtual Session Configuration (Simultaneous Class 3)
     virtualSession: {
-      platform: 'Google Meet',
-      link: 'https://meet.google.com/new',
-      meetingId: '845 2100 103',
-      passcode: 'IPSUR-TLR101',
+      platform: 'Aula Virtual IPSUR',
+      link: 'https://meet.jit.si/IPSUR_Taller_Lectura_I_Virtual',
+      meetingId: 'IPSUR-TLR101',
+      passcode: 'IPSUR2026',
       schedule: 'Lunes y Miércoles 18:00 - 19:30 hrs (En Simultáneo)',
       status: 'live',
       channelName: 'IPSUR_Taller_Lectura_I_Virtual',
