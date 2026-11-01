@@ -39,41 +39,41 @@ export default function TeacherDashboard({ onSelectClassroom }) {
   return (
     <div className="space-y-6">
       {/* Teacher Hero Banner */}
-      <div className="bg-gradient-to-r from-indigo-900 via-ipsur-navy-800 to-ipsur-pink-800 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-        <div className="relative z-10 max-w-2xl">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md p-1.5 flex items-center justify-center border border-white/20 shadow-inner flex-shrink-0">
-              <img src="/ipsur-logo.png" alt="IPSUR Emblem" className="w-full h-full object-contain filter drop-shadow" />
+      <div className="bg-gradient-to-r from-[#0A0D1B] via-[#141B41] to-[#750042] rounded-3xl p-6 sm:p-9 text-white shadow-xl border border-white/10 relative overflow-hidden">
+        <div className="relative z-10 max-w-3xl">
+          <div className="flex items-center gap-3.5 mb-3.5">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-md p-2 flex items-center justify-center border border-white/20 shadow-2xl flex-shrink-0">
+              <img src="/ipsur-logo.png" alt="IPSUR Emblem" className="w-full h-full object-contain filter drop-shadow-[0_2px_10px_rgba(255,255,255,0.25)]" />
             </div>
             <div>
-              <div className="inline-flex items-center gap-2 bg-white/10 px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-pink-200">
+              <div className="inline-flex items-center gap-2 bg-white/15 px-3 py-0.5 rounded-full text-[11px] font-bold text-pink-200 border border-white/15">
                 <BookOpen className="w-3.5 h-3.5 text-ipsur-pink-400" />
                 <span>Portal del Docente Titular · Prepa en Línea IPSUR</span>
               </div>
-              <p className="text-[11px] text-indigo-200 mt-0.5 font-medium">Instituto Peninsular del Sur</p>
+              <p className="text-[11px] sm:text-xs text-indigo-200 mt-1 font-medium tracking-wide">Instituto Peninsular del Sur · "La educación es el camino"</p>
             </div>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
             Bienvenida, {currentUser.name}
           </h1>
-          <p className="text-xs sm:text-sm text-indigo-100 mt-2 leading-relaxed">
+          <p className="text-xs sm:text-sm text-indigo-100/90 mt-2.5 leading-relaxed font-normal max-w-2xl">
             {currentUser.title}. Administra tus aulas virtuales, establece los porcentajes de evaluación obligatorios al 100%, sube materiales didácticos y califica las tareas en el rango de 0 a 100.
           </p>
 
-          <div className="mt-4 flex flex-wrap items-center gap-4 text-xs">
-            <span className="bg-white/15 px-3 py-1 rounded-lg">
-              Salas a tu cargo: <strong className="text-white">{displayClassrooms.length}</strong>
+          <div className="mt-5 flex flex-wrap items-center gap-3 text-xs">
+            <span className="bg-white/15 px-3.5 py-1.5 rounded-xl border border-white/10 shadow-sm">
+              Salas a tu cargo: <strong className="text-white font-bold">{displayClassrooms.length}</strong>
             </span>
-            <span className="bg-white/15 px-3 py-1 rounded-lg">
-              Tareas por calificar: <strong className="text-pink-300">{totalPendingGrading}</strong>
+            <span className="bg-white/15 px-3.5 py-1.5 rounded-xl border border-white/10 shadow-sm">
+              Tareas por calificar: <strong className="text-pink-300 font-bold">{totalPendingGrading}</strong>
             </span>
           </div>
         </div>
 
         {/* Decorative Transparent Watermark */}
         <div className="absolute -right-4 -bottom-10 opacity-20 pointer-events-none hidden md:block">
-          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-72 h-auto object-contain filter brightness-150 drop-shadow-2xl" />
+          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-80 h-auto object-contain filter brightness-150 drop-shadow-2xl" />
         </div>
       </div>
 
@@ -117,23 +117,23 @@ export default function TeacherDashboard({ onSelectClassroom }) {
             return (
               <div
                 key={cls.id}
-                className="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between"
+                className="executive-card rounded-2xl overflow-hidden flex flex-col justify-between group hover:-translate-y-1"
               >
                 {/* Header */}
-                <div className="p-5 bg-gradient-to-r from-ipsur-navy-800 to-indigo-900 text-white">
-                  <div className="flex items-center justify-between text-xs mb-2">
-                    <span className="font-mono bg-white/20 px-2 py-0.5 rounded font-bold">
+                <div className="p-5 bg-gradient-to-r from-[#0E1229] via-[#1E1B4B] to-[#500030] text-white">
+                  <div className="flex items-center justify-between text-xs mb-2.5">
+                    <span className="font-mono bg-white/15 px-2.5 py-0.5 rounded-md font-bold tracking-wider text-[10px] border border-white/10">
                       {cls.code}
                     </span>
-                    <span className="bg-ipsur-pink-500 text-white font-bold px-2 py-0.5 rounded-full text-[10px]">
+                    <span className="bg-gradient-to-r from-ipsur-pink-500 to-rose-600 text-white font-bold px-2.5 py-0.5 rounded-full text-[10px] shadow-sm">
                       {cls.periodName}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-white line-clamp-1">
+                  <h3 className="font-display text-base font-bold text-white line-clamp-1 group-hover:text-pink-200 transition-colors">
                     {cls.name}
                   </h3>
-                  <p className="text-xs text-indigo-200 mt-1">
+                  <p className="text-xs text-indigo-200/90 mt-1 font-medium">
                     Grupo: {cls.group} · {studentsCount} Alumnos
                   </p>
                 </div>

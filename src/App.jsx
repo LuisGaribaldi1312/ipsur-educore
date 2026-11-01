@@ -37,42 +37,44 @@ function MainLayout() {
         )}
       </main>
 
-      {/* Institutional Footer */}
-      <footer className="bg-white border-t border-slate-200 mt-12 py-8 text-xs text-slate-500">
+      {/* Institutional Executive Footer */}
+      <footer className="bg-white border-t border-slate-200 mt-16 py-10 text-xs text-slate-500 shadow-inner">
         <div className="w-full px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 max-w-[1920px] mx-auto space-y-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <img
-                src="/ipsur-logo.png"
-                alt="IPSUR Logo"
-                className="h-10 w-auto object-contain"
-              />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-1.5 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center">
+                <img
+                  src="/ipsur-logo.png"
+                  alt="IPSUR Logo Oficial"
+                  className="h-14 sm:h-16 w-auto object-contain filter drop-shadow"
+                />
+              </div>
               <div>
-                <p className="font-bold text-slate-800 text-sm">
-                  {institutionalInfo.name} <span className="text-slate-400 font-normal">| {institutionalInfo.tagline}</span>
+                <p className="font-display font-black text-slate-900 text-base sm:text-lg">
+                  {institutionalInfo.name} <span className="text-slate-400 font-normal text-xs">| {institutionalInfo.tagline}</span>
                 </p>
-                <p className="text-[11px] text-slate-500 font-semibold">
-                  {institutionalInfo.schoolName} — <span className="italic text-ipsur-pink-600">"{institutionalInfo.schoolMotto}"</span>
+                <p className="text-xs text-slate-600 font-semibold mt-0.5">
+                  {institutionalInfo.schoolName} — <span className="italic text-ipsur-pink-600 font-serif font-medium">"{institutionalInfo.schoolMotto}"</span>
                 </p>
               </div>
             </div>
 
             <div className="text-center md:text-right">
-              <p className="font-bold text-ipsur-navy-800 text-xs">
+              <p className="font-display font-bold text-ipsur-navy-900 text-sm">
                 {institutionalInfo.slogan}
               </p>
-              <p className="text-[11px] text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 {institutionalInfo.subSlogan}
               </p>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-400">
+          <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
             <p>
-              © {new Date().getFullYear()} {institutionalInfo.schoolName}. Todos los derechos reservados. Clave de Registro RVOE: {institutionalInfo.rvoe}.
+              © {new Date().getFullYear()} {institutionalInfo.schoolName}. Todos los derechos reservados. Clave Oficial RVOE: {institutionalInfo.rvoe}.
             </p>
-            <div className="flex items-center gap-3">
-              <span>Soporte Técnico: {institutionalInfo.supportEmail}</span>
+            <div className="flex items-center gap-3 font-medium">
+              <span>Soporte: {institutionalInfo.supportEmail}</span>
               <span>•</span>
               <span>Tel: {institutionalInfo.phone}</span>
             </div>

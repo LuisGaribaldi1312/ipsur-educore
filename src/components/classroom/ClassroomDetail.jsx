@@ -105,46 +105,46 @@ export default function ClassroomDetail({ classroomId, onBack }) {
         </div>
       </div>
 
-      {/* Classroom Hero Banner with integrated logo */}
-      <div className="rounded-3xl overflow-hidden shadow-md border border-slate-200 bg-gradient-to-r from-ipsur-navy-900 via-indigo-900 to-ipsur-navy-800 text-white p-5 sm:p-7 md:p-8 relative">
+      {/* Classroom Hero Banner with enlarged executive emblem */}
+      <div className="rounded-3xl overflow-hidden shadow-xl border border-white/10 bg-gradient-to-r from-[#0A0D1B] via-[#141B41] to-[#750042] text-white p-6 sm:p-8 md:p-9 relative">
         <div className="relative z-10 max-w-3xl">
-          <div className="flex items-center gap-3 mb-2.5">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/10 backdrop-blur-md p-1.5 flex items-center justify-center border border-white/20 shadow-inner flex-shrink-0">
-              <img src="/ipsur-logo.png" alt="IPSUR Logo" className="w-full h-full object-contain filter drop-shadow" />
+          <div className="flex items-center gap-3.5 mb-3.5">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-md p-2 flex items-center justify-center border border-white/20 shadow-2xl flex-shrink-0">
+              <img src="/ipsur-logo.png" alt="IPSUR Logo" className="w-full h-full object-contain filter drop-shadow-[0_2px_10px_rgba(255,255,255,0.25)]" />
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest bg-ipsur-pink-500 text-white px-2.5 py-0.5 rounded-full shadow-sm">
+              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest bg-gradient-to-r from-ipsur-pink-500 to-rose-600 text-white px-3 py-0.5 rounded-full shadow-sm">
                 Prepa en Línea IPSUR
               </span>
-              <span className="text-[10px] sm:text-[11px] font-semibold bg-white/15 text-indigo-100 px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] sm:text-[11px] font-bold bg-white/15 text-indigo-100 px-3 py-0.5 rounded-full border border-white/10">
                 Grupo: {classroom.group}
               </span>
             </div>
           </div>
 
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
             {classroom.name}
           </h1>
 
-          <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-indigo-100">
+          <div className="mt-3.5 flex flex-wrap items-center gap-4 text-xs sm:text-sm text-indigo-100/90 font-medium">
             <span className="flex items-center gap-1.5">
               <span className="text-white/60">Profesor Titular:</span>
-              <strong className="text-white font-semibold">{classroom.teacherName}</strong>
+              <strong className="text-white font-bold">{classroom.teacherName}</strong>
             </span>
             <span className="hidden sm:inline text-white/30">•</span>
             <span className="flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5 text-indigo-300" />
+              <Users className="w-4 h-4 text-pink-300" />
               <span>{enrolledStudents.length} Estudiantes Matriculados</span>
             </span>
           </div>
 
-          {/* Portal de Videoconferencias Sincrónicas (Google Meet, Zoom, Teams, Aula Virtual) */}
-          <div className="mt-4 pt-4 border-t border-white/15 flex flex-wrap items-center gap-3">
+          {/* Portal de Videoconferencias Sincrónicas */}
+          <div className="mt-5 pt-4 border-t border-white/15 flex flex-wrap items-center gap-3">
             <button
               onClick={() => setVirtualPortalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-ipsur-navy-900 bg-white hover:bg-slate-100 rounded-xl shadow-md transition group"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-bold text-ipsur-navy-900 bg-white hover:bg-slate-100 rounded-xl shadow-lg transition active:scale-95 group"
             >
-              <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></div>
               <Video className="w-4 h-4 text-ipsur-pink-600 transition-transform group-hover:scale-110" />
               <span>Aula Virtual en Vivo y Clases Simultáneas</span>
             </button>
@@ -152,9 +152,9 @@ export default function ClassroomDetail({ classroomId, onBack }) {
             {/* Quick button to view official rubric loaded by coordinator */}
             <button
               onClick={() => setRubricModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition shadow-sm"
             >
-              <FileText className="w-3.5 h-3.5 text-pink-300" />
+              <FileText className="w-4 h-4 text-pink-300" />
               <span>Ver Rúbrica Oficial de Coordinación</span>
             </button>
           </div>
@@ -162,7 +162,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
 
         {/* Decorative Watermark Emblem */}
         <div className="absolute right-2 bottom-0 opacity-20 pointer-events-none hidden md:block">
-          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-64 h-auto object-contain filter brightness-150 drop-shadow-2xl" />
+          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-72 h-auto object-contain filter brightness-150 drop-shadow-2xl" />
         </div>
       </div>
 

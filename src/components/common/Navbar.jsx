@@ -53,71 +53,75 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Institutional Top Header */}
-      <div className="bg-gradient-to-r from-ipsur-navy-900 via-ipsur-navy-700 to-ipsur-pink-700 text-white text-xs py-1.5 px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 shadow-sm">
-        <div className="w-full max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold tracking-wide text-[11px] sm:text-xs">INSTITUTO PENINSULAR DEL SUR</span>
-            <span className="hidden sm:inline text-white/50">|</span>
-            <span className="hidden md:inline italic text-pink-100">"La educación es el camino"</span>
-            <span className="hidden lg:inline bg-white/20 text-[10px] px-2 py-0.5 rounded-full font-mono">Prepa en Línea</span>
+      {/* Institutional Top Header Strip */}
+      <div className="bg-gradient-to-r from-[#0E1026] via-[#1E1F5C] to-[#990054] text-white text-xs py-2 px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 shadow-sm border-b border-white/10">
+        <div className="w-full max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5">
+            <span className="font-bold tracking-wider text-[11px] sm:text-xs text-white">INSTITUTO PENINSULAR DEL SUR</span>
+            <span className="hidden sm:inline text-white/40">•</span>
+            <span className="hidden md:inline italic text-pink-200 text-xs font-serif font-light">"La educación es el camino"</span>
+            <span className="hidden lg:inline-flex items-center gap-1 bg-white/15 text-[10px] font-bold px-2.5 py-0.5 rounded-full text-white border border-white/20">
+              <Sparkles className="w-3 h-3 text-pink-300" />
+              <span>Campus Virtual Oficial</span>
+            </span>
           </div>
 
-          <div className="flex items-center gap-3 ml-auto text-[11px]">
-            <span className="text-white/80 hidden xl:inline">
+          <div className="flex items-center gap-3.5 ml-auto text-[11px]">
+            <span className="text-white/80 hidden xl:inline font-medium tracking-wide">
               Toda tu institución. Un solo sistema.
             </span>
-            <div className="flex items-center gap-1.5 bg-black/25 px-2.5 py-0.5 rounded-md border border-white/10">
+            <div className="flex items-center gap-2 bg-black/30 px-3 py-1 rounded-full border border-white/15 shadow-inner">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="font-medium text-white text-[10px] sm:text-xs">{activePeriod.name}</span>
+              <span className="font-bold text-white text-[10px] sm:text-xs tracking-wide">{activePeriod.name}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Navbar */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+      {/* Main Executive Navbar */}
+      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-40 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
         <div className="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
-          <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Logo and Brand Title with transparent logo integration */}
+          <div className="flex items-center justify-between h-20 sm:h-24 md:h-28">
+            {/* Logo and Brand Title with enlarged executive presentation */}
             <div 
-              className="flex items-center gap-3 sm:gap-4 cursor-pointer select-none min-w-0 py-1"
+              className="flex items-center gap-3.5 sm:gap-5 md:gap-6 cursor-pointer select-none min-w-0 py-2 group"
               onClick={() => setActiveClassroomId(null)}
               title="Ir al inicio de IPSUR EDUCORE"
             >
-              <div className="relative group flex-shrink-0 flex items-center justify-center">
+              {/* Enlarged Official Logo */}
+              <div className="relative flex-shrink-0 flex items-center justify-center p-1 sm:p-1.5 rounded-2xl bg-gradient-to-b from-slate-50 to-white border border-slate-200/80 shadow-[0_4px_12px_rgba(46,48,146,0.08)] group-hover:shadow-[0_6px_20px_rgba(230,0,126,0.18)] group-hover:border-pink-300 transition-all duration-300">
                 <img 
                   src="/ipsur-logo.png" 
                   alt="IPSUR Logo Oficial" 
-                  className="h-12 sm:h-16 w-auto object-contain filter drop-shadow-[0_2px_6px_rgba(46,48,146,0.15)] transition-transform duration-300 group-hover:scale-105"
+                  className="h-14 sm:h-18 md:h-22 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(46,48,146,0.2)] transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
 
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <h1 className="text-lg sm:text-2xl font-black tracking-tight text-ipsur-navy-800 truncate">
-                    IPSUR <span className="text-ipsur-pink-500">EDUCORE</span>
+              <div className="min-w-0 flex flex-col justify-center">
+                <div className="flex items-center gap-2 sm:gap-2.5">
+                  <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-ipsur-navy-900 truncate">
+                    IPSUR <span className="bg-gradient-to-r from-ipsur-pink-500 via-rose-500 to-ipsur-pink-600 bg-clip-text text-transparent">EDUCORE</span>
                   </h1>
-                  <span className="hidden md:inline-block text-[10px] font-bold uppercase tracking-wider bg-ipsur-navy-50 text-ipsur-navy-700 border border-ipsur-navy-200 px-2 py-0.5 rounded-full flex-shrink-0">
+                  <span className="hidden sm:inline-flex items-center text-[10px] md:text-[11px] font-black uppercase tracking-widest bg-gradient-to-r from-ipsur-navy-50 to-indigo-50 text-ipsur-navy-800 border border-ipsur-navy-200/80 px-2.5 py-0.5 rounded-full shadow-sm flex-shrink-0">
                     Academic MS
                   </span>
                 </div>
-                <p className="text-[10px] sm:text-xs font-semibold text-slate-500 tracking-tight leading-tight truncate">
+                <p className="text-[10px] sm:text-xs md:text-[13px] font-bold text-slate-600 tracking-[0.22em] uppercase leading-snug truncate mt-0.5">
                   ACADEMIC MANAGEMENT SYSTEM
                 </p>
-                <p className="text-[10px] text-slate-400 hidden xl:block">
+                <p className="text-[11px] text-slate-400 font-medium hidden xl:block leading-tight mt-0.5">
                   Gestión académica · Administración · Control escolar · Tecnología
                 </p>
               </div>
             </div>
 
             {/* Right Controls: Navigation, Role Switcher, User Avatar */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3.5">
               {/* Back to dashboard button when inside a classroom */}
               {activeClassroomId && (
                 <button
                   onClick={() => setActiveClassroomId(null)}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                  className="hidden sm:flex items-center gap-2 px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300/80 rounded-xl transition shadow-sm"
                 >
                   <School className="w-4 h-4 text-ipsur-navy-600" />
                   <span>Mis Salas</span>
@@ -129,22 +133,22 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setRoleMenuOpen(!roleMenuOpen)}
-                  className="flex items-center gap-2.5 p-1.5 sm:px-3 sm:py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition text-left"
+                  className="flex items-center gap-2.5 p-1.5 sm:px-3.5 sm:py-2.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 shadow-sm transition text-left"
                 >
                   <img
                     src={currentUser.avatar}
                     alt={currentUser.name}
-                    className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm ring-2 ring-ipsur-navy-100"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-ipsur-navy-200/70"
                   />
                   <div className="hidden sm:block">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-800 line-clamp-1 max-w-[140px]">
+                      <span className="text-xs font-bold text-slate-900 line-clamp-1 max-w-[150px]">
                         {currentUser.name}
                       </span>
                       <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded border ${currentBadge.bg}`}>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${currentBadge.bg}`}>
                         {currentBadge.label}
                       </span>
                     </div>

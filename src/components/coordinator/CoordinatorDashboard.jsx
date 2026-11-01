@@ -40,33 +40,33 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-ipsur-navy-900 via-indigo-900 to-ipsur-pink-800 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-        <div className="relative z-10 max-w-2xl">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md p-1.5 flex items-center justify-center border border-white/20 shadow-inner flex-shrink-0">
-              <img src="/ipsur-logo.png" alt="IPSUR Emblem" className="w-full h-full object-contain filter drop-shadow" />
+      {/* Executive Welcome Banner */}
+      <div className="bg-gradient-to-r from-[#0A0D1B] via-[#151945] to-[#750042] rounded-3xl p-6 sm:p-9 text-white shadow-xl border border-white/10 relative overflow-hidden">
+        <div className="relative z-10 max-w-3xl">
+          <div className="flex items-center gap-3.5 mb-3.5">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-md p-2 flex items-center justify-center border border-white/20 shadow-2xl flex-shrink-0">
+              <img src="/ipsur-logo.png" alt="IPSUR Emblem" className="w-full h-full object-contain filter drop-shadow-[0_2px_10px_rgba(255,255,255,0.25)]" />
             </div>
             <div>
-              <div className="inline-flex items-center gap-2 bg-white/10 px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-pink-200">
+              <div className="inline-flex items-center gap-2 bg-white/15 px-3 py-0.5 rounded-full text-[11px] font-bold text-pink-200 border border-white/15">
                 <ShieldCheck className="w-3.5 h-3.5 text-ipsur-pink-400" />
                 <span>Módulo de Control y Coordinación Escolar</span>
               </div>
-              <p className="text-[11px] text-indigo-200 mt-0.5 font-medium">Instituto Peninsular del Sur · "La educación es el camino"</p>
+              <p className="text-[11px] sm:text-xs text-indigo-200 mt-1 font-medium tracking-wide">Instituto Peninsular del Sur · "La educación es el camino"</p>
             </div>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
             Panel de Coordinación Académica
           </h1>
-          <p className="text-xs sm:text-sm text-indigo-100 mt-2 leading-relaxed">
+          <p className="text-xs sm:text-sm text-indigo-100/90 mt-2.5 leading-relaxed font-normal max-w-2xl">
             Administra y crea salas virtuales para el bachillerato en línea, asigna docentes titulares, matricula alumnos y carga la rúbrica oficial con el temario del bimestre o cuatrimestre.
           </p>
 
-          <div className="mt-5 flex flex-wrap items-center gap-3">
+          <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
               onClick={() => setCreateModalOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-ipsur-navy-900 bg-white hover:bg-slate-100 rounded-xl shadow-md transition"
+              className="flex items-center gap-2 px-6 py-3 text-xs sm:text-sm font-bold text-ipsur-navy-900 bg-white hover:bg-slate-100 rounded-xl shadow-lg transition active:scale-95"
             >
               <Plus className="w-4 h-4 text-ipsur-pink-600" />
               <span>Crear Nueva Sala de Clases</span>
@@ -76,52 +76,66 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
 
         {/* Background decorative watermark with pure transparent emblem */}
         <div className="absolute -right-4 -bottom-10 opacity-20 pointer-events-none hidden md:block">
-          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-72 h-auto object-contain filter brightness-150 drop-shadow-2xl" />
+          <img src="/ipsur-logo.png" alt="IPSUR Watermark" className="w-80 h-auto object-contain filter brightness-150 drop-shadow-2xl" />
         </div>
       </div>
 
-      {/* KPI Cards: Responsive on phones (2 cols), tablets (2 cols), and computers (4 cols) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
-        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
+      {/* KPI Cards: Executive Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
+        <div className="executive-card p-4 sm:p-5 rounded-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ipsur-navy-600 to-indigo-600"></div>
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Salas Activas</span>
-            <School className="w-4 h-4 sm:w-5 sm:h-5 text-ipsur-navy-600" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Salas Activas</span>
+            <div className="p-2 rounded-xl bg-indigo-50 text-ipsur-navy-600 group-hover:bg-ipsur-navy-600 group-hover:text-white transition-colors duration-300">
+              <School className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
           </div>
-          <p className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800">{classrooms.length}</p>
-          <span className="text-[10px] sm:text-[11px] text-emerald-600 font-semibold mt-1 block">
+          <p className="font-display text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">{classrooms.length}</p>
+          <span className="text-[11px] text-emerald-600 font-semibold mt-1.5 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             100% Disponibles en línea
           </span>
         </div>
 
-        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="executive-card p-4 sm:p-5 rounded-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ipsur-pink-500 to-rose-500"></div>
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Estudiantes</span>
-            <Users className="w-4 h-4 sm:w-5 sm:h-5 text-ipsur-pink-500" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Estudiantes</span>
+            <div className="p-2 rounded-xl bg-pink-50 text-ipsur-pink-600 group-hover:bg-ipsur-pink-600 group-hover:text-white transition-colors duration-300">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
           </div>
-          <p className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800">{totalStudents}</p>
-          <span className="text-[10px] sm:text-[11px] text-slate-500 mt-1 block font-mono truncate">
+          <p className="font-display text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">{totalStudents}</p>
+          <span className="text-[11px] text-slate-500 mt-1.5 block font-mono truncate">
             PREPA-101-ONLINE
           </span>
         </div>
 
-        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="executive-card p-4 sm:p-5 rounded-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Docentes</span>
-            <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Docentes</span>
+            <div className="p-2 rounded-xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
+              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
           </div>
-          <p className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800">{totalTeachers}</p>
-          <span className="text-[10px] sm:text-[11px] text-indigo-600 font-semibold mt-1 block">
+          <p className="font-display text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">{totalTeachers}</p>
+          <span className="text-[11px] text-indigo-600 font-semibold mt-1.5 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
             Asignados a salas
           </span>
         </div>
 
-        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="executive-card p-4 sm:p-5 rounded-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Ciclo Activo</span>
-            <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">Ciclo Activo</span>
+            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
           </div>
-          <p className="text-base sm:text-lg md:text-xl font-black text-slate-800 truncate">1er Bimestre 2026</p>
-          <span className="text-[10px] sm:text-[11px] text-emerald-600 font-semibold mt-1 block">
+          <p className="font-display text-lg sm:text-xl md:text-2xl font-black text-slate-900 truncate">1er Bimestre 2026</p>
+          <span className="text-[11px] text-emerald-600 font-semibold mt-1.5 block">
             Modalidad Virtual SEP
           </span>
         </div>
@@ -185,24 +199,25 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
           return (
             <div
               key={cls.id}
-              className="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between"
+              className="executive-card rounded-2xl overflow-hidden flex flex-col justify-between group hover:-translate-y-1"
             >
               {/* Card Header with gradient */}
-              <div className="p-4 bg-gradient-to-r from-ipsur-navy-800 via-indigo-900 to-ipsur-navy-700 text-white relative">
-                <div className="flex items-center justify-between text-[11px] mb-2">
-                  <span className="font-mono bg-white/20 px-2 py-0.5 rounded font-semibold">
+              <div className="p-4 sm:p-5 bg-gradient-to-r from-[#0E1229] via-[#1E1B4B] to-[#500030] text-white relative">
+                <div className="flex items-center justify-between text-[11px] mb-2.5">
+                  <span className="font-mono bg-white/15 px-2.5 py-0.5 rounded-md font-bold tracking-wider text-[10px] border border-white/10">
                     {cls.code}
                   </span>
-                  <span className="bg-ipsur-pink-500/90 text-white font-bold px-2 py-0.5 rounded-full text-[10px]">
+                  <span className="bg-gradient-to-r from-ipsur-pink-500 to-rose-600 text-white font-bold px-2.5 py-0.5 rounded-full text-[10px] shadow-sm">
                     {cls.periodName}
                   </span>
                 </div>
 
-                <h3 className="text-sm font-bold text-white line-clamp-1">
+                <h3 className="font-display text-base font-bold text-white line-clamp-1 group-hover:text-pink-200 transition-colors">
                   {cls.name}
                 </h3>
-                <p className="text-xs text-indigo-200 mt-0.5 font-medium">
-                  Prof: {cls.teacherName}
+                <p className="text-xs text-indigo-200/90 mt-1 font-medium flex items-center gap-1.5">
+                  <span>Prof:</span>
+                  <strong className="text-white font-semibold">{cls.teacherName}</strong>
                 </p>
               </div>
 
