@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { USERS, INITIAL_CLASSROOMS, PERIODS, INSTITUTIONAL_INFO } from '../data/initialData';
 import { validateCriteria } from '../utils/calculations';
 import { getDeadlineStatus } from '../utils/dateFormatter';
@@ -28,6 +28,15 @@ export function AppProvider({ children }) {
 
   const [activeClassroomId, setActiveClassroomId] = useState(null);
   const [notification, setNotification] = useState(null);
+  const toastTimerRef = useRef(null);
+
+  const clearNotification = () => {
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = null;
+    }
+    setNotification(null);
+  };
 
   // Sync to localStorage
   useEffect(() => {
@@ -42,11 +51,27 @@ export function AppProvider({ children }) {
     localStorage.setItem(STORAGE_KEY_USER, currentUserId);
   }, [currentUserId]);
 
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
+
   const showToast = (title, message, type = 'success') => {
-    setNotification({ title, message, type, id: Date.now() });
-    setTimeout(() => {
-      setNotification(prev => (prev?.id === notification?.id ? null : prev));
-    }, 4500);
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
+    const toastId = Date.now();
+    setNotification({ title, message, type, id: toastId });
+
+    // Toast will disappear strictly after 3 seconds (3000ms)
+    toastTimerRef.current = setTimeout(() => {
+      setNotification(prev => (prev?.id === toastId ? null : prev));
+      toastTimerRef.current = null;
+    }, 3000);
   };
 
   const currentUser = USERS.find(u => u.id === currentUserId) || USERS[0];
@@ -428,6 +453,7 @@ export function AppProvider({ children }) {
         activeClassroomId,
         setActiveClassroomId,
         notification,
+        clearNotification,
         switchUser,
         createClassroom,
         updateClassroomRubric,

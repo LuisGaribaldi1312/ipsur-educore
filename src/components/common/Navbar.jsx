@@ -14,7 +14,8 @@ import {
   Layers,
   CheckCircle2,
   AlertCircle,
-  Info
+  Info,
+  X
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -26,6 +27,7 @@ export default function Navbar() {
     activeClassroomId, 
     setActiveClassroomId,
     notification,
+    clearNotification,
     periods
   } = useApp();
 
@@ -224,15 +226,15 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Floating Notification Toast */}
+      {/* Floating Notification Toast (Strictly disappears after 3 seconds) */}
       {notification && (
-        <div className="fixed bottom-5 right-5 z-50 max-w-md w-full animate-in slide-in-from-bottom-5 duration-300">
-          <div className={`rounded-xl p-4 shadow-xl border flex items-start gap-3 bg-white ${
+        <div className="fixed bottom-5 right-5 z-50 max-w-sm w-full mx-4 sm:mx-0 animate-in slide-in-from-bottom-5 duration-300">
+          <div className={`rounded-2xl p-4 shadow-2xl border flex items-start gap-3 bg-white relative overflow-hidden ${
             notification.type === 'error' ? 'border-rose-300 ring-2 ring-rose-100' :
             notification.type === 'info' ? 'border-blue-300 ring-2 ring-blue-100' :
             'border-emerald-300 ring-2 ring-emerald-100'
           }`}>
-            <div className={`p-2 rounded-lg flex-shrink-0 ${
+            <div className={`p-2 rounded-xl flex-shrink-0 ${
               notification.type === 'error' ? 'bg-rose-100 text-rose-600' :
               notification.type === 'info' ? 'bg-blue-100 text-blue-600' :
               'bg-emerald-100 text-emerald-600'
@@ -245,9 +247,27 @@ export default function Navbar() {
                 <CheckCircle2 className="w-5 h-5" />
               )}
             </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-bold text-slate-800">{notification.title}</h4>
-              <p className="text-xs text-slate-600 mt-0.5">{notification.message}</p>
+            <div className="flex-1 min-w-0 pr-1">
+              <h4 className="text-xs sm:text-sm font-bold text-slate-800 leading-tight">{notification.title}</h4>
+              <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5 leading-snug">{notification.message}</p>
+            </div>
+            <button
+              onClick={clearNotification}
+              className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition flex-shrink-0"
+              title="Cerrar notificación"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Visual 3-second countdown progress bar */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-100 overflow-hidden">
+              <div 
+                className={`h-full animate-toast-bar ${
+                  notification.type === 'error' ? 'bg-rose-500' :
+                  notification.type === 'info' ? 'bg-blue-500' :
+                  'bg-emerald-500'
+                }`}
+              />
             </div>
           </div>
         </div>
