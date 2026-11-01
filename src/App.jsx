@@ -5,8 +5,8 @@ import CoordinatorDashboard from './components/coordinator/CoordinatorDashboard'
 import TeacherDashboard from './components/teacher/TeacherDashboard';
 import StudentDashboard from './components/student/StudentDashboard';
 import ClassroomDetail from './components/classroom/ClassroomDetail';
+import LoginScreen from './components/auth/LoginScreen';
 import { INSTITUTIONAL_INFO } from './data/initialData';
-import { ShieldCheck, School, Heart, CheckCircle2 } from 'lucide-react';
 
 function MainLayout() {
   const { 
@@ -85,10 +85,21 @@ function MainLayout() {
   );
 }
 
+function AppContent() {
+  const { currentUserId, currentUser } = useApp();
+
+  // If no user is authenticated or page was reopened, strictly show the Login Screen
+  if (!currentUserId || !currentUser) {
+    return <LoginScreen />;
+  }
+
+  return <MainLayout />;
+}
+
 export default function App() {
   return (
     <AppProvider>
-      <MainLayout />
+      <AppContent />
     </AppProvider>
   );
 }

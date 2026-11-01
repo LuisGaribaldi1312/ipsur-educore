@@ -41,12 +41,13 @@ export function AppProvider({ children }) {
     return USERS;
   });
 
-  // Current authenticated user ID
+  // Current authenticated user ID (Session ONLY: Clears automatically when tab or browser is closed)
   const [currentUserId, setCurrentUserId] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY_USER);
-    if (saved) return saved;
-    // Default to Super Admin so platform owner can immediately operate
-    return 'usr-superadmin';
+    try {
+      return sessionStorage.getItem('ipsur_educore_session_user') || null;
+    } catch (e) {
+      return null;
+    }
   });
 
   // Load classrooms with localStorage fallback
@@ -93,10 +94,16 @@ export function AppProvider({ children }) {
   }, [classrooms]);
 
   useEffect(() => {
-    if (currentUserId) {
-      localStorage.setItem(STORAGE_KEY_USER, currentUserId);
-    } else {
+    try {
       localStorage.removeItem(STORAGE_KEY_USER);
+      localStorage.removeItem('ipsur_educore_current_user_v1');
+      if (currentUserId) {
+        sessionStorage.setItem('ipsur_educore_session_user', currentUserId);
+      } else {
+        sessionStorage.removeItem('ipsur_educore_session_user');
+      }
+    } catch (e) {
+      // Ignore
     }
   }, [currentUserId]);
 
@@ -123,15 +130,15 @@ export function AppProvider({ children }) {
     }, 3000);
   };
 
-  // Current User Object
-  const currentUser = users.find(u => u.id === currentUserId) || users[0] || USERS[0];
-  const isSuperAdmin = currentUser?.role === 'superadmin' || currentUser?.isSuperAdmin;
+  // Current User Object (null if no active session)
+  const currentUser = currentUserId ? (users.find(u => u.id === currentUserId) || null) : null;
+  const isSuperAdmin = Boolean(currentUser?.role === 'superadmin' || currentUser?.isSuperAdmin);
 
   // STRICT HIDDEN USER FILTER:
   // Non-superadmin users CANNOT see the Super Usuario in any list, table, or directory
   const visibleUsers = users.filter(u => {
     if (u.hidden || u.isSuperAdmin || u.role === 'superadmin') {
-      return isSuperAdmin && currentUser.id === u.id;
+      return isSuperAdmin && currentUser?.id === u.id;
     }
     return true;
   });
