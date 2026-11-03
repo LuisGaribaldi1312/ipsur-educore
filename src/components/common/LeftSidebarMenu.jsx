@@ -25,10 +25,11 @@ import {
   Lock,
   Layers,
   Menu,
-  X
+  X,
+  Compass
 } from 'lucide-react';
 
-export default function RightVerticalMenu() {
+export default function LeftSidebarMenu() {
   const { 
     currentUser, 
     activeClassroomId, 
@@ -42,11 +43,19 @@ export default function RightVerticalMenu() {
     showToast
   } = useApp();
 
-  // Expanded menu state (collapsed by default to not obstruct content, expandable with 1 click)
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Expanded menu state (defaults to expanded on desktop, can be collapsed/hidden with arrow click)
+  const [isExpanded, setIsExpanded] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ipsur_sidebar_expanded');
+      return saved !== null ? saved === 'true' : true;
+    } catch {
+      return true;
+    }
+  });
+
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  // Modals controlled by right menu
+  // Modals controlled by menu
   const [virtualPortalOpen, setVirtualPortalOpen] = useState(false);
   const [actaModalOpen, setActaModalOpen] = useState(false);
   const [boletaModalOpen, setBoletaModalOpen] = useState(false);
@@ -54,6 +63,18 @@ export default function RightVerticalMenu() {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   if (!currentUser) return null;
+
+  const toggleSidebar = () => {
+    setIsExpanded(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('ipsur_sidebar_expanded', String(next));
+      } catch (e) {
+        // Ignore localStorage error in private mode
+      }
+      return next;
+    });
+  };
 
   const isStudent = currentUser.role === 'student';
   const canManageUsers = isSuperAdmin || currentUser.role === 'director' || currentUser.role === 'coordinator';
@@ -157,97 +178,155 @@ export default function RightVerticalMenu() {
 
   return (
     <>
-      {/* Desktop Right Vertical Dock / Rail (Fixed to the right edge) */}
+      {/* Desktop Left Sidebar: Adhered directly to the portal layout structure (not floating) */}
       <aside 
-        aria-label="Menú Vertical Derecho"
-        className={`fixed right-3 top-1/2 -translate-y-1/2 z-40 transition-all duration-300 hidden lg:flex flex-col items-center select-none ${
+        aria-label="Menú Lateral Izquierdo Adherido"
+        className={`hidden lg:flex flex-col shrink-0 bg-[#0E1026] text-white border-r border-slate-200/20 shadow-md transition-all duration-300 select-none relative min-h-[calc(100vh-140px)] ${
           isExpanded ? 'w-64' : 'w-16'
         }`}
       >
-        <div className="w-full bg-[#0E1026]/95 backdrop-blur-2xl border border-white/20 rounded-3xl p-2.5 shadow-[0_15px_50px_rgba(0,0,0,0.5)] flex flex-col gap-2 relative">
+        {/* Border Toggle Button (anchored right on the vertical seam between sidebar and main content) */}
+        <button
+          onClick={toggleSidebar}
+          aria-label={isExpanded ? 'Ocultar menú lateral' : 'Mostrar menú lateral'}
+          title={isExpanded ? 'Ocultar menú lateral (Contraer)' : 'Mostrar menú lateral (Expandir)'}
+          className="absolute -right-3.5 top-6 z-30 w-7 h-7 rounded-full bg-[#1E1F5C] hover:bg-ipsur-pink-600 text-white border border-white/30 flex items-center justify-center shadow-lg transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+        >
+          {isExpanded ? (
+            <ChevronLeft className="w-4 h-4 text-white" />
+          ) : (
+            <ChevronRight className="w-4 h-4 text-pink-300" />
+          )}
+        </button>
+
+        <div className="w-full flex-1 flex flex-col justify-between p-2.5 relative">
           
-          {/* Header Strip with Expand / Collapse Button */}
-          <div className="flex items-center justify-between pb-2 border-b border-white/10 px-1">
-            {isExpanded && (
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span className="w-2 h-2 rounded-full bg-ipsur-pink-500 animate-pulse"></span>
-                <span className="text-[10px] font-black tracking-widest uppercase text-white/90 truncate">
-                  Menú Rápido
-                </span>
-              </div>
-            )}
-            
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition mx-auto cursor-pointer"
-              title={isExpanded ? 'Contraer menú' : 'Expandir menú lateral'}
-            >
-              {isExpanded ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-            </button>
-          </div>
-
-          {/* Menu Items Stack */}
-          <nav className="flex flex-col gap-1.5">
-            {menuItems.map(item => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  onClick={item.action}
-                  className={`group relative flex items-center rounded-2xl transition-all duration-200 cursor-pointer ${
-                    isExpanded 
-                      ? 'px-3 py-2.5 gap-3 hover:bg-white/10 text-left w-full' 
-                      : 'w-11 h-11 justify-center hover:bg-white/15'
-                  } ${item.danger ? 'hover:bg-rose-500/20 text-rose-300' : 'text-white'}`}
-                >
-                  {/* Icon Container with Gradient */}
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-tr ${item.color} text-white shadow-md group-hover:scale-105 transition-transform`}>
-                    <Icon className="w-4 h-4" />
+          <div>
+            {/* Sidebar Top Header */}
+            <div className={`flex items-center pb-3 mb-2 border-b border-white/10 ${
+              isExpanded ? 'justify-between px-2' : 'justify-center'
+            }`}>
+              {isExpanded ? (
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-ipsur-pink-500 to-indigo-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
+                    <Compass className="w-3.5 h-3.5" />
                   </div>
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-black tracking-wider uppercase text-white/90 truncate block">
+                      Menú Principal
+                    </span>
+                    <span className="text-[9px] text-pink-300 font-medium block truncate">
+                      Navegación IPSUR
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div 
+                  onClick={toggleSidebar}
+                  className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition"
+                  title="Expandir menú lateral"
+                >
+                  <ChevronRight className="w-4 h-4 text-pink-300" />
+                </div>
+              )}
 
-                  {/* Expanded Text Content */}
-                  {isExpanded && (
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold truncate leading-tight block text-white group-hover:text-pink-200">
-                          {item.label}
-                        </span>
-                        {item.live && (
-                          <span className="text-[9px] font-bold text-rose-300 bg-rose-500/30 px-1.5 py-0.2 rounded-full border border-rose-400/40 animate-pulse">
-                            VIVO
+              {isExpanded && (
+                <button
+                  onClick={toggleSidebar}
+                  className="p-1 text-white/60 hover:text-white bg-white/5 hover:bg-white/15 rounded-lg transition cursor-pointer"
+                  title="Ocultar menú lateral"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Menu Navigation Items */}
+            <nav className="flex flex-col gap-1.5 mt-1">
+              {menuItems.map(item => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={item.action}
+                    className={`group relative flex items-center rounded-2xl transition-all duration-200 cursor-pointer ${
+                      isExpanded 
+                        ? 'px-3 py-2.5 gap-3 hover:bg-white/10 text-left w-full' 
+                        : 'w-11 h-11 justify-center hover:bg-white/15 mx-auto'
+                    } ${item.danger ? 'hover:bg-rose-500/20 text-rose-300' : 'text-white'}`}
+                  >
+                    {/* Icon Container */}
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-tr ${item.color} text-white shadow-md group-hover:scale-105 transition-transform`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+
+                    {/* Expanded Content with Titles and Badges */}
+                    {isExpanded && (
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold truncate leading-tight block text-white group-hover:text-pink-200">
+                            {item.label}
                           </span>
+                          {item.live && (
+                            <span className="text-[9px] font-bold text-rose-300 bg-rose-500/30 px-1.5 py-0.2 rounded-full border border-rose-400/40 animate-pulse">
+                              VIVO
+                            </span>
+                          )}
+                          {item.badge && (
+                            <span className="text-[9px] font-mono font-bold bg-white/20 text-white px-1.5 py-0.2 rounded-full">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-white/50 block truncate leading-tight mt-0.5">
+                          {item.sublabel}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Hover Tooltip (When collapsed, opens to the RIGHT) */}
+                    {!isExpanded && (
+                      <div className="absolute left-full ml-3.5 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[#0A0D1B] text-white text-xs font-bold rounded-xl shadow-2xl border border-white/20 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 flex items-center gap-2">
+                        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#0A0D1B] border-l border-b border-white/20 rotate-45"></div>
+                        <span>{item.label}</span>
+                        {item.live && (
+                          <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
                         )}
                         {item.badge && (
-                          <span className="text-[9px] font-mono font-bold bg-white/20 text-white px-1.5 py-0.2 rounded-full">
+                          <span className="text-[9px] font-mono bg-white/20 px-1.5 rounded-full">
                             {item.badge}
                           </span>
                         )}
                       </div>
-                      <span className="text-[10px] text-white/50 block truncate leading-tight mt-0.5">
-                        {item.sublabel}
-                      </span>
-                    </div>
-                  )}
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
 
-                  {/* Compact Tooltip on Hover (When collapsed) */}
-                  {!isExpanded && (
-                    <div className="absolute right-full mr-3.5 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[#0A0D1B] text-white text-xs font-bold rounded-xl shadow-2xl border border-white/20 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 flex items-center gap-2">
-                      <span>{item.label}</span>
-                      {item.live && (
-                        <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-                      )}
-                      <div className="absolute top-1/2 -right-1 -translate-y-1/2 w-2 h-2 bg-[#0A0D1B] border-r border-t border-white/20 rotate-45"></div>
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
+          {/* Bottom Sidebar Info */}
+          {isExpanded ? (
+            <div className="pt-3 border-t border-white/10 px-2 text-[10px] text-white/40 space-y-1">
+              <div className="flex items-center gap-1.5 text-white/70 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="truncate">{institutionalInfo?.schoolName || 'IPSUR EDUCORE'}</span>
+              </div>
+              <p className="text-[9px] text-white/30 truncate">
+                RVOE: {institutionalInfo?.rvoe || 'SEP-DGB Oficial'}
+              </p>
+            </div>
+          ) : (
+            <div className="pt-3 border-t border-white/10 flex justify-center">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Sistema en Línea"></span>
+            </div>
+          )}
+
         </div>
       </aside>
 
-      {/* Floating Trigger Button for Mobile & Tablets (Bottom-Right) */}
-      <div className="fixed bottom-5 right-4 z-40 lg:hidden">
+      {/* Floating Trigger Button for Mobile & Tablets (Bottom-Left) */}
+      <div className="fixed bottom-5 left-4 z-40 lg:hidden">
         <button
           onClick={() => setIsMobileOpen(true)}
           className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-ipsur-navy-800 to-ipsur-pink-600 text-white font-bold rounded-2xl shadow-2xl border border-white/20 active:scale-95 transition"
@@ -258,10 +337,10 @@ export default function RightVerticalMenu() {
         </button>
       </div>
 
-      {/* Mobile Slide-out Drawer */}
+      {/* Mobile Slide-out Drawer (From Left) */}
       {isMobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-72 max-w-[85%] h-full bg-[#0E1026] text-white p-5 flex flex-col justify-between shadow-2xl border-l border-white/10 animate-in slide-in-from-right duration-250">
+        <div className="fixed inset-0 z-50 lg:hidden flex justify-start bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-72 max-w-[85%] h-full bg-[#0E1026] text-white p-5 flex flex-col justify-between shadow-2xl border-r border-white/10 animate-in slide-in-from-left duration-250">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
                 <div className="flex items-center gap-2.5">

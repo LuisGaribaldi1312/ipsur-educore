@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import Navbar from './components/common/Navbar';
-import RightVerticalMenu from './components/common/RightVerticalMenu';
+import LeftSidebarMenu from './components/common/LeftSidebarMenu';
 import CoordinatorDashboard from './components/coordinator/CoordinatorDashboard';
 import TeacherDashboard from './components/teacher/TeacherDashboard';
 import StudentDashboard from './components/student/StudentDashboard';
@@ -18,28 +18,31 @@ function MainLayout() {
   } = useApp();
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 relative">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
       {/* Top Navbar */}
       <Navbar />
 
-      {/* Right-Hand Vertical Menu Dock */}
-      <RightVerticalMenu />
+      {/* Main Structural Body: Adhered Left Sidebar + Central Work Container */}
+      <div className="flex-1 flex flex-row w-full max-w-[1920px] mx-auto min-h-0 relative">
+        {/* Adhered Left Sidebar Menu */}
+        <LeftSidebarMenu />
 
-      {/* Main Container: Full width on computer screens, dynamically responsive on tablets & phones */}
-      <main className="flex-1 w-full px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 py-4 sm:py-6 max-w-[1920px] mx-auto lg:pr-24">
-        {activeClassroomId ? (
-          <ClassroomDetail
-            classroomId={activeClassroomId}
-            onBack={() => setActiveClassroomId(null)}
-          />
-        ) : (currentUser.role === 'coordinator' || currentUser.role === 'director' || currentUser.role === 'superadmin') ? (
-          <CoordinatorDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
-        ) : currentUser.role === 'teacher' ? (
-          <TeacherDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
-        ) : (
-          <StudentDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
-        )}
-      </main>
+        {/* Main Central Container: Full responsive workspace */}
+        <main className="flex-1 min-w-0 px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 py-4 sm:py-6">
+          {activeClassroomId ? (
+            <ClassroomDetail
+              classroomId={activeClassroomId}
+              onBack={() => setActiveClassroomId(null)}
+            />
+          ) : (currentUser.role === 'coordinator' || currentUser.role === 'director' || currentUser.role === 'superadmin') ? (
+            <CoordinatorDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
+          ) : currentUser.role === 'teacher' ? (
+            <TeacherDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
+          ) : (
+            <StudentDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
+          )}
+        </main>
+      </div>
 
       {/* Institutional Executive Footer */}
       <footer className="bg-white border-t border-slate-200 mt-16 py-10 text-xs text-slate-500 shadow-inner">
