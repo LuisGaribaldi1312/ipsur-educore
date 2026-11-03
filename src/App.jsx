@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import Navbar from './components/common/Navbar';
+import RightVerticalMenu from './components/common/RightVerticalMenu';
 import CoordinatorDashboard from './components/coordinator/CoordinatorDashboard';
 import TeacherDashboard from './components/teacher/TeacherDashboard';
 import StudentDashboard from './components/student/StudentDashboard';
@@ -17,12 +18,15 @@ function MainLayout() {
   } = useApp();
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 relative">
       {/* Top Navbar */}
       <Navbar />
 
+      {/* Right-Hand Vertical Menu Dock */}
+      <RightVerticalMenu />
+
       {/* Main Container: Full width on computer screens, dynamically responsive on tablets & phones */}
-      <main className="flex-1 w-full px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 py-4 sm:py-6 max-w-[1920px] mx-auto">
+      <main className="flex-1 w-full px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 py-4 sm:py-6 max-w-[1920px] mx-auto lg:pr-24">
         {activeClassroomId ? (
           <ClassroomDetail
             classroomId={activeClassroomId}
