@@ -72,7 +72,8 @@ export default function Navbar() {
   const currentBadge = getRoleBadge(currentUser?.role, currentUser?.isSuperAdmin);
   const BadgeIcon = currentBadge.icon;
 
-  const canManageUsers = isSuperAdmin || currentUser?.role === 'director' || currentUser?.role === 'coordinator';
+  // STRICT ACCESS: Only Super Admin and Director General can manage users and permissions
+  const canManageUsers = isSuperAdmin || currentUser?.role === 'director';
 
   return (
     <>

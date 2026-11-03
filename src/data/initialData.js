@@ -1,6 +1,69 @@
 // Initial Seed Data for IPSUR EDUCORE
 // Instituto Peninsular del Sur - Bachillerato en Línea y Campus Digital
 
+export const DEFAULT_ROLE_PERMISSIONS = {
+  superadmin: {
+    scope: 'global',
+    scopeLabel: 'Institucional Total (100%)',
+    canManageUsers: true,
+    canCreateClassrooms: true,
+    canGrade: true,
+    canScheduleLive: true,
+    canPublishAnnouncements: true,
+    canViewBoletas: true,
+    canManageCalendar: true,
+    canExportReports: true
+  },
+  director: {
+    scope: 'global',
+    scopeLabel: 'Institucional General (100%)',
+    canManageUsers: true,
+    canCreateClassrooms: true,
+    canGrade: true,
+    canScheduleLive: true,
+    canPublishAnnouncements: true,
+    canViewBoletas: true,
+    canManageCalendar: true,
+    canExportReports: true
+  },
+  coordinator: {
+    scope: 'academic',
+    scopeLabel: 'Supervisión Académica',
+    canManageUsers: false,
+    canCreateClassrooms: true,
+    canGrade: false,
+    canScheduleLive: true,
+    canPublishAnnouncements: true,
+    canViewBoletas: true,
+    canManageCalendar: true,
+    canExportReports: true
+  },
+  teacher: {
+    scope: 'assigned',
+    scopeLabel: 'Materias Asignadas',
+    canManageUsers: false,
+    canCreateClassrooms: false,
+    canGrade: true,
+    canScheduleLive: true,
+    canPublishAnnouncements: false,
+    canViewBoletas: false,
+    canManageCalendar: false,
+    canExportReports: true
+  },
+  student: {
+    scope: 'personal',
+    scopeLabel: 'Expediente Personal',
+    canManageUsers: false,
+    canCreateClassrooms: false,
+    canGrade: false,
+    canScheduleLive: false,
+    canPublishAnnouncements: false,
+    canViewBoletas: true,
+    canManageCalendar: false,
+    canExportReports: false
+  }
+};
+
 export const USERS = [
   {
     id: 'usr-superadmin',
@@ -15,7 +78,18 @@ export const USERS = [
     matricula: 'IPS-ROOT-001',
     phone: '+52 (998) 845-2100',
     createdAt: '2026-01-01T00:00:00Z',
-    status: 'active'
+    status: 'active',
+    scope: 'global',
+    permissions: {
+      canManageUsers: true,
+      canCreateClassrooms: true,
+      canGrade: true,
+      canScheduleLive: true,
+      canPublishAnnouncements: true,
+      canViewBoletas: true,
+      canManageCalendar: true,
+      canExportReports: true
+    }
   },
   {
     id: 'usr-director-1',
@@ -30,7 +104,18 @@ export const USERS = [
     matricula: 'IPS-DIR-001',
     phone: '+52 (998) 845-2101',
     createdAt: '2026-01-01T00:00:00Z',
-    status: 'active'
+    status: 'active',
+    scope: 'global',
+    permissions: {
+      canManageUsers: true,
+      canCreateClassrooms: true,
+      canGrade: true,
+      canScheduleLive: true,
+      canPublishAnnouncements: true,
+      canViewBoletas: true,
+      canManageCalendar: true,
+      canExportReports: true
+    }
   }
 ];
 

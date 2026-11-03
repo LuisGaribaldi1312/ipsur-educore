@@ -77,14 +77,26 @@ export default function LeftSidebarMenu() {
   };
 
   const isStudent = currentUser.role === 'student';
-  const canManageUsers = isSuperAdmin || currentUser.role === 'director' || currentUser.role === 'coordinator';
+  const isTeacher = currentUser.role === 'teacher';
+  // STRICT ACCESS: Only Super Admin and Director General can manage users and permissions
+  const canManageUsers = isSuperAdmin || currentUser.role === 'director';
+
+  // Teacher classrooms filter
+  const teacherClassrooms = classrooms.filter(c => c.teacherId === currentUser.id);
 
   // Active target classroom for acts/sessions
-  const targetClassroom = classrooms.find(c => c.id === activeClassroomId) || classrooms[0] || null;
+  const targetClassroom = classrooms.find(c => c.id === activeClassroomId) || 
+    (isTeacher ? teacherClassrooms[0] : classrooms[0]) || null;
 
   const handleOpenGrades = () => {
     if (isStudent) {
       setBoletaModalOpen(true);
+    } else if (isTeacher) {
+      if (teacherClassrooms.length === 0) {
+        showToast('Sin Salas Asignadas', 'Aún no tienes salas virtuales a tu cargo para emitir actas oficiales.', 'info');
+        return;
+      }
+      setActaModalOpen(true);
     } else {
       if (classrooms.length === 0) {
         showToast('Sin Salas Registradas', 'Crea una sala virtual primero para emitir actas oficiales.', 'info');
@@ -102,11 +114,11 @@ export default function LeftSidebarMenu() {
     setVirtualPortalOpen(true);
   };
 
-  // Menu items list
+  // Menu items list (Strictly filtered according to user role and scope)
   const menuItems = [
     {
       id: 'dashboard',
-      label: isStudent ? 'Mis Materias' : 'Salas Virtuales',
+      label: isStudent ? 'Mis Materias' : (isTeacher ? 'Mis Salas Virtuales' : 'Salas Virtuales'),
       sublabel: 'Panel Principal',
       icon: School,
       color: 'from-blue-500 to-indigo-600',
@@ -114,18 +126,20 @@ export default function LeftSidebarMenu() {
         setActiveClassroomId(null);
         showToast('Navegación', 'Regresaste al panel principal de salas.', 'info');
       },
-      badge: classrooms.length > 0 ? classrooms.length : null,
+      badge: (isTeacher ? teacherClassrooms.length : classrooms.length) > 0 
+        ? (isTeacher ? teacherClassrooms.length : classrooms.length) 
+        : null,
       visible: true
     },
     {
       id: 'users',
       label: 'Gestión de Usuarios',
-      sublabel: 'Roles y Directorio',
+      sublabel: 'Permisos y Alcance',
       icon: Users,
       color: 'from-purple-500 to-indigo-600',
       action: () => setUserManagerModalOpen(true),
-      badge: isSuperAdmin ? 'Master' : null,
-      visible: canManageUsers
+      badge: isSuperAdmin ? 'Master' : 'Directivo',
+      visible: canManageUsers // Strictly Super Admin and Director only
     },
     {
       id: 'virtual_sessions',
@@ -140,7 +154,7 @@ export default function LeftSidebarMenu() {
     {
       id: 'grades',
       label: isStudent ? 'Mi Boleta Oficial' : 'Actas de Calificaciones',
-      sublabel: isStudent ? 'Expediente SEP' : 'Control y Validación',
+      sublabel: isStudent ? 'Expediente Personal SEP' : (isTeacher ? 'Mis Actas de Grupo' : 'Control Institucional'),
       icon: Award,
       color: 'from-amber-500 to-orange-600',
       action: handleOpenGrades,

@@ -95,13 +95,16 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
               <span>Crear Nueva Sala de Clases</span>
             </button>
 
-            <button
-              onClick={() => setUserManagerModalOpen(true)}
-              className="flex items-center gap-2 px-5 py-3 text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 border border-white/20 rounded-xl shadow-lg transition active:scale-95"
-            >
-              <Users className="w-4 h-4 text-pink-300" />
-              <span>Gestión de Usuarios y Permisos</span>
-            </button>
+            {/* User Management strictly for Super Admin and Director General */}
+            {(isSuperAdmin || isDirector) && (
+              <button
+                onClick={() => setUserManagerModalOpen(true)}
+                className="flex items-center gap-2 px-5 py-3 text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 border border-white/20 rounded-xl shadow-lg transition active:scale-95"
+              >
+                <Users className="w-4 h-4 text-pink-300" />
+                <span>Gestión de Usuarios y Permisos</span>
+              </button>
+            )}
           </div>
         </div>
 

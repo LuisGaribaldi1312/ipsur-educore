@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { USERS, INITIAL_CLASSROOMS, PERIODS, INSTITUTIONAL_INFO } from '../data/initialData';
+import { USERS, INITIAL_CLASSROOMS, PERIODS, INSTITUTIONAL_INFO, DEFAULT_ROLE_PERMISSIONS } from '../data/initialData';
 import { validateCriteria } from '../utils/calculations';
 import { getDeadlineStatus } from '../utils/dateFormatter';
 
@@ -27,12 +27,21 @@ export function AppProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Guarantee that the superadmin account is always present with its secret flag
+          // Guarantee that the superadmin account is always present with its secret flag and permissions
           const hasSuperAdmin = parsed.some(u => u.isSuperAdmin || u.role === 'superadmin');
+          const normalized = parsed.map(u => ({
+            ...u,
+            scope: u.scope || DEFAULT_ROLE_PERMISSIONS[u.role]?.scope || 'assigned',
+            permissions: {
+              ...(DEFAULT_ROLE_PERMISSIONS[u.role] || DEFAULT_ROLE_PERMISSIONS.student),
+              ...(u.permissions || {})
+            }
+          }));
+
           if (!hasSuperAdmin) {
-            return [USERS[0], ...parsed];
+            return [USERS[0], ...normalized];
           }
-          return parsed;
+          return normalized;
         }
       }
     } catch (e) {
@@ -207,7 +216,7 @@ export function AppProvider({ children }) {
     );
   };
 
-  // User Management: Create User
+  // User Management: Create User (Strictly restricted to Super Admin & Director General)
   const createUser = ({
     name,
     email,
@@ -217,15 +226,19 @@ export function AppProvider({ children }) {
     title,
     specialty,
     shift,
-    phone
+    phone,
+    scope,
+    permissions
   }) => {
-    // Permission checks
-    if (currentUser.role === 'coordinator' && (role === 'director' || role === 'superadmin')) {
-      showToast('Permiso Denegado', 'Un Coordinador no tiene permisos para crear Directores o Administradores.', 'error');
+    const canManage = isSuperAdmin || currentUser?.role === 'director';
+    if (!canManage) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador y el Director General pueden dar de alta usuarios.', 'error');
       return false;
     }
-    if (currentUser.role === 'director' && role === 'superadmin') {
-      showToast('Permiso Denegado', 'El Super Administrador es un rol reservado del sistema.', 'error');
+
+    // Role restrictions: Director cannot create a superadmin
+    if (currentUser?.role === 'director' && (role === 'superadmin' || permissions?.canManageUsers)) {
+      showToast('Permiso Denegado', 'La gestión de usuarios raíz y el rol de Super Administrador son exclusivos del sistema.', 'error');
       return false;
     }
 
@@ -234,6 +247,18 @@ export function AppProvider({ children }) {
     if (emailExists) {
       showToast('Correo Duplicado', 'Ya existe un usuario registrado con este correo electrónico.', 'error');
       return false;
+    }
+
+    const defaultRolePerms = DEFAULT_ROLE_PERMISSIONS[role] || DEFAULT_ROLE_PERMISSIONS.student;
+    const finalScope = scope || defaultRolePerms.scope;
+    const finalPermissions = {
+      ...defaultRolePerms,
+      ...(permissions || {})
+    };
+
+    // If not superadmin, ensure canManageUsers is false for created non-director accounts
+    if (role !== 'director' && role !== 'superadmin') {
+      finalPermissions.canManageUsers = false;
     }
 
     const newId = `usr-${role}-${Date.now()}`;
@@ -257,7 +282,9 @@ export function AppProvider({ children }) {
       shift: shift || 'En Línea',
       phone: phone || '+52 (998) 845-2100',
       createdAt: new Date().toISOString(),
-      status: 'active'
+      status: 'active',
+      scope: finalScope,
+      permissions: finalPermissions
     };
 
     setUsers(prev => [newUser, ...prev]);
@@ -267,6 +294,12 @@ export function AppProvider({ children }) {
 
   // User Management: Update User
   const updateUser = (userId, updatedFields) => {
+    const canManage = isSuperAdmin || currentUser?.role === 'director';
+    if (!canManage) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador y el Director General pueden modificar usuarios.', 'error');
+      return false;
+    }
+
     const target = users.find(u => u.id === userId);
     if (!target) return false;
 
@@ -280,16 +313,26 @@ export function AppProvider({ children }) {
       if (u.id !== userId) return u;
       return {
         ...u,
-        ...updatedFields
+        ...updatedFields,
+        permissions: {
+          ...(u.permissions || DEFAULT_ROLE_PERMISSIONS[u.role] || {}),
+          ...(updatedFields.permissions || {})
+        }
       };
     }));
 
-    showToast('Usuario Actualizado', 'Los datos del usuario han sido guardados.');
+    showToast('Usuario Actualizado', 'Los datos y permisos del usuario han sido guardados.');
     return true;
   };
 
   // User Management: Delete User
   const deleteUser = (userId) => {
+    const canManage = isSuperAdmin || currentUser?.role === 'director';
+    if (!canManage) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador y el Director General pueden eliminar usuarios.', 'error');
+      return false;
+    }
+
     const target = users.find(u => u.id === userId);
     if (!target) return false;
 
@@ -310,6 +353,12 @@ export function AppProvider({ children }) {
 
   // User Management: Toggle Status (Active / Inactive)
   const toggleUserStatus = (userId) => {
+    const canManage = isSuperAdmin || currentUser?.role === 'director';
+    if (!canManage) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador y el Director General pueden cambiar el estado de usuarios.', 'error');
+      return false;
+    }
+
     const target = users.find(u => u.id === userId);
     if (!target) return false;
 

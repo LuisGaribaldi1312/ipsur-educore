@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { DEFAULT_ROLE_PERMISSIONS } from '../../data/initialData';
 import Modal from '../common/Modal';
 import { 
   Users, 
@@ -22,7 +23,12 @@ import {
   Sparkles,
   School,
   AlertTriangle,
-  Award
+  Award,
+  Video,
+  FileCheck,
+  Calendar,
+  Layers,
+  Settings
 } from 'lucide-react';
 
 export default function UserManagerModal({ isOpen, onClose }) {
@@ -42,6 +48,9 @@ export default function UserManagerModal({ isOpen, onClose }) {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
 
+  // STRICT ACCESS CHECK: Only Super Admin and Director General can access user management
+  const canManage = isSuperAdmin || currentUser?.role === 'director';
+
   // Form Fields for new/editing user
   const [formData, setFormData] = useState({
     name: '',
@@ -52,15 +61,29 @@ export default function UserManagerModal({ isOpen, onClose }) {
     title: '',
     specialty: 'Bachillerato General',
     shift: 'En Línea',
-    phone: '+52 (998) 845-2100'
+    phone: '+52 (998) 845-2100',
+    scope: 'assigned',
+    permissions: {
+      canManageUsers: false,
+      canCreateClassrooms: false,
+      canGrade: true,
+      canScheduleLive: true,
+      canPublishAnnouncements: false,
+      canViewBoletas: false,
+      canManageCalendar: false,
+      canExportReports: true
+    }
   });
 
   const [showPassword, setShowPassword] = useState(false);
 
+  // If user is not authorized, don't show modal
+  if (!isOpen || !canManage) return null;
+
   // Allowed roles depending on who is logged in
   const canManageDirectors = isSuperAdmin;
   const canManageCoordinators = isSuperAdmin || currentUser.role === 'director';
-  const canManageTeachersAndStudents = isSuperAdmin || currentUser.role === 'director' || currentUser.role === 'coordinator';
+  const canManageTeachersAndStudents = isSuperAdmin || currentUser.role === 'director';
 
   // Role options for select box
   const availableRoleOptions = [];
@@ -94,19 +117,64 @@ export default function UserManagerModal({ isOpen, onClose }) {
     return true;
   });
 
+  // Handle Role Change in Form to auto-sync default permissions and scope
+  const handleRoleChange = (newRole) => {
+    const roleDefaults = DEFAULT_ROLE_PERMISSIONS[newRole] || DEFAULT_ROLE_PERMISSIONS.student;
+    setFormData(prev => ({
+      ...prev,
+      role: newRole,
+      scope: roleDefaults.scope,
+      permissions: {
+        canManageUsers: newRole === 'director' || newRole === 'superadmin',
+        canCreateClassrooms: Boolean(roleDefaults.canCreateClassrooms),
+        canGrade: Boolean(roleDefaults.canGrade),
+        canScheduleLive: Boolean(roleDefaults.canScheduleLive),
+        canPublishAnnouncements: Boolean(roleDefaults.canPublishAnnouncements),
+        canViewBoletas: Boolean(roleDefaults.canViewBoletas),
+        canManageCalendar: Boolean(roleDefaults.canManageCalendar),
+        canExportReports: Boolean(roleDefaults.canExportReports)
+      }
+    }));
+  };
+
+  // Toggle individual permission checkbox
+  const handleTogglePermission = (permKey) => {
+    setFormData(prev => ({
+      ...prev,
+      permissions: {
+        ...prev.permissions,
+        [permKey]: !prev.permissions?.[permKey]
+      }
+    }));
+  };
+
   // Open creation form
   const handleOpenRegister = () => {
     setEditingUser(null);
+    const initialRole = availableRoleOptions[0]?.value || 'teacher';
+    const roleDefaults = DEFAULT_ROLE_PERMISSIONS[initialRole] || DEFAULT_ROLE_PERMISSIONS.student;
+
     setFormData({
       name: '',
       email: '',
       password: '',
-      role: availableRoleOptions[0]?.value || 'teacher',
+      role: initialRole,
       matricula: `IPS-${Math.floor(100 + Math.random() * 900)}`,
       title: '',
       specialty: 'Bachillerato General',
       shift: 'En Línea',
-      phone: '+52 (998) 845-2100'
+      phone: '+52 (998) 845-2100',
+      scope: roleDefaults.scope,
+      permissions: {
+        canManageUsers: initialRole === 'director',
+        canCreateClassrooms: Boolean(roleDefaults.canCreateClassrooms),
+        canGrade: Boolean(roleDefaults.canGrade),
+        canScheduleLive: Boolean(roleDefaults.canScheduleLive),
+        canPublishAnnouncements: Boolean(roleDefaults.canPublishAnnouncements),
+        canViewBoletas: Boolean(roleDefaults.canViewBoletas),
+        canManageCalendar: Boolean(roleDefaults.canManageCalendar),
+        canExportReports: Boolean(roleDefaults.canExportReports)
+      }
     });
     setIsRegisterOpen(true);
   };
@@ -114,6 +182,8 @@ export default function UserManagerModal({ isOpen, onClose }) {
   // Open edit form
   const handleOpenEdit = (user) => {
     setEditingUser(user);
+    const roleDefaults = DEFAULT_ROLE_PERMISSIONS[user.role] || DEFAULT_ROLE_PERMISSIONS.student;
+
     setFormData({
       name: user.name || '',
       email: user.email || '',
@@ -123,7 +193,18 @@ export default function UserManagerModal({ isOpen, onClose }) {
       title: user.title || '',
       specialty: user.specialty || 'General',
       shift: user.shift || 'En Línea',
-      phone: user.phone || ''
+      phone: user.phone || '',
+      scope: user.scope || roleDefaults.scope,
+      permissions: {
+        canManageUsers: user.role === 'director' || user.role === 'superadmin',
+        canCreateClassrooms: user.permissions?.canCreateClassrooms ?? roleDefaults.canCreateClassrooms,
+        canGrade: user.permissions?.canGrade ?? roleDefaults.canGrade,
+        canScheduleLive: user.permissions?.canScheduleLive ?? roleDefaults.canScheduleLive,
+        canPublishAnnouncements: user.permissions?.canPublishAnnouncements ?? roleDefaults.canPublishAnnouncements,
+        canViewBoletas: user.permissions?.canViewBoletas ?? roleDefaults.canViewBoletas,
+        canManageCalendar: user.permissions?.canManageCalendar ?? roleDefaults.canManageCalendar,
+        canExportReports: user.permissions?.canExportReports ?? roleDefaults.canExportReports
+      }
     });
     setIsRegisterOpen(true);
   };
@@ -146,6 +227,8 @@ export default function UserManagerModal({ isOpen, onClose }) {
         specialty: formData.specialty,
         shift: formData.shift,
         phone: formData.phone,
+        scope: formData.scope,
+        permissions: formData.permissions,
         ...(formData.password ? { password: formData.password.trim() } : {})
       });
       setIsRegisterOpen(false);
@@ -160,7 +243,9 @@ export default function UserManagerModal({ isOpen, onClose }) {
         title: formData.title.trim(),
         specialty: formData.specialty,
         shift: formData.shift,
-        phone: formData.phone
+        phone: formData.phone,
+        scope: formData.scope,
+        permissions: formData.permissions
       });
       if (created) {
         setIsRegisterOpen(false);
@@ -186,6 +271,19 @@ export default function UserManagerModal({ isOpen, onClose }) {
     }
   };
 
+  const getScopeBadge = (scope, role) => {
+    if (role === 'superadmin' || scope === 'global' || role === 'director') {
+      return { label: 'Institucional Total', bg: 'bg-rose-50 text-rose-700 border-rose-200' };
+    }
+    if (scope === 'academic' || role === 'coordinator') {
+      return { label: 'Supervisión Académica', bg: 'bg-purple-50 text-purple-700 border-purple-200' };
+    }
+    if (scope === 'assigned' || role === 'teacher') {
+      return { label: 'Materias Asignadas', bg: 'bg-blue-50 text-blue-700 border-blue-200' };
+    }
+    return { label: 'Expediente Personal', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -203,17 +301,23 @@ export default function UserManagerModal({ isOpen, onClose }) {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900">
-                  Gestión y Creación de Usuarios
+                  Gestión de Usuarios, Permisos y Alcance
                 </h2>
                 {isSuperAdmin && (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-full">
                     <Sparkles className="w-3 h-3 text-amber-600" />
-                    Control Total (Super Admin)
+                    Super Admin
+                  </span>
+                )}
+                {currentUser.role === 'director' && !isSuperAdmin && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300 px-2 py-0.5 rounded-full">
+                    <ShieldCheck className="w-3 h-3 text-rose-600" />
+                    Dirección General
                   </span>
                 )}
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                Alta, edición y administración de roles y permisos del personal institucional y alumnado.
+                Exclusivo para la Dirección y Administración. Asigna roles, delimita el alcance institucional y configura los permisos de visualización.
               </p>
             </div>
           </div>
@@ -227,11 +331,11 @@ export default function UserManagerModal({ isOpen, onClose }) {
           </button>
         </div>
 
-        {/* User Creation / Editing Form Sub-Panel */}
+        {/* User Creation / Editing Form Sub-Panel with Granular Permissions */}
         {isRegisterOpen && (
           <form 
             onSubmit={handleSubmitForm}
-            className="bg-slate-50 border-2 border-indigo-200/80 rounded-2xl p-5 sm:p-6 space-y-4 animate-in fade-in duration-200 shadow-sm"
+            className="bg-slate-50 border-2 border-indigo-200/80 rounded-2xl p-5 sm:p-6 space-y-5 animate-in fade-in duration-200 shadow-sm"
           >
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2">
@@ -239,7 +343,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
                   <UserPlus className="w-4 h-4" />
                 </span>
                 <h3 className="text-sm font-bold text-slate-900">
-                  {editingUser ? `Editar Usuario: ${editingUser.name}` : 'Crear Nuevo Usuario Institucional'}
+                  {editingUser ? `Editar Usuario y Permisos: ${editingUser.name}` : 'Crear Nuevo Usuario Institucional'}
                 </h3>
               </div>
               <button
@@ -251,6 +355,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
               </button>
             </div>
 
+            {/* Basic Info Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[11px]">
@@ -282,11 +387,11 @@ export default function UserManagerModal({ isOpen, onClose }) {
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[11px]">
-                  Rol / Área de Permisos *
+                  Rol / Perfil Institucional *
                 </label>
                 <select
                   value={formData.role}
-                  onChange={e => setFormData({ ...formData, role: e.target.value })}
+                  onChange={e => handleRoleChange(e.target.value)}
                   className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-ipsur-navy-500 outline-none text-slate-900 font-bold"
                 >
                   {availableRoleOptions.map(opt => (
@@ -374,15 +479,81 @@ export default function UserManagerModal({ isOpen, onClose }) {
                 />
               </div>
 
-              <div className="flex items-end">
-                <button
-                  type="submit"
-                  className="w-full py-2.5 px-4 bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white font-bold rounded-xl shadow-sm transition active:scale-95 text-xs flex items-center justify-center gap-2"
+              <div>
+                <label className="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[11px]">
+                  Alcance de Visualización y Acción *
+                </label>
+                <select
+                  value={formData.scope}
+                  onChange={e => setFormData({ ...formData, scope: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-ipsur-navy-500 outline-none text-slate-900 font-semibold"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>{editingUser ? 'Guardar Cambios' : 'Registrar y Habilitar Usuario'}</span>
-                </button>
+                  <option value="global">Institucional Total (100% - Dirección General)</option>
+                  <option value="academic">Supervisión Académica (Coordinación Escolar)</option>
+                  <option value="assigned">Por Asignación (Solo materias y alumnos a su cargo)</option>
+                  <option value="personal">Expediente Personal (Solo sus materias y notas)</option>
+                </select>
               </div>
+            </div>
+
+            {/* Granular Permissions Section */}
+            <div className="pt-3 border-t border-slate-200">
+              <div className="flex items-center gap-2 mb-3">
+                <Settings className="w-4 h-4 text-ipsur-navy-700" />
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                  Permisos Granulares Concedidos en la Plataforma
+                </h4>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                {[
+                  { key: 'canCreateClassrooms', label: 'Crear / Editar Salas', desc: 'Apertura de materias y temarios' },
+                  { key: 'canGrade', label: 'Calificar y Asentar Actas', desc: 'Evaluar tareas y emitir calificaciones' },
+                  { key: 'canScheduleLive', label: 'Clases en Vivo (Meet)', desc: 'Transmitir sesiones virtuales' },
+                  { key: 'canPublishAnnouncements', label: 'Avisos Institucionales', desc: 'Publicar comunicados en el muro' },
+                  { key: 'canViewBoletas', label: 'Ver Boletas / Expedientes', desc: 'Historial oficial de notas' },
+                  { key: 'canManageCalendar', label: 'Calendario Escolar', desc: 'Configurar periodos y cierres' },
+                  { key: 'canExportReports', label: 'Exportar Actas SEP', desc: 'Descarga e impresión de actas' }
+                ].map(p => {
+                  const isChecked = Boolean(formData.permissions?.[p.key]);
+                  return (
+                    <label 
+                      key={p.key}
+                      className={`p-2.5 rounded-xl border flex items-start gap-2.5 cursor-pointer transition select-none ${
+                        isChecked 
+                          ? 'bg-indigo-50/80 border-indigo-300 text-indigo-950' 
+                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100/60'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleTogglePermission(p.key)}
+                        className="mt-0.5 rounded border-slate-300 text-ipsur-pink-600 focus:ring-ipsur-pink-500 w-4 h-4"
+                      />
+                      <div className="min-w-0">
+                        <span className="block text-xs font-bold leading-tight">
+                          {p.label}
+                        </span>
+                        <span className="block text-[10px] text-slate-500 mt-0.5 leading-tight">
+                          {p.desc}
+                        </span>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-2 flex justify-end">
+              <button
+                type="submit"
+                className="py-2.5 px-6 bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white font-bold rounded-xl shadow-md transition active:scale-95 text-xs flex items-center justify-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{editingUser ? 'Guardar Cambios y Actualizar Permisos' : 'Registrar y Habilitar Usuario'}</span>
+              </button>
             </div>
           </form>
         )}
@@ -392,7 +563,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
             {[
               { id: 'all', label: 'Todos los Usuarios', count: users.length },
-              ...(canManageDirectors || isSuperAdmin ? [{ id: 'director', label: 'Dirección', count: users.filter(u => u.role === 'director').length }] : []),
+              ...(canManageDirectors ? [{ id: 'director', label: 'Dirección', count: users.filter(u => u.role === 'director').length }] : []),
               { id: 'coordinator', label: 'Coordinación', count: users.filter(u => u.role === 'coordinator').length },
               { id: 'teacher', label: 'Maestros(as)', count: users.filter(u => u.role === 'teacher').length },
               { id: 'student', label: 'Alumnos(as)', count: users.filter(u => u.role === 'student').length },
@@ -441,6 +612,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
                   <th className="py-3 px-4">Correo Institucional</th>
                   <th className="py-3 px-4">Matrícula / Clave</th>
                   <th className="py-3 px-4">Área / Rol</th>
+                  <th className="py-3 px-4">Alcance y Permisos</th>
                   <th className="py-3 px-4 text-center">Estado</th>
                   <th className="py-3 px-4 text-right">Acciones</th>
                 </tr>
@@ -448,7 +620,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
               <tbody className="divide-y divide-slate-100 text-xs">
                 {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="py-12 text-center text-slate-400">
+                    <td colSpan="7" className="py-12 text-center text-slate-400">
                       <Users className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                       <p className="font-semibold">No se encontraron usuarios en esta área.</p>
                       <button
@@ -463,6 +635,10 @@ export default function UserManagerModal({ isOpen, onClose }) {
                   filteredUsers.map(u => {
                     const isSecret = u.isSuperAdmin || u.role === 'superadmin';
                     const badge = getRoleBadge(u.role, isSecret);
+                    const scopeBadge = getScopeBadge(u.scope, u.role);
+
+                    // Count enabled permissions
+                    const enabledPermCount = Object.values(u.permissions || {}).filter(Boolean).length;
 
                     return (
                       <tr key={u.id} className="hover:bg-slate-50/70 transition">
@@ -498,6 +674,18 @@ export default function UserManagerModal({ isOpen, onClose }) {
                           </span>
                         </td>
 
+                        <td className="py-3.5 px-4">
+                          <div className="space-y-1">
+                            <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-md border ${scopeBadge.bg}`}>
+                              {scopeBadge.label}
+                            </span>
+                            <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                              <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                              <span>{enabledPermCount} permisos activos</span>
+                            </div>
+                          </div>
+                        </td>
+
                         <td className="py-3.5 px-4 text-center">
                           <button
                             disabled={isSecret}
@@ -519,7 +707,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
                             <button
                               onClick={() => handleOpenEdit(u)}
                               className="p-1.5 rounded-lg text-slate-500 hover:text-ipsur-navy-700 hover:bg-slate-100 transition"
-                              title="Editar datos de usuario"
+                              title="Editar datos y permisos de usuario"
                             >
                               <Edit className="w-3.5 h-3.5" />
                             </button>
