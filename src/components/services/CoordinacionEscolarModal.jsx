@@ -14,17 +14,19 @@ import {
   Laptop,
   Layers,
   GraduationCap,
-  Sparkles
+  Sparkles,
+  Edit
 } from 'lucide-react';
 
 export default function CoordinacionEscolarModal({ 
   isOpen, 
   onClose, 
   onOpenCreateClassroom, 
+  onOpenEditClassroom,
   onOpenRubric,
   onSelectClassroom 
 }) {
-  const { classrooms, users, currentUser, showToast } = useApp();
+  const { classrooms, users, currentUser, isSuperAdmin, showToast } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLevel, setFilterLevel] = useState('all');
 
@@ -33,6 +35,8 @@ export default function CoordinacionEscolarModal({
   const isStudent = currentUser?.role === 'student';
   const isTeacher = currentUser?.role === 'teacher';
   if (isStudent || isTeacher) return null;
+
+  const canEditClassrooms = isSuperAdmin || currentUser?.role === 'director' || currentUser?.role === 'coordinator';
 
   const filteredClassrooms = (classrooms || []).filter(c => {
     const matchesSearch = c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -174,17 +178,33 @@ export default function CoordinacionEscolarModal({
 
                   {/* Actions for this Classroom */}
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <button
-                      onClick={() => {
-                        onClose();
-                        if (onOpenRubric) onOpenRubric(c);
-                      }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer"
-                      title="Configurar rúbrica de evaluación"
-                    >
-                      <SlidersHorizontal className="w-3.5 h-3.5" />
-                      <span>Rúbrica</span>
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      {canEditClassrooms && (
+                        <button
+                          onClick={() => {
+                            onClose();
+                            if (onOpenEditClassroom) onOpenEditClassroom(c);
+                          }}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer"
+                          title="Editar información de la sala virtual"
+                        >
+                          <Edit className="w-3.5 h-3.5 text-slate-600" />
+                          <span>Editar</span>
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => {
+                          onClose();
+                          if (onOpenRubric) onOpenRubric(c);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer"
+                        title="Configurar rúbrica de evaluación"
+                      >
+                        <SlidersHorizontal className="w-3.5 h-3.5" />
+                        <span>Rúbrica</span>
+                      </button>
+                    </div>
 
                     <button
                       onClick={() => {

@@ -582,6 +582,42 @@ export function AppProvider({ children }) {
     return newClassroom;
   };
 
+  // Update Classroom (Strictly restricted to: Super Admin, Director, Coordinator)
+  const updateClassroom = (classroomId, updatedFields) => {
+    const canEdit = isSuperAdmin || currentUser?.role === 'director' || currentUser?.role === 'coordinator';
+    if (!canEdit) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador, Director General y Coordinador Escolar pueden editar salas.', 'error');
+      return false;
+    }
+
+    setClassrooms(prev => prev.map(cls => {
+      if (cls.id !== classroomId) return cls;
+
+      let teacherName = cls.teacherName;
+      if (updatedFields.teacherId && updatedFields.teacherId !== cls.teacherId) {
+        const foundTeacher = users.find(u => u.id === updatedFields.teacherId);
+        if (foundTeacher) teacherName = foundTeacher.name;
+      }
+
+      let periodName = cls.periodName;
+      if (updatedFields.periodId && updatedFields.periodId !== cls.periodId) {
+        const foundPeriod = periods.find(p => p.id === updatedFields.periodId);
+        if (foundPeriod) periodName = foundPeriod.name;
+      }
+
+      return {
+        ...cls,
+        ...updatedFields,
+        teacherName: updatedFields.teacherName || teacherName,
+        periodName: updatedFields.periodName || periodName,
+        updatedAt: new Date().toISOString()
+      };
+    }));
+
+    showToast('Sala Actualizada', 'La información de la sala virtual ha sido actualizada exitosamente.', 'success');
+    return true;
+  };
+
   // Coordinator: Update Rubric & Topics
   const updateClassroomRubric = (classroomId, updatedRubric) => {
     setClassrooms(prev => prev.map(cls => {
@@ -858,6 +894,7 @@ export function AppProvider({ children }) {
         deleteUser,
         toggleUserStatus,
         createClassroom,
+        updateClassroom,
         updateClassroomRubric,
         updateClassroomEnrollment,
         setEvaluationCriteria,

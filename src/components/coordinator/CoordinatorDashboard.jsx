@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import CreateClassroomModal from './CreateClassroomModal';
+import EditClassroomModal from './EditClassroomModal';
 import RubricModal from './RubricModal';
 import RegisterStudentModal from '../services/RegisterStudentModal';
 import PaymentsAccountingModal from '../services/PaymentsAccountingModal';
@@ -37,7 +38,8 @@ import {
   SlidersHorizontal,
   ChevronDown,
   Building,
-  Laptop
+  Laptop,
+  Edit
 } from 'lucide-react';
 
 export default function CoordinatorDashboard({ onSelectClassroom }) {
@@ -56,6 +58,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
 
   // Modals
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editingClassroom, setEditingClassroom] = useState(null);
   const [selectedRubricClassroom, setSelectedRubricClassroom] = useState(null);
   const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
   const [registerStudentModalOpen, setRegisterStudentModalOpen] = useState(false);
@@ -765,6 +768,15 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
+                      onClick={() => setEditingClassroom(cls)}
+                      className="px-2 py-1 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition inline-flex items-center gap-1 cursor-pointer"
+                      title="Editar datos de la sala virtual"
+                    >
+                      <Edit className="w-3 h-3 text-slate-600" />
+                      <span>Editar</span>
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => setSelectedRubricClassroom(cls)}
                       className="px-2.5 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition"
                     >
@@ -773,7 +785,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
                     <button
                       type="button"
                       onClick={() => onSelectClassroom(cls.id)}
-                      className="px-3 py-1 text-[11px] font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-lg shadow-xs transition"
+                      className="px-3 py-1 text-[11px] font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-lg shadow-xs transition cursor-pointer"
                     >
                       Abrir Sala
                     </button>
@@ -790,6 +802,14 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
       />
+
+      {editingClassroom && (
+        <EditClassroomModal
+          isOpen={Boolean(editingClassroom)}
+          onClose={() => setEditingClassroom(null)}
+          classroom={editingClassroom}
+        />
+      )}
 
       <RubricModal
         isOpen={Boolean(selectedRubricClassroom)}

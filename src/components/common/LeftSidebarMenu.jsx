@@ -15,6 +15,7 @@ import CoordinacionEscolarModal from '../services/CoordinacionEscolarModal';
 import DocentesModal from '../services/DocentesModal';
 import AlumnosModal from '../services/AlumnosModal';
 import CreateClassroomModal from '../coordinator/CreateClassroomModal';
+import EditClassroomModal from '../coordinator/EditClassroomModal';
 import RubricModal from '../coordinator/RubricModal';
 import Modal from './Modal';
 import { 
@@ -81,6 +82,7 @@ export default function LeftSidebarMenu() {
   // Sub-modals triggered from directories
   const [registerStudentModalOpen, setRegisterStudentModalOpen] = useState(false);
   const [createClassroomModalOpen, setCreateClassroomModalOpen] = useState(false);
+  const [editingClassroom, setEditingClassroom] = useState(null);
   const [rubricClassroom, setRubricClassroom] = useState(null);
   const [boletaModalOpen, setBoletaModalOpen] = useState(false);
   const [virtualPortalOpen, setVirtualPortalOpen] = useState(false);
@@ -490,6 +492,7 @@ export default function LeftSidebarMenu() {
         isOpen={coordinacionModalOpen}
         onClose={() => setCoordinacionModalOpen(false)}
         onOpenCreateClassroom={() => setCreateClassroomModalOpen(true)}
+        onOpenEditClassroom={(classroom) => setEditingClassroom(classroom)}
         onOpenRubric={(classroom) => setRubricClassroom(classroom)}
         onSelectClassroom={(id) => {
           setActiveClassroomId(id);
@@ -553,6 +556,14 @@ export default function LeftSidebarMenu() {
         isOpen={createClassroomModalOpen}
         onClose={() => setCreateClassroomModalOpen(false)}
       />
+
+      {editingClassroom && (
+        <EditClassroomModal
+          isOpen={Boolean(editingClassroom)}
+          onClose={() => setEditingClassroom(null)}
+          classroom={editingClassroom}
+        />
+      )}
 
       {rubricClassroom && (
         <RubricModal

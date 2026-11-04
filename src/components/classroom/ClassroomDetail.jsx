@@ -8,6 +8,7 @@ import GradeSubmissionsModal from '../teacher/GradeSubmissionsModal';
 import AttendanceAssessmentModal from '../teacher/AttendanceAssessmentModal';
 import SubmitActivityModal from '../student/SubmitActivityModal';
 import RubricModal from '../coordinator/RubricModal';
+import EditClassroomModal from '../coordinator/EditClassroomModal';
 import InstitutionalActaModal from '../reports/InstitutionalActaModal';
 import VirtualSessionPortalModal from './VirtualSessionPortalModal';
 import { calculateStudentGrades } from '../../utils/calculations';
@@ -48,7 +49,8 @@ export default function ClassroomDetail({ classroomId, onBack }) {
   const { 
     classrooms, 
     currentUser, 
-    users 
+    users,
+    isSuperAdmin
   } = useApp();
 
   const classroom = classrooms.find(c => c.id === classroomId);
@@ -58,6 +60,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
   const [activityFilter, setActivityFilter] = useState('all'); // 'all' | 'pending' | 'submitted' | 'graded'
 
   // Modal controls
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [criteriaModalOpen, setCriteriaModalOpen] = useState(false);
   const [createActivityModalOpen, setCreateActivityModalOpen] = useState(false);
   const [uploadMaterialModalOpen, setUploadMaterialModalOpen] = useState(false);
@@ -84,6 +87,7 @@ export default function ClassroomDetail({ classroomId, onBack }) {
   const isTeacher = currentUser.role === 'teacher';
   const isCoordinator = currentUser.role === 'coordinator';
   const isStudent = currentUser.role === 'student';
+  const canEditClassroom = isSuperAdmin || currentUser.role === 'director' || currentUser.role === 'coordinator';
 
   const enrolledStudents = users.filter(u => classroom.enrolledStudentIds?.includes(u.id));
 
@@ -114,6 +118,17 @@ export default function ClassroomDetail({ classroomId, onBack }) {
             <Sparkles className="w-3.5 h-3.5 text-ipsur-pink-500" />
             <span>{classroom.modality || 'Prepa en Línea'}</span>
           </span>
+
+          {canEditClassroom && (
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="inline-flex items-center gap-1.5 bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer"
+              title="Modificar configuración de esta sala virtual"
+            >
+              <Edit className="w-3.5 h-3.5" />
+              <span>Editar Sala</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -1221,6 +1236,14 @@ export default function ClassroomDetail({ classroomId, onBack }) {
         onClose={() => setVirtualPortalOpen(false)}
         classroom={classroom}
       />
+
+      {isEditModalOpen && (
+        <EditClassroomModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          classroom={classroom}
+        />
+      )}
 
       {gradingActivity && (
         <GradeSubmissionsModal
