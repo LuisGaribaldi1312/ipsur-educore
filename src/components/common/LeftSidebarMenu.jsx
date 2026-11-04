@@ -218,7 +218,7 @@ export default function LeftSidebarMenu() {
           <div>
             {/* Sidebar Top Header */}
             <div className={`flex items-center pb-3 mb-2 border-b border-white/10 ${
-              isExpanded ? 'justify-between px-2' : 'justify-center'
+              isExpanded ? 'justify-start px-2' : 'justify-center'
             }`}>
               {isExpanded ? (
                 <div className="flex items-center gap-2 min-w-0">
@@ -242,16 +242,6 @@ export default function LeftSidebarMenu() {
                 >
                   <ChevronRight className="w-4 h-4 text-pink-300" />
                 </div>
-              )}
-
-              {isExpanded && (
-                <button
-                  onClick={toggleSidebar}
-                  className="p-1 text-white/60 hover:text-white bg-white/5 hover:bg-white/15 rounded-lg transition cursor-pointer"
-                  title="Ocultar menú lateral"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
               )}
             </div>
 
