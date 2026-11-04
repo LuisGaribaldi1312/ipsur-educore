@@ -123,14 +123,19 @@ export default function Navbar() {
                 className="flex items-center gap-2.5 cursor-pointer select-none"
                 onClick={() => setActiveClassroomId(null)}
               >
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#0066FF] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-pink-50 text-ipsur-pink-600 flex items-center justify-center">
                   <LayoutGrid className="w-4 h-4" />
                 </div>
-                <h1 className="font-display text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                  Panel de Control
-                </h1>
+                <div>
+                  <h1 className="font-display text-base sm:text-lg font-black text-slate-900 tracking-tight leading-none">
+                    Panel de Control
+                  </h1>
+                  <span className="text-[10px] font-bold text-ipsur-pink-600 tracking-wider uppercase block">
+                    IPSUR EDUCORE
+                  </span>
+                </div>
                 {activeClassroomId && (
-                  <span className="hidden md:inline-flex items-center text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                  <span className="hidden md:inline-flex items-center text-xs font-bold text-ipsur-navy-700 bg-indigo-50 px-2 py-0.5 rounded-md">
                     / Sala de Clases
                   </span>
                 )}
@@ -149,9 +154,11 @@ export default function Navbar() {
                   title="Mensajes y Notificaciones"
                 >
                   <Bell className="w-5 h-5" />
-                  <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center shadow-xs">
-                    {(notificationsList || []).length || 3}
-                  </span>
+                  {(notificationsList || []).length > 0 && (
+                    <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-ipsur-pink-500 text-white text-[10px] font-black flex items-center justify-center shadow-xs">
+                      {notificationsList.length}
+                    </span>
+                  )}
                 </button>
 
                 {/* Notifications Dropdown */}
@@ -161,22 +168,29 @@ export default function Navbar() {
                       <span className="font-display font-black text-xs text-slate-900 uppercase tracking-wider">
                         Notificaciones Institucionales
                       </span>
-                      <span className="text-[10px] text-blue-600 font-bold">
+                      <span className="text-[10px] text-ipsur-pink-600 font-bold">
                         {(notificationsList || []).length} nuevas
                       </span>
                     </div>
 
                     <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto">
-                      {(notificationsList || []).map((n, i) => (
-                        <div key={n.id || i} className="p-3 hover:bg-slate-50 transition flex items-start gap-3">
-                          <span className={`w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 ${n.color || 'bg-blue-500'}`}></span>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-bold text-slate-800 leading-snug">{n.title}</p>
-                            <p className="text-[11px] text-slate-500 mt-0.5">{n.description}</p>
-                            <span className="text-[10px] text-slate-400 mt-1 block">{n.time}</span>
-                          </div>
+                      {(notificationsList || []).length === 0 ? (
+                        <div className="p-6 text-center text-xs text-slate-400">
+                          <Bell className="w-6 h-6 text-slate-300 mx-auto mb-1.5" />
+                          No tienes notificaciones pendientes. Todo al día.
                         </div>
-                      ))}
+                      ) : (
+                        notificationsList.map((n, i) => (
+                          <div key={n.id || i} className="p-3 hover:bg-slate-50 transition flex items-start gap-3">
+                            <span className={`w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 ${n.color || 'bg-ipsur-pink-500'}`}></span>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-bold text-slate-800 leading-snug">{n.title}</p>
+                              <p className="text-[11px] text-slate-500 mt-0.5">{n.description}</p>
+                              <span className="text-[10px] text-slate-400 mt-1 block">{n.time}</span>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
 
                     <div className="pt-2 px-4 border-t border-slate-100 text-center">

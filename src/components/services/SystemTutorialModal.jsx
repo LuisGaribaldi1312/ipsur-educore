@@ -10,9 +10,9 @@ export default function SystemTutorialModal({ isOpen, onClose }) {
   const steps = [
     {
       title: '1. Navegación Principal y Roles',
-      description: 'IPSUR Manager School unifica toda la gestión directiva, académica y administrativa. El menú lateral izquierdo te da acceso a Rectoría, Dirección, Servicios Escolares, Aulas Virtuales y Contabilidad según tu perfil de usuario.',
+      description: 'IPSUR EDUCORE unifica toda la gestión directiva, académica y administrativa. El menú lateral izquierdo te da acceso a Rectoría, Dirección, Servicios Escolares, Aulas Virtuales y Contabilidad según tu perfil de usuario.',
       icon: School,
-      color: 'from-blue-600 to-indigo-600'
+      color: 'from-ipsur-navy-700 to-ipsur-pink-600'
     },
     {
       title: '2. Creación de Salas y Temarios',
@@ -35,7 +35,7 @@ export default function SystemTutorialModal({ isOpen, onClose }) {
   ];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Tutorial de Inducción · IPSUR Manager School" size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="Tutorial de Inducción · IPSUR EDUCORE" size="lg">
       <div className="space-y-4">
         {/* Video simulation preview box */}
         <div className="relative rounded-2xl overflow-hidden bg-slate-950 aspect-video flex items-center justify-center border border-slate-800 shadow-xl group">

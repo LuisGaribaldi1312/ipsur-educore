@@ -34,38 +34,47 @@ export default function PaymentsAccountingModal({ isOpen, onClose }) {
   };
 
   const filteredPayments = (payments || []).filter(p => 
-    p.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.concept.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.id.toLowerCase().includes(searchTerm.toLowerCase())
+    p.student?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.concept?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.id?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalAmount = (payments || []).reduce((acc, p) => {
+    const raw = String(p.amount || '').replace(/[^0-9.]/g, '');
+    return acc + (Number(raw) || 0);
+  }, 0);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Administrativo y Contabilidad · Módulo de Pagos" size="lg">
       <div className="space-y-4">
         {/* Top Summary Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="bg-gradient-to-br from-emerald-500 to-teal-700 text-white p-4 rounded-2xl shadow-sm">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-100">Ingresos Totales (Mes)</span>
-            <p className="font-display text-2xl font-black mt-1">$142,850.00 <span className="text-xs font-normal text-emerald-200">MXN</span></p>
-            <span className="text-[10px] text-emerald-100 mt-1 block">94% Colegiaturas al corriente</span>
+          <div className="bg-gradient-to-br from-emerald-600 to-teal-800 text-white p-4 rounded-2xl shadow-sm">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-100">Ingresos Registrados</span>
+            <p className="font-display text-2xl font-black mt-1">
+              ${totalAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} <span className="text-xs font-normal text-emerald-200">MXN</span>
+            </p>
+            <span className="text-[10px] text-emerald-100 mt-1 block">
+              {payments?.length > 0 ? `${payments.length} transacciones capturadas` : 'Caja abierta'}
+            </span>
           </div>
 
-          <div className="bg-slate-900 text-white p-4 rounded-2xl shadow-sm">
+          <div className="bg-[#0A0D1B] text-white p-4 rounded-2xl shadow-sm border border-slate-800">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Recibos Emitidos</span>
-            <p className="font-display text-2xl font-black mt-1">{payments?.length || 0} <span className="text-xs font-normal text-slate-400">Trámites</span></p>
-            <span className="text-[10px] text-slate-300 mt-1 block">Facturación CFDI 4.0 activa</span>
+            <p className="font-display text-2xl font-black mt-1">{payments?.length || 0} <span className="text-xs font-normal text-slate-400">Comprobantes</span></p>
+            <span className="text-[10px] text-slate-300 mt-1 block">Folios oficiales IPSUR</span>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-4 rounded-2xl shadow-sm flex flex-col justify-between">
+          <div className="bg-gradient-to-br from-ipsur-navy-800 to-ipsur-pink-700 text-white p-4 rounded-2xl shadow-sm flex flex-col justify-between">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-100">Caja y Tesorería</span>
-              <p className="text-xs text-blue-100 mt-0.5">Control financiero institucional</p>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-pink-100">Caja y Tesorería</span>
+              <p className="text-xs text-pink-100 mt-0.5">Control financiero institucional</p>
             </div>
             <button
               onClick={() => setIsAdding(!isAdding)}
-              className="mt-2 w-full py-2 px-3 text-xs font-bold bg-white text-blue-900 hover:bg-blue-50 rounded-xl transition flex items-center justify-center gap-1.5 shadow"
+              className="mt-2 w-full py-2 px-3 text-xs font-bold bg-white text-ipsur-navy-900 hover:bg-slate-100 rounded-xl transition flex items-center justify-center gap-1.5 shadow"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-ipsur-pink-600" />
               <span>{isAdding ? 'Ver Lista de Pagos' : 'Registrar Nuevo Pago'}</span>
             </button>
           </div>
@@ -182,30 +191,39 @@ export default function PaymentsAccountingModal({ isOpen, onClose }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 bg-white">
-                  {filteredPayments.map(p => (
-                    <tr key={p.id} className="hover:bg-slate-50 transition">
-                      <td className="py-2.5 px-3 font-mono font-bold text-slate-500 text-[11px]">{p.id}</td>
-                      <td className="py-2.5 px-3 font-semibold text-slate-900">{p.student}</td>
-                      <td className="py-2.5 px-3 text-slate-600">{p.concept}</td>
-                      <td className="py-2.5 px-3 font-bold text-emerald-700">{p.amount}</td>
-                      <td className="py-2.5 px-3 text-slate-500 text-[11px]">{p.method}</td>
-                      <td className="py-2.5 px-3">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          <CheckCircle className="w-3 h-3 text-emerald-600" />
-                          {p.status}
-                        </span>
-                      </td>
-                      <td className="py-2.5 px-3 text-right">
-                        <button
-                          onClick={() => showToast('Recibo Digital', `Descargando comprobante fiscal de ${p.student}`, 'info')}
-                          className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition"
-                          title="Descargar recibo digital PDF"
-                        >
-                          <Download className="w-4 h-4" />
-                        </button>
+                  {filteredPayments.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-8 text-center text-slate-400">
+                        <CreditCard className="w-8 h-8 text-slate-300 mx-auto mb-1.5" />
+                        Sin pagos registrados en el periodo. Utiliza "Registrar Nuevo Pago" para capturar cobros.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredPayments.map(p => (
+                      <tr key={p.id} className="hover:bg-slate-50 transition">
+                        <td className="py-2.5 px-3 font-mono font-bold text-slate-500 text-[11px]">{p.id}</td>
+                        <td className="py-2.5 px-3 font-semibold text-slate-900">{p.student}</td>
+                        <td className="py-2.5 px-3 text-slate-600">{p.concept}</td>
+                        <td className="py-2.5 px-3 font-bold text-emerald-700">{p.amount}</td>
+                        <td className="py-2.5 px-3 text-slate-500 text-[11px]">{p.method}</td>
+                        <td className="py-2.5 px-3">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                            <CheckCircle className="w-3 h-3 text-emerald-600" />
+                            {p.status}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-right">
+                          <button
+                            onClick={() => showToast('Recibo Digital', `Descargando comprobante fiscal de ${p.student}`, 'info')}
+                            className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition"
+                            title="Descargar recibo digital PDF"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

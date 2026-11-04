@@ -59,10 +59,10 @@ export default function LoginModal({ isOpen, onClose }) {
             />
           </div>
           <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white font-display">
-            IPSUR <span className="text-sky-300">Manager School</span>
+            IPSUR <span className="text-pink-300">EDUCORE</span>
           </h2>
-          <p className="text-[11px] text-sky-200/90 font-semibold tracking-wider uppercase mt-0.5">
-            Innovación Educativa para un Mejor Futuro
+          <p className="text-[11px] text-pink-200/90 font-semibold tracking-wider uppercase mt-0.5">
+            "La educación es el camino" · Portal Institucional
           </p>
         </div>
 

@@ -29,6 +29,10 @@ export function AppProvider({ children }) {
       localStorage.removeItem('ipsur_educore_classrooms_v2');
       localStorage.removeItem('ipsur_educore_users_v2');
       localStorage.removeItem('ipsur_educore_current_user_v2');
+      localStorage.removeItem('ipsur_activities_v1');
+      localStorage.removeItem('ipsur_notifications_v1');
+      localStorage.removeItem('ipsur_procedures_v1');
+      localStorage.removeItem('ipsur_payments_v1');
     } catch (e) {
       // Ignore
     }
@@ -105,50 +109,50 @@ export function AppProvider({ children }) {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [userManagerModalOpen, setUserManagerModalOpen] = useState(false);
 
-  // Manager School additional services datasets
+  // IPSUR EDUCORE live services datasets (Zero demo data)
   const [activities, setActivities] = useState(() => {
     try {
-      const saved = localStorage.getItem('ipsur_activities_v1');
-      return saved ? JSON.parse(saved) : SAMPLE_ACTIVITIES;
+      const saved = localStorage.getItem('ipsur_educore_activities_clean');
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return SAMPLE_ACTIVITIES;
+      return [];
     }
   });
 
   const [notificationsList, setNotificationsList] = useState(() => {
     try {
-      const saved = localStorage.getItem('ipsur_notifications_v1');
-      return saved ? JSON.parse(saved) : SAMPLE_NOTIFICATIONS;
+      const saved = localStorage.getItem('ipsur_educore_notifications_clean');
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return SAMPLE_NOTIFICATIONS;
+      return [];
     }
   });
 
   const [procedures, setProcedures] = useState(() => {
     try {
-      const saved = localStorage.getItem('ipsur_procedures_v1');
-      return saved ? JSON.parse(saved) : SAMPLE_PROCEDURES;
+      const saved = localStorage.getItem('ipsur_educore_procedures_clean');
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return SAMPLE_PROCEDURES;
+      return [];
     }
   });
 
   const [payments, setPayments] = useState(() => {
     try {
-      const saved = localStorage.getItem('ipsur_payments_v1');
-      return saved ? JSON.parse(saved) : SAMPLE_PAYMENTS;
+      const saved = localStorage.getItem('ipsur_educore_payments_clean');
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return SAMPLE_PAYMENTS;
+      return [];
     }
   });
 
   // Sync to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('ipsur_activities_v1', JSON.stringify(activities));
-      localStorage.setItem('ipsur_notifications_v1', JSON.stringify(notificationsList));
-      localStorage.setItem('ipsur_procedures_v1', JSON.stringify(procedures));
-      localStorage.setItem('ipsur_payments_v1', JSON.stringify(payments));
+      localStorage.setItem('ipsur_educore_activities_clean', JSON.stringify(activities));
+      localStorage.setItem('ipsur_educore_notifications_clean', JSON.stringify(notificationsList));
+      localStorage.setItem('ipsur_educore_procedures_clean', JSON.stringify(procedures));
+      localStorage.setItem('ipsur_educore_payments_clean', JSON.stringify(payments));
     } catch (e) {
       // Ignore
     }

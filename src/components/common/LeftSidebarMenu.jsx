@@ -40,6 +40,8 @@ export default function LeftSidebarMenu() {
     setActiveClassroomId, 
     classrooms, 
     periods, 
+    users,
+    procedures,
     institutionalInfo, 
     setUserManagerModalOpen, 
     logout,
@@ -93,6 +95,9 @@ export default function LeftSidebarMenu() {
   const canManageUsers = isSuperAdmin || currentUser.role === 'director' || currentUser.role === 'rector';
 
   const teacherClassrooms = classrooms.filter(c => c.teacherId === currentUser.id);
+  const totalStudents = (users || []).filter(u => u.role === 'student').length;
+  const totalTeachers = (users || []).filter(u => u.role === 'teacher').length;
+  const pendingProceduresCount = (procedures || []).filter(p => p.status === 'Pendiente').length;
 
   const handleOpenGrades = () => {
     if (isStudent) {
@@ -102,7 +107,7 @@ export default function LeftSidebarMenu() {
     }
   };
 
-  // Menu items list matching the official IPSUR Manager School screenshot
+  // Menu items list matching the official IPSUR EDUCORE architecture
   const menuItems = [
     {
       id: 'inicio',
@@ -112,7 +117,7 @@ export default function LeftSidebarMenu() {
       action: () => {
         setActiveTab('inicio');
         setActiveClassroomId(null);
-        showToast('Inicio', 'Bienvenido a IPSUR Manager School', 'info');
+        showToast('Inicio', 'Bienvenido a IPSUR EDUCORE', 'info');
       },
       visible: true
     },
@@ -143,7 +148,7 @@ export default function LeftSidebarMenu() {
       label: 'Servicios Escolares',
       icon: FileText,
       hasChevron: true,
-      badge: '24',
+      badge: pendingProceduresCount > 0 ? String(pendingProceduresCount) : null,
       action: () => {
         setActiveTab('servicios_escolares');
         setProceduresModalOpen(true);
@@ -175,7 +180,7 @@ export default function LeftSidebarMenu() {
       id: 'docentes',
       label: 'Docentes',
       icon: Users,
-      badge: '86',
+      badge: totalTeachers > 0 ? String(totalTeachers) : null,
       action: () => {
         setActiveTab('docentes');
         setSchedulesModalOpen(true);
@@ -186,7 +191,7 @@ export default function LeftSidebarMenu() {
       id: 'alumnos',
       label: 'Alumnos',
       icon: GraduationCap,
-      badge: '1,248',
+      badge: totalStudents > 0 ? String(totalStudents) : null,
       action: () => {
         setActiveTab('alumnos');
         setRegisterStudentModalOpen(true);
@@ -221,19 +226,19 @@ export default function LeftSidebarMenu() {
 
   return (
     <>
-      {/* Desktop Left Sidebar: Adhered directly to layout structure */}
+      {/* Desktop Left Sidebar: Adhered directly to layout structure with IPSUR Navy Palette */}
       <aside
-        aria-label="Menú Lateral IPSUR Manager School"
-        className={`hidden lg:flex flex-col shrink-0 bg-[#0B1528] text-white border-r border-slate-800 shadow-xl transition-all duration-300 select-none relative min-h-[calc(100vh-80px)] ${
+        aria-label="Menú Lateral IPSUR EDUCORE"
+        className={`hidden lg:flex flex-col shrink-0 bg-[#0A0D1B] text-white border-r border-[#1E1F5C]/40 shadow-xl transition-all duration-300 select-none relative min-h-[calc(100vh-80px)] ${
           isExpanded ? 'w-64' : 'w-16'
         }`}
       >
-        {/* Toggle Collapse/Expand Button */}
+        {/* Toggle Collapse/Expand Button with IPSUR Pink Accent */}
         <button
           onClick={toggleSidebar}
           aria-label={isExpanded ? 'Ocultar menú lateral' : 'Mostrar menú lateral'}
           title={isExpanded ? 'Contraer menú lateral' : 'Expandir menú lateral'}
-          className="absolute -right-3.5 top-6 z-30 w-7 h-7 rounded-full bg-[#1877F2] hover:bg-blue-600 text-white border border-white/40 flex items-center justify-center shadow-lg transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+          className="absolute -right-3.5 top-6 z-30 w-7 h-7 rounded-full bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white border border-pink-300 flex items-center justify-center shadow-lg transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
         >
           {isExpanded ? (
             <ChevronLeft className="w-4 h-4 text-white" />
@@ -244,38 +249,42 @@ export default function LeftSidebarMenu() {
 
         <div className="w-full flex-1 flex flex-col justify-between p-3 relative">
           <div>
-            {/* Sidebar Top Header matching screenshot emblem */}
+            {/* Sidebar Top Header with Official IPSUR Logo */}
             <div className={`pb-4 mb-3 border-b border-white/10 ${
               isExpanded ? 'flex flex-col items-center text-center' : 'flex justify-center'
             }`}>
               {isExpanded ? (
                 <div className="flex flex-col items-center">
-                  {/* Graduation cap & shield icon emblem */}
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#0066FF] via-[#1E70EB] to-sky-400 p-2.5 flex items-center justify-center text-white shadow-lg mb-2 border border-white/20">
-                    <GraduationCap className="w-8 h-8 text-white filter drop-shadow" />
+                  {/* Clean White Container for Official IPSUR Logo */}
+                  <div className="w-16 h-16 rounded-[22px] bg-white p-2 flex items-center justify-center shadow-xl mb-2.5 border-2 border-white/90">
+                    <img 
+                      src="/ipsur-logo.png" 
+                      alt="IPSUR Logo Oficial" 
+                      className="w-full h-full object-contain filter drop-shadow" 
+                    />
                   </div>
                   <h2 className="font-display text-xl font-black tracking-tight text-white leading-none">
-                    IPSUR
+                    IPSUR <span className="text-ipsur-pink-500">EDUCORE</span>
                   </h2>
-                  <span className="font-display text-xs font-bold text-sky-300 tracking-wider uppercase mt-0.5">
-                    Manager School
+                  <span className="font-display text-[10px] font-bold text-indigo-200 tracking-widest uppercase mt-1">
+                    Academic Management System
                   </span>
-                  <p className="italic text-[10px] text-slate-300 font-light mt-1 max-w-[200px]">
-                    Innovación Educativa para un Mejor Futuro
+                  <p className="italic text-[10px] text-pink-300/90 font-light mt-1 max-w-[200px]">
+                    "La educación es el camino"
                   </p>
                 </div>
               ) : (
                 <div
                   onClick={toggleSidebar}
-                  className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0066FF] to-sky-400 text-white flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition"
-                  title="IPSUR Manager School (Clic para expandir)"
+                  className="w-10 h-10 rounded-xl bg-white p-1 text-white flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition"
+                  title="IPSUR EDUCORE (Clic para expandir)"
                 >
-                  <GraduationCap className="w-5 h-5 text-white" />
+                  <img src="/ipsur-logo.png" alt="IPSUR Logo" className="w-full h-full object-contain" />
                 </div>
               )}
             </div>
 
-            {/* Menu Items */}
+            {/* Menu Items with IPSUR Navy to Pink Gradient for Active Item */}
             <nav className="flex flex-col gap-1">
               {menuItems.map(item => {
                 const Icon = item.icon;
@@ -288,17 +297,17 @@ export default function LeftSidebarMenu() {
                       isExpanded
                         ? `px-3.5 py-2.5 gap-3 w-full text-left ${
                             isActive
-                              ? 'bg-[#0077FF] text-white shadow-md font-bold'
+                              ? 'bg-gradient-to-r from-ipsur-navy-700 via-ipsur-navy-600 to-ipsur-pink-600 text-white shadow-[0_4px_16px_rgba(230,0,126,0.35)] font-bold'
                               : 'text-slate-300 hover:text-white hover:bg-white/10 font-medium'
                           }`
                         : `w-10 h-10 justify-center mx-auto ${
                             isActive
-                              ? 'bg-[#0077FF] text-white shadow-md'
+                              ? 'bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 text-white shadow-md'
                               : 'text-slate-300 hover:text-white hover:bg-white/10'
                           }`
                     }`}
                   >
-                    <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'}`} />
+                    <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-300 group-hover:text-pink-300'}`} />
 
                     {isExpanded && (
                       <div className="flex-1 flex items-center justify-between min-w-0">
@@ -312,7 +321,7 @@ export default function LeftSidebarMenu() {
                             </span>
                           )}
                           {item.hasChevron && (
-                            <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-transform" />
+                            <ChevronRight className="w-3.5 h-3.5 text-pink-300/70 group-hover:text-pink-300 group-hover:translate-x-0.5 transition-transform" />
                           )}
                         </div>
                       </div>
@@ -320,11 +329,11 @@ export default function LeftSidebarMenu() {
 
                     {/* Tooltip when collapsed */}
                     {!isExpanded && (
-                      <div className="absolute left-full ml-3.5 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[#091122] text-white text-xs font-bold rounded-xl shadow-2xl border border-white/20 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 flex items-center gap-2">
-                        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#091122] border-l border-b border-white/20 rotate-45"></div>
+                      <div className="absolute left-full ml-3.5 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[#0A0D1B] text-white text-xs font-bold rounded-xl shadow-2xl border border-white/20 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 flex items-center gap-2">
+                        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#0A0D1B] border-l border-b border-white/20 rotate-45"></div>
                         <span>{item.label}</span>
                         {item.badge && (
-                          <span className="text-[9px] font-mono bg-white/20 px-1.5 rounded-full">
+                          <span className="text-[9px] font-mono bg-ipsur-pink-500 text-white px-1.5 rounded-full">
                             {item.badge}
                           </span>
                         )}
@@ -336,28 +345,26 @@ export default function LeftSidebarMenu() {
             </nav>
           </div>
 
-          {/* Bottom Sidebar Card: Campus building photo with wave graphic */}
+          {/* Bottom Sidebar Card: IPSUR Official Palette Card */}
           {isExpanded ? (
             <div className="mt-6 pt-3 border-t border-white/10">
-              <div className="relative rounded-2xl overflow-hidden border border-white/15 bg-gradient-to-t from-slate-950 via-slate-900 to-blue-950 shadow-lg p-3 text-center group">
-                <img
-                  src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=400&q=80"
-                  alt="Campus IPSUR"
-                  className="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:scale-105 transition duration-500"
-                />
+              <div className="relative rounded-2xl overflow-hidden border border-white/15 bg-gradient-to-br from-[#0A0D1B] via-[#141B41] to-[#750042] shadow-lg p-3.5 text-center group">
                 <div className="relative z-10">
-                  <p className="font-display font-bold text-white text-xs leading-snug">
-                    Educación sin límites
+                  <p className="font-display font-black text-white text-xs leading-snug">
+                    IPSUR EDUCORE
                   </p>
-                  <p className="text-[10px] text-blue-200 font-medium leading-tight mt-0.5">
-                    con tecnología de vanguardia
+                  <p className="text-[10px] text-pink-200 font-medium leading-tight mt-0.5 italic">
+                    "La educación es el camino"
+                  </p>
+                  <p className="text-[9px] text-slate-300 font-light mt-1">
+                    Bachillerato en Línea SEP
                   </p>
                 </div>
               </div>
             </div>
           ) : (
             <div className="pt-3 border-t border-white/10 flex justify-center">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Sistema en Línea"></span>
+              <span className="w-2 h-2 rounded-full bg-ipsur-pink-500 animate-pulse" title="Sistema en Línea"></span>
             </div>
           )}
         </div>
@@ -367,7 +374,7 @@ export default function LeftSidebarMenu() {
       <div className="fixed bottom-5 left-4 z-40 lg:hidden">
         <button
           onClick={() => setIsMobileOpen(true)}
-          className="flex items-center gap-2 px-4 py-3 bg-[#0077FF] text-white font-bold rounded-2xl shadow-2xl border border-white/20 active:scale-95 transition"
+          className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-ipsur-navy-800 to-ipsur-pink-600 text-white font-bold rounded-2xl shadow-2xl border border-white/20 active:scale-95 transition"
         >
           <Menu className="w-5 h-5" />
           <span className="text-xs font-bold tracking-wide">Menú</span>
@@ -377,16 +384,16 @@ export default function LeftSidebarMenu() {
       {/* Mobile Drawer */}
       {isMobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex justify-start bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-72 max-w-[85%] h-full bg-[#0B1528] text-white p-5 flex flex-col justify-between shadow-2xl border-r border-white/10 animate-in slide-in-from-left duration-250">
+          <div className="w-72 max-w-[85%] h-full bg-[#0A0D1B] text-white p-5 flex flex-col justify-between shadow-2xl border-r border-white/10 animate-in slide-in-from-left duration-250">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-[#0077FF] flex items-center justify-center text-white">
-                    <GraduationCap className="w-6 h-6" />
+                  <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center">
+                    <img src="/ipsur-logo.png" alt="IPSUR" className="w-full h-full object-contain" />
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-white text-sm">IPSUR Manager</h3>
-                    <p className="text-[10px] text-sky-300">Menú Móvil</p>
+                    <h3 className="font-display font-bold text-white text-sm">IPSUR EDUCORE</h3>
+                    <p className="text-[10px] text-pink-300">Menú Móvil</p>
                   </div>
                 </div>
                 <button
@@ -410,7 +417,7 @@ export default function LeftSidebarMenu() {
                       }}
                       className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition ${
                         isActive
-                          ? 'bg-[#0077FF] text-white'
+                          ? 'bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 text-white'
                           : 'text-slate-300 hover:bg-white/10'
                       }`}
                     >
@@ -418,7 +425,7 @@ export default function LeftSidebarMenu() {
                         <Icon className="w-4 h-4" />
                         <span>{item.label}</span>
                       </div>
-                      {item.hasChevron && <ChevronRight className="w-4 h-4 text-slate-400" />}
+                      {item.hasChevron && <ChevronRight className="w-4 h-4 text-pink-300" />}
                     </button>
                   );
                 })}

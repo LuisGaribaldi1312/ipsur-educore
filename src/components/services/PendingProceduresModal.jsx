@@ -26,11 +26,11 @@ export default function PendingProceduresModal({ isOpen, onClose }) {
             </div>
             <div>
               <h4 className="font-display font-bold text-slate-900 text-sm">Ventanilla Única Digital SEP</h4>
-              <p className="text-xs text-slate-600">24 trámites en curso · Emisión de constancias, credenciales y actas</p>
+              <p className="text-xs text-slate-600">{procedures?.length || 0} trámites en curso · Emisión de constancias, credenciales y actas</p>
             </div>
           </div>
           <span className="px-3 py-1 rounded-full bg-teal-100 text-teal-800 text-xs font-bold">
-            92% Eficiencia
+            Ventanilla Activa
           </span>
         </div>
 
@@ -60,48 +60,57 @@ export default function PendingProceduresModal({ isOpen, onClose }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
-              {filtered.map(item => (
-                <tr key={item.id} className="hover:bg-slate-50 transition">
-                  <td className="py-2.5 px-3 font-mono text-[11px] font-bold text-slate-500">{item.id}</td>
-                  <td className="py-2.5 px-3">
-                    <span className="font-bold text-slate-900 block">{item.student}</span>
-                    <span className="text-[10px] text-slate-400 font-mono">{item.matricula}</span>
-                  </td>
-                  <td className="py-2.5 px-3 text-slate-700">{item.type}</td>
-                  <td className="py-2.5 px-3 text-slate-500 text-[11px]">{item.date}</td>
-                  <td className="py-2.5 px-3">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                      item.status === 'Aprobado' 
-                        ? 'bg-emerald-100 text-emerald-800' 
-                        : item.status === 'En Proceso'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-amber-100 text-amber-800'
-                    }`}>
-                      {item.status}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-3 text-right">
-                    <div className="inline-flex items-center gap-1">
-                      {item.status !== 'Aprobado' && (
-                        <button
-                          onClick={() => updateProcedureStatus(item.id, 'Aprobado')}
-                          className="px-2.5 py-1 text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs transition"
-                          title="Aprobar y emitir documento oficial"
-                        >
-                          Aprobar
-                        </button>
-                      )}
-                      <button
-                        onClick={() => showToast('Descarga Documento', `Generando PDF oficial para ${item.student}`, 'info')}
-                        className="p-1.5 text-slate-500 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition"
-                        title="Ver / Descargar constancia"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </div>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-slate-400">
+                    <FileText className="w-8 h-8 text-slate-300 mx-auto mb-1.5" />
+                    Sin trámites escolares registrados en la ventanilla.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filtered.map(item => (
+                  <tr key={item.id} className="hover:bg-slate-50 transition">
+                    <td className="py-2.5 px-3 font-mono text-[11px] font-bold text-slate-500">{item.id}</td>
+                    <td className="py-2.5 px-3">
+                      <span className="font-bold text-slate-900 block">{item.student}</span>
+                      <span className="text-[10px] text-slate-400 font-mono">{item.matricula}</span>
+                    </td>
+                    <td className="py-2.5 px-3 text-slate-700">{item.type}</td>
+                    <td className="py-2.5 px-3 text-slate-500 text-[11px]">{item.date}</td>
+                    <td className="py-2.5 px-3">
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                        item.status === 'Aprobado' 
+                          ? 'bg-emerald-100 text-emerald-800' 
+                          : item.status === 'En Proceso'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 text-right">
+                      <div className="inline-flex items-center gap-1">
+                        {item.status !== 'Aprobado' && (
+                          <button
+                            onClick={() => updateProcedureStatus(item.id, 'Aprobado')}
+                            className="px-2.5 py-1 text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs transition"
+                            title="Aprobar y emitir documento oficial"
+                          >
+                            Aprobar
+                          </button>
+                        )}
+                        <button
+                          onClick={() => showToast('Descarga Documento', `Generando PDF oficial para ${item.student}`, 'info')}
+                          className="p-1.5 text-slate-500 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition"
+                          title="Ver / Descargar constancia"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
