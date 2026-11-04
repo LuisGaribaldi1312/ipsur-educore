@@ -88,17 +88,23 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
   return (
     <div className="space-y-6">
       
-      {/* 1. Hero Executive Welcome Banner in Official IPSUR Navy & Magenta Pink */}
+      {/* 1. Hero Executive Welcome Banner in Official IPSUR Navy & Magenta Pink with Seamless Blended Mask */}
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#0A0D1B] via-[#141B41] to-[#750042] text-white shadow-xl border border-white/10 min-h-[220px] sm:min-h-[240px] flex items-center">
-        {/* Subtle background campus image with pink/navy gradient overlay */}
-        <div className="absolute right-0 top-0 bottom-0 w-full md:w-3/5 overflow-hidden pointer-events-none">
+        {/* Seamless full-bleed campus image with progressive gradient mask (eliminates all hard edges and seams) */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
           <img
-            src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80"
+            src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1600&q=80"
             alt="Campus IPSUR Moderno"
-            className="w-full h-full object-cover object-center opacity-25 md:opacity-35"
+            className="absolute inset-0 w-full h-full object-cover object-[75%_center] opacity-35 md:opacity-45 transition-opacity duration-700"
+            style={{
+              maskImage: 'linear-gradient(to right, transparent 0%, transparent 22%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.85) 70%, black 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 22%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.85) 70%, black 100%)'
+            }}
           />
-          {/* Dynamic IPSUR gradient wave */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0A0D1B] via-[#0A0D1B]/85 to-transparent"></div>
+          {/* Multi-stage IPSUR Navy to Pink color grade overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0A0D1B] via-[#0A0D1B]/80 via-[#141B41]/55 to-[#750042]/70"></div>
+          {/* Vignette depth gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0D1B]/70 via-transparent to-transparent"></div>
         </div>
 
         {/* Content container */}
