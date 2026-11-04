@@ -161,28 +161,59 @@ export default function LoginScreen() {
               )}
             </button>
 
-            {/* Quick Access Helper Buttons for convenient testing */}
+            {/* Quick Access Helper Buttons for all official roles */}
             <div className="pt-4 border-t border-slate-100 text-[11px] space-y-2">
-              <span className="text-slate-400 font-semibold block text-center">
-                Acceso Rápido para Administración:
+              <span className="text-slate-500 font-semibold block text-center">
+                Perfiles Institucionales Oficiales:
               </span>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => fillQuickCredentials('superadmin@ipsur.edu.mx', 'ipsurSuperAdmin2026*')}
-                  className="p-2.5 text-left bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl transition group"
+                  onClick={() => fillQuickCredentials('director@ipsur.edu.mx', 'directorIpsur2026*')}
+                  className="p-2 text-left bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl transition group"
                 >
-                  <span className="font-bold text-amber-900 block group-hover:text-amber-950">👑 Super Admin</span>
-                  <span className="text-[10px] text-amber-700 block truncate">superadmin@ipsur.edu.mx</span>
+                  <span className="font-bold text-indigo-900 block truncate">🏛️ Director General</span>
+                  <span className="text-[10px] text-indigo-700 block truncate font-mono">director@ipsur.edu.mx</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => fillQuickCredentials('director@ipsur.edu.mx', 'directorIpsur2026*')}
-                  className="p-2.5 text-left bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl transition group"
+                  onClick={() => fillQuickCredentials('coordinacion@ipsur.edu.mx', 'coordinadorIpsur2026*')}
+                  className="p-2 text-left bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl transition group"
                 >
-                  <span className="font-bold text-indigo-900 block group-hover:text-indigo-950">🏛️ Director General</span>
-                  <span className="text-[10px] text-indigo-700 block truncate">director@ipsur.edu.mx</span>
+                  <span className="font-bold text-purple-900 block truncate">🛡️ Coordinación</span>
+                  <span className="text-[10px] text-purple-700 block truncate font-mono">coordinacion@ipsur.edu.mx</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => fillQuickCredentials('maestro@ipsur.edu.mx', 'docenteIpsur2026*')}
+                  className="p-2 text-left bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl transition group"
+                >
+                  <span className="font-bold text-blue-900 block truncate">📚 Maestro(a)</span>
+                  <span className="text-[10px] text-blue-700 block truncate font-mono">maestro@ipsur.edu.mx</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => fillQuickCredentials('alumno@ipsur.edu.mx', 'alumnoIpsur2026*')}
+                  className="p-2 text-left bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition group"
+                >
+                  <span className="font-bold text-emerald-900 block truncate">🎓 Alumno(a)</span>
+                  <span className="text-[10px] text-emerald-700 block truncate font-mono">alumno@ipsur.edu.mx</span>
+                </button>
+              </div>
+
+              {/* Discreet Super Admin Helper */}
+              <div className="pt-1.5 text-center">
+                <button
+                  type="button"
+                  onClick={() => fillQuickCredentials('superadmin@ipsur.edu.mx', 'ipsurSuperAdmin2026*')}
+                  className="text-[10px] text-slate-400 hover:text-amber-700 transition underline inline-flex items-center gap-1 font-mono"
+                  title="Acceso Super Administrador Oculto"
+                >
+                  <Lock className="w-2.5 h-2.5" />
+                  <span>Acceso Super Admin (Oculto)</span>
                 </button>
               </div>
             </div>

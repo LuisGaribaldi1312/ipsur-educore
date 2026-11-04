@@ -27,8 +27,7 @@ export function AppProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Guarantee that the superadmin account is always present with its secret flag and permissions
-          const hasSuperAdmin = parsed.some(u => u.isSuperAdmin || u.role === 'superadmin');
+          // Normalize existing users with proper scopes and permissions
           const normalized = parsed.map(u => ({
             ...u,
             scope: u.scope || DEFAULT_ROLE_PERMISSIONS[u.role]?.scope || 'assigned',
@@ -38,10 +37,23 @@ export function AppProvider({ children }) {
             }
           }));
 
+          // Guarantee that all official seed users are present in the list
+          const existingIds = new Set(normalized.map(u => u.id));
+          const existingEmails = new Set(normalized.map(u => u.email?.toLowerCase()));
+          
+          const missingSeedUsers = USERS.filter(u => 
+            !existingIds.has(u.id) && !existingEmails.has(u.email?.toLowerCase())
+          );
+
+          // Guarantee that the superadmin account is always present with its secret flag and permissions
+          const hasSuperAdmin = normalized.some(u => u.isSuperAdmin || u.role === 'superadmin') || 
+                                missingSeedUsers.some(u => u.isSuperAdmin || u.role === 'superadmin');
+
+          let result = [...missingSeedUsers, ...normalized];
           if (!hasSuperAdmin) {
-            return [USERS[0], ...normalized];
+            result = [USERS[0], ...result];
           }
-          return normalized;
+          return result;
         }
       }
     } catch (e) {
