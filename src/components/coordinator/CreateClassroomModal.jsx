@@ -28,7 +28,8 @@ export default function CreateClassroomModal({ isOpen, onClose }) {
   const { currentUser, isSuperAdmin, users, periods, createClassroom, showToast } = useApp();
 
   const isStudent = currentUser?.role === 'student';
-  if (!isOpen || isStudent) return null;
+  const isTeacher = currentUser?.role === 'teacher';
+  if (!isOpen || isStudent || isTeacher) return null;
 
   const teachers = users.filter(u => u.role === 'teacher');
   const students = users.filter(u => u.role === 'student');

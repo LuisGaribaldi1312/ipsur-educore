@@ -115,6 +115,7 @@ export default function LeftSidebarMenu() {
   const isStudent = currentUser.role === 'student';
   const isTeacher = currentUser.role === 'teacher';
   const canManageUsers = isSuperAdmin || currentUser.role === 'director' || currentUser.role === 'rector';
+  const teacherClassrooms = (classrooms || []).filter(c => c.teacherId === currentUser.id);
 
   const totalStudents = (users || []).filter(u => u.role === 'student').length;
   const totalTeachers = (users || []).filter(u => u.role === 'teacher').length;
@@ -170,14 +171,16 @@ export default function LeftSidebarMenu() {
     },
     {
       id: 'coordinacion',
-      label: isStudent ? 'Mis Clases Virtuales' : 'Coordinación Escolar',
+      label: isStudent ? 'Mis Clases Virtuales' : (isTeacher ? 'Mis Clases Asignadas' : 'Coordinación Escolar'),
       icon: BookOpen,
-      badge: !isStudent && classrooms.length > 0 ? String(classrooms.length) : null,
+      badge: isTeacher 
+        ? (teacherClassrooms.length > 0 ? String(teacherClassrooms.length) : null)
+        : (!isStudent && classrooms.length > 0 ? String(classrooms.length) : null),
       action: () => {
-        if (isStudent) {
+        if (isStudent || isTeacher) {
           setActiveTab('coordinacion');
           setActiveClassroomId(null);
-          showToast('Mis Clases Virtuales', 'Consulta tus asignaturas y sesiones en vivo.', 'info');
+          showToast(isTeacher ? 'Mis Clases Asignadas' : 'Mis Clases Virtuales', 'Aulas virtuales y sesiones en vivo.', 'info');
         } else {
           setActiveTab('coordinacion');
           setCoordinacionModalOpen(true);
@@ -190,16 +193,20 @@ export default function LeftSidebarMenu() {
       label: isStudent ? 'Mis Pagos y Colegiaturas' : 'Administrativo y Contabilidad',
       icon: CreditCard,
       action: () => {
+        if (isTeacher) {
+          showToast('Acceso Restringido', 'El perfil docente no tiene acceso a la administración y contabilidad.', 'warning');
+          return;
+        }
         setActiveTab('administrativo');
         setPaymentsModalOpen(true);
       },
-      visible: true
+      visible: !isTeacher && !isStudent // STRICT: Teachers and students do NOT see Administrativo y Contabilidad
     },
     {
       id: 'docentes',
-      label: isStudent ? 'Mis Docentes y Horarios' : 'Docentes',
+      label: isTeacher ? 'Claustro y Horarios' : (isStudent ? 'Mis Docentes y Horarios' : 'Docentes'),
       icon: Users,
-      badge: !isStudent && totalTeachers > 0 ? String(totalTeachers) : null,
+      badge: !isStudent && !isTeacher && totalTeachers > 0 ? String(totalTeachers) : null,
       action: () => {
         setActiveTab('docentes');
         setDocentesModalOpen(true);
@@ -208,9 +215,9 @@ export default function LeftSidebarMenu() {
     },
     {
       id: 'alumnos',
-      label: isStudent ? 'Mi Expediente y Boleta' : 'Alumnos',
+      label: isStudent ? 'Mi Expediente y Boleta' : (isTeacher ? 'Alumnos de Mis Clases' : 'Alumnos'),
       icon: GraduationCap,
-      badge: !isStudent && totalStudents > 0 ? String(totalStudents) : null,
+      badge: !isStudent && !isTeacher && totalStudents > 0 ? String(totalStudents) : null,
       action: () => {
         if (isStudent) {
           setActiveTab('alumnos');
@@ -224,7 +231,7 @@ export default function LeftSidebarMenu() {
     },
     {
       id: 'reportes',
-      label: isStudent ? 'Mi Boleta Oficial' : 'Reportes y Estadísticas',
+      label: isStudent ? 'Mi Boleta Oficial' : (isTeacher ? 'Actas de Evaluación' : 'Reportes y Estadísticas'),
       icon: BarChart3,
       action: () => {
         if (isStudent) {
@@ -242,8 +249,8 @@ export default function LeftSidebarMenu() {
       label: 'Configuración',
       icon: Settings,
       action: () => {
-        if (isStudent) {
-          showToast('Acceso Denegado', 'Los alumnos no tienen acceso al panel de configuración institucional.', 'error');
+        if (isStudent || isTeacher) {
+          showToast('Acceso Denegado', 'No cuentas con autorización para el panel de configuración institucional.', 'error');
           return;
         }
         setActiveTab('configuracion');
@@ -253,7 +260,7 @@ export default function LeftSidebarMenu() {
           showToast('Configuración', 'Acceso exclusivo para Rectoría, Dirección y Super Admin.', 'warning');
         }
       },
-      visible: !isStudent && canManageUsers // Students NEVER see Configuración
+      visible: !isStudent && !isTeacher && canManageUsers // Teachers and students NEVER see Configuración
     }
   ].filter(i => i.visible);
 

@@ -70,6 +70,8 @@ export const DEFAULT_ROLE_PERMISSIONS = {
     canManageTeachers: false,
     canEnrollStudents: false,
     canCreateClassrooms: false,
+    canManageAccounting: false, // Bloqueado: Sin acceso a contabilidad ni caja
+    canViewFinances: false,      // Bloqueado: Sin acceso a ingresos ni colegiaturas
     canGrade: true,
     canScheduleLive: true,
     canPublishAnnouncements: false,
@@ -85,6 +87,8 @@ export const DEFAULT_ROLE_PERMISSIONS = {
     canManageTeachers: false,
     canEnrollStudents: false,
     canCreateClassrooms: false,
+    canManageAccounting: false, // Bloqueado: Sin acceso a contabilidad institucional
+    canViewFinances: false,      // Bloqueado: Solo visualiza sus propios pagos
     canGrade: false,
     canScheduleLive: false,
     canPublishAnnouncements: false,

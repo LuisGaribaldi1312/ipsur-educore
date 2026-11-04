@@ -7,7 +7,8 @@ export default function PaymentsAccountingModal({ isOpen, onClose }) {
   const { payments, addPayment, showToast, currentUser, isSuperAdmin } = useApp();
 
   const isStudent = currentUser?.role === 'student';
-  const canManageAccounting = !isStudent && (
+  const isTeacher = currentUser?.role === 'teacher';
+  const canManageAccounting = !isStudent && !isTeacher && (
     isSuperAdmin || 
     currentUser?.role === 'director' || 
     currentUser?.role === 'rector' || 
@@ -22,6 +23,31 @@ export default function PaymentsAccountingModal({ isOpen, onClose }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   if (!isOpen) return null;
+
+  // STRICT SECURITY CHECK: Teachers have NO access to accounting and payments
+  if (isTeacher) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose} title="Acceso Restringido · Permisos" size="sm">
+        <div className="p-4 text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+            <ShieldCheck className="w-6 h-6" />
+          </div>
+          <h4 className="font-display font-bold text-slate-900 text-sm">
+            Módulo Exclusivo Administrativo
+          </h4>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            El perfil docente no tiene facultades para consultar o administrar la contabilidad, ingresos y cobro de colegiaturas institucionales.
+          </p>
+          <button
+            onClick={onClose}
+            className="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition"
+          >
+            Entendido
+          </button>
+        </div>
+      </Modal>
+    );
+  }
 
   const handleRegisterPayment = (e) => {
     e.preventDefault();

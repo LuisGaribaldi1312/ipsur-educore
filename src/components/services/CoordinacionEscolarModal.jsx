@@ -31,7 +31,8 @@ export default function CoordinacionEscolarModal({
   if (!isOpen) return null;
 
   const isStudent = currentUser?.role === 'student';
-  if (isStudent) return null;
+  const isTeacher = currentUser?.role === 'teacher';
+  if (isStudent || isTeacher) return null;
 
   const filteredClassrooms = (classrooms || []).filter(c => {
     const matchesSearch = c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||

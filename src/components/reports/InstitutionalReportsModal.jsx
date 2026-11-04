@@ -21,15 +21,20 @@ import {
 export default function InstitutionalReportsModal({ isOpen, onClose }) {
   const { classrooms, users, currentUser, showToast } = useApp();
   const isStudent = currentUser?.role === 'student';
+  const isTeacher = currentUser?.role === 'teacher';
+
+  const visibleClassrooms = isTeacher 
+    ? (classrooms || []).filter(c => c.teacherId === currentUser?.id)
+    : (classrooms || []);
 
   const [activeTab, setActiveTab] = useState('actas'); // 'actas' | 'estadisticas' | 'boletas'
-  const [selectedClassroomId, setSelectedClassroomId] = useState(classrooms[0]?.id || '');
+  const [selectedClassroomId, setSelectedClassroomId] = useState(visibleClassrooms[0]?.id || '');
   const [selectedActaModalOpen, setSelectedActaModalOpen] = useState(false);
   const [selectedBoletaModalOpen, setSelectedBoletaModalOpen] = useState(false);
 
   if (!isOpen || isStudent) return null;
 
-  const selectedClassroom = classrooms.find(c => c.id === selectedClassroomId) || classrooms[0];
+  const selectedClassroom = visibleClassrooms.find(c => c.id === selectedClassroomId) || visibleClassrooms[0];
   const totalStudents = (users || []).filter(u => u.role === 'student').length;
   const totalTeachers = (users || []).filter(u => u.role === 'teacher').length;
 
@@ -123,11 +128,15 @@ export default function InstitutionalReportsModal({ isOpen, onClose }) {
                     onChange={e => setSelectedClassroomId(e.target.value)}
                     className="px-3 py-2 text-xs font-bold bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-ipsur-pink-500 outline-none"
                   >
-                    {classrooms.map(c => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} ({c.code})
-                      </option>
-                    ))}
+                    {visibleClassrooms.length === 0 ? (
+                      <option value="">Sin salas asignadas</option>
+                    ) : (
+                      visibleClassrooms.map(c => (
+                        <option key={c.id} value={c.id}>
+                          {c.name} ({c.code})
+                        </option>
+                      ))
+                    )}
                   </select>
 
                   <button

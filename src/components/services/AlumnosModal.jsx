@@ -29,7 +29,8 @@ export default function AlumnosModal({
   if (!isOpen) return null;
 
   const isStudent = currentUser?.role === 'student';
-  const canEnrollStudents = !isStudent && (
+  const isTeacher = currentUser?.role === 'teacher';
+  const canEnrollStudents = !isStudent && !isTeacher && (
     isSuperAdmin || 
     currentUser?.role === 'director' || 
     currentUser?.role === 'rector' || 
@@ -42,8 +43,16 @@ export default function AlumnosModal({
     currentUser?.role === 'coordinator'
   );
 
-  // Filter students from users
-  const students = (users || []).filter(u => u.role === 'student');
+  // If teacher, only display students enrolled in their assigned classrooms
+  const teacherClassrooms = isTeacher ? (classrooms || []).filter(c => c.teacherId === currentUser?.id) : [];
+  const teacherEnrolledStudentIds = new Set();
+  teacherClassrooms.forEach(c => {
+    (c.enrolledStudentIds || []).forEach(id => teacherEnrolledStudentIds.add(id));
+  });
+
+  const students = isTeacher
+    ? (users || []).filter(u => u.role === 'student' && teacherEnrolledStudentIds.has(u.id))
+    : (users || []).filter(u => u.role === 'student');
 
   const filteredStudents = students.filter(s => {
     const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
