@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import VirtualSessionPortalModal from '../classroom/VirtualSessionPortalModal';
 import InstitutionalActaModal from '../reports/InstitutionalActaModal';
+import InstitutionalReportsModal from '../reports/InstitutionalReportsModal';
 import StudentGeneralBoletaModal from '../student/StudentGeneralBoletaModal';
 import RegisterStudentModal from '../services/RegisterStudentModal';
 import PaymentsAccountingModal from '../services/PaymentsAccountingModal';
@@ -10,6 +11,11 @@ import AnnouncementsModal from '../services/AnnouncementsModal';
 import PendingProceduresModal from '../services/PendingProceduresModal';
 import SystemTutorialModal from '../services/SystemTutorialModal';
 import RectoriaDirectivaModal from '../services/RectoriaDirectivaModal';
+import CoordinacionEscolarModal from '../services/CoordinacionEscolarModal';
+import DocentesModal from '../services/DocentesModal';
+import AlumnosModal from '../services/AlumnosModal';
+import CreateClassroomModal from '../coordinator/CreateClassroomModal';
+import RubricModal from '../coordinator/RubricModal';
 import Modal from './Modal';
 import { 
   Home,
@@ -66,14 +72,17 @@ export default function LeftSidebarMenu() {
   const [rectoriaModalOpen, setRectoriaModalOpen] = useState(false);
   const [direccionModalOpen, setDireccionModalOpen] = useState(false);
   const [proceduresModalOpen, setProceduresModalOpen] = useState(false);
+  const [coordinacionModalOpen, setCoordinacionModalOpen] = useState(false);
   const [paymentsModalOpen, setPaymentsModalOpen] = useState(false);
-  const [schedulesModalOpen, setSchedulesModalOpen] = useState(false);
-  const [announcementsModalOpen, setAnnouncementsModalOpen] = useState(false);
+  const [docentesModalOpen, setDocentesModalOpen] = useState(false);
+  const [alumnosModalOpen, setAlumnosModalOpen] = useState(false);
+  const [reportsModalOpen, setReportsModalOpen] = useState(false);
+
+  // Sub-modals triggered from directories
   const [registerStudentModalOpen, setRegisterStudentModalOpen] = useState(false);
-  const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
-  const [actaModalOpen, setActaModalOpen] = useState(false);
+  const [createClassroomModalOpen, setCreateClassroomModalOpen] = useState(false);
+  const [rubricClassroom, setRubricClassroom] = useState(null);
   const [boletaModalOpen, setBoletaModalOpen] = useState(false);
-  const [calendarModalOpen, setCalendarModalOpen] = useState(false);
   const [virtualPortalOpen, setVirtualPortalOpen] = useState(false);
 
   if (!currentUser) return null;
@@ -107,18 +116,9 @@ export default function LeftSidebarMenu() {
   const isTeacher = currentUser.role === 'teacher';
   const canManageUsers = isSuperAdmin || currentUser.role === 'director' || currentUser.role === 'rector';
 
-  const teacherClassrooms = classrooms.filter(c => c.teacherId === currentUser.id);
   const totalStudents = (users || []).filter(u => u.role === 'student').length;
   const totalTeachers = (users || []).filter(u => u.role === 'teacher').length;
   const pendingProceduresCount = (procedures || []).filter(p => p.status === 'Pendiente').length;
-
-  const handleOpenGrades = () => {
-    if (isStudent) {
-      setBoletaModalOpen(true);
-    } else {
-      setActaModalOpen(true);
-    }
-  };
 
   // Menu items list matching the official IPSUR EDUCORE architecture
   const menuItems = [
@@ -130,7 +130,7 @@ export default function LeftSidebarMenu() {
       action: () => {
         setActiveTab('inicio');
         setActiveClassroomId(null);
-        showToast('Inicio', 'Bienvenido a IPSUR EDUCORE', 'info');
+        showToast('Inicio', 'Panel Principal · Campus Virtual IPSUR', 'info');
       },
       visible: true
     },
@@ -172,10 +172,10 @@ export default function LeftSidebarMenu() {
       id: 'coordinacion',
       label: 'Coordinación Escolar',
       icon: BookOpen,
+      badge: classrooms.length > 0 ? String(classrooms.length) : null,
       action: () => {
         setActiveTab('coordinacion');
-        setActiveClassroomId(null);
-        showToast('Coordinación Escolar', 'Aulas virtuales y temarios activos', 'info');
+        setCoordinacionModalOpen(true);
       },
       visible: true
     },
@@ -196,7 +196,7 @@ export default function LeftSidebarMenu() {
       badge: totalTeachers > 0 ? String(totalTeachers) : null,
       action: () => {
         setActiveTab('docentes');
-        setSchedulesModalOpen(true);
+        setDocentesModalOpen(true);
       },
       visible: true
     },
@@ -207,7 +207,7 @@ export default function LeftSidebarMenu() {
       badge: totalStudents > 0 ? String(totalStudents) : null,
       action: () => {
         setActiveTab('alumnos');
-        setRegisterStudentModalOpen(true);
+        setAlumnosModalOpen(true);
       },
       visible: true
     },
@@ -217,7 +217,7 @@ export default function LeftSidebarMenu() {
       icon: BarChart3,
       action: () => {
         setActiveTab('reportes');
-        handleOpenGrades();
+        setReportsModalOpen(true);
       },
       visible: true
     },
@@ -458,64 +458,86 @@ export default function LeftSidebarMenu() {
         </div>
       )}
 
-      {/* Interactive Service Modals */}
-      <RegisterStudentModal
-        isOpen={registerStudentModalOpen}
-        onClose={() => setRegisterStudentModalOpen(false)}
+      {/* 1. Coordinación Escolar Modal */}
+      <CoordinacionEscolarModal
+        isOpen={coordinacionModalOpen}
+        onClose={() => setCoordinacionModalOpen(false)}
+        onOpenCreateClassroom={() => setCreateClassroomModalOpen(true)}
+        onOpenRubric={(classroom) => setRubricClassroom(classroom)}
+        onSelectClassroom={(id) => {
+          setActiveClassroomId(id);
+          setActiveTab('coordinacion');
+        }}
       />
 
-      <PaymentsAccountingModal
-        isOpen={paymentsModalOpen}
-        onClose={() => setPaymentsModalOpen(false)}
+      {/* 2. Docentes Modal */}
+      <DocentesModal
+        isOpen={docentesModalOpen}
+        onClose={() => setDocentesModalOpen(false)}
       />
 
-      <SchedulesModal
-        isOpen={schedulesModalOpen}
-        onClose={() => setSchedulesModalOpen(false)}
+      {/* 3. Alumnos Modal */}
+      <AlumnosModal
+        isOpen={alumnosModalOpen}
+        onClose={() => setAlumnosModalOpen(false)}
+        onOpenRegisterStudent={() => setRegisterStudentModalOpen(true)}
+        onOpenBoleta={(student) => setBoletaModalOpen(true)}
       />
 
-      <AnnouncementsModal
-        isOpen={announcementsModalOpen}
-        onClose={() => setAnnouncementsModalOpen(false)}
+      {/* 4. Reportes y Estadísticas Modal */}
+      <InstitutionalReportsModal
+        isOpen={reportsModalOpen}
+        onClose={() => setReportsModalOpen(false)}
       />
 
+      {/* 5. Servicios Escolares / Trámites */}
       <PendingProceduresModal
         isOpen={proceduresModalOpen}
         onClose={() => setProceduresModalOpen(false)}
       />
 
-      <SystemTutorialModal
-        isOpen={tutorialModalOpen}
-        onClose={() => setTutorialModalOpen(false)}
+      {/* 6. Administrativo y Contabilidad */}
+      <PaymentsAccountingModal
+        isOpen={paymentsModalOpen}
+        onClose={() => setPaymentsModalOpen(false)}
       />
 
+      {/* 7. Rectoría */}
       <RectoriaDirectivaModal
         isOpen={rectoriaModalOpen}
         onClose={() => setRectoriaModalOpen(false)}
         initialTab="rectoria"
       />
 
+      {/* 8. Dirección */}
       <RectoriaDirectivaModal
         isOpen={direccionModalOpen}
         onClose={() => setDireccionModalOpen(false)}
         initialTab="direccion"
       />
 
-      <InstitutionalActaModal
-        isOpen={actaModalOpen}
-        onClose={() => setActaModalOpen(false)}
-        classroom={classrooms[0] || null}
+      {/* Linked Supporting Modals */}
+      <RegisterStudentModal
+        isOpen={registerStudentModalOpen}
+        onClose={() => setRegisterStudentModalOpen(false)}
       />
+
+      <CreateClassroomModal
+        isOpen={createClassroomModalOpen}
+        onClose={() => setCreateClassroomModalOpen(false)}
+      />
+
+      {rubricClassroom && (
+        <RubricModal
+          isOpen={Boolean(rubricClassroom)}
+          onClose={() => setRubricClassroom(null)}
+          classroom={rubricClassroom}
+        />
+      )}
 
       <StudentGeneralBoletaModal
         isOpen={boletaModalOpen}
         onClose={() => setBoletaModalOpen(false)}
-      />
-
-      <VirtualSessionPortalModal
-        isOpen={virtualPortalOpen}
-        onClose={() => setVirtualPortalOpen(false)}
-        classroom={classrooms[0] || null}
       />
     </>
   );
