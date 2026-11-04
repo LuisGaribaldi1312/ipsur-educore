@@ -4,7 +4,15 @@ import { useApp } from '../../context/AppContext';
 import { UserPlus, User, Mail, Phone, BookOpen, School, CheckCircle2, ShieldCheck, Hash } from 'lucide-react';
 
 export default function RegisterStudentModal({ isOpen, onClose }) {
-  const { createUser, showToast, addActivity } = useApp();
+  const { currentUser, isSuperAdmin, createUser, showToast, addActivity } = useApp();
+
+  const isStudent = currentUser?.role === 'student';
+  const canEnroll = !isStudent && (
+    isSuperAdmin || 
+    currentUser?.role === 'director' || 
+    currentUser?.role === 'rector' || 
+    currentUser?.role === 'coordinator'
+  );
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -16,8 +24,37 @@ export default function RegisterStudentModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
+  // Strict Security Check: Students cannot access enrollment
+  if (isStudent || !canEnroll) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose} title="Acceso Restringido · Permisos" size="sm">
+        <div className="p-4 text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+            <ShieldCheck className="w-6 h-6" />
+          </div>
+          <h4 className="font-display font-bold text-slate-900 text-sm">
+            Acceso no autorizado
+          </h4>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Los alumnos no cuentan con permisos para inscribir o gestionar a otros estudiantes. La matrícula es una función exclusiva de Servicios Escolares y Dirección.
+          </p>
+          <button
+            onClick={onClose}
+            className="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition"
+          >
+            Entendido
+          </button>
+        </div>
+      </Modal>
+    );
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isStudent || !canEnroll) {
+      showToast('Acceso Denegado', 'Los alumnos no tienen permisos para inscribir estudiantes.', 'error');
+      return;
+    }
     if (!name.trim() || !email.trim()) {
       showToast('Campos Incompletos', 'Por favor ingresa nombre y correo del estudiante.', 'warning');
       return;

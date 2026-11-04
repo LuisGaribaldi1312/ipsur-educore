@@ -120,7 +120,7 @@ export default function LeftSidebarMenu() {
   const totalTeachers = (users || []).filter(u => u.role === 'teacher').length;
   const pendingProceduresCount = (procedures || []).filter(p => p.status === 'Pendiente').length;
 
-  // Menu items list matching the official IPSUR EDUCORE architecture
+  // Menu items list matching the official IPSUR EDUCORE architecture with strict role permissions
   const menuItems = [
     {
       id: 'inicio',
@@ -170,18 +170,24 @@ export default function LeftSidebarMenu() {
     },
     {
       id: 'coordinacion',
-      label: 'Coordinación Escolar',
+      label: isStudent ? 'Mis Clases Virtuales' : 'Coordinación Escolar',
       icon: BookOpen,
-      badge: classrooms.length > 0 ? String(classrooms.length) : null,
+      badge: !isStudent && classrooms.length > 0 ? String(classrooms.length) : null,
       action: () => {
-        setActiveTab('coordinacion');
-        setCoordinacionModalOpen(true);
+        if (isStudent) {
+          setActiveTab('coordinacion');
+          setActiveClassroomId(null);
+          showToast('Mis Clases Virtuales', 'Consulta tus asignaturas y sesiones en vivo.', 'info');
+        } else {
+          setActiveTab('coordinacion');
+          setCoordinacionModalOpen(true);
+        }
       },
       visible: true
     },
     {
       id: 'administrativo',
-      label: 'Administrativo y Contabilidad',
+      label: isStudent ? 'Mis Pagos y Colegiaturas' : 'Administrativo y Contabilidad',
       icon: CreditCard,
       action: () => {
         setActiveTab('administrativo');
@@ -191,9 +197,9 @@ export default function LeftSidebarMenu() {
     },
     {
       id: 'docentes',
-      label: 'Docentes',
+      label: isStudent ? 'Mis Docentes y Horarios' : 'Docentes',
       icon: Users,
-      badge: totalTeachers > 0 ? String(totalTeachers) : null,
+      badge: !isStudent && totalTeachers > 0 ? String(totalTeachers) : null,
       action: () => {
         setActiveTab('docentes');
         setDocentesModalOpen(true);
@@ -202,22 +208,32 @@ export default function LeftSidebarMenu() {
     },
     {
       id: 'alumnos',
-      label: 'Alumnos',
+      label: isStudent ? 'Mi Expediente y Boleta' : 'Alumnos',
       icon: GraduationCap,
-      badge: totalStudents > 0 ? String(totalStudents) : null,
+      badge: !isStudent && totalStudents > 0 ? String(totalStudents) : null,
       action: () => {
-        setActiveTab('alumnos');
-        setAlumnosModalOpen(true);
+        if (isStudent) {
+          setActiveTab('alumnos');
+          setBoletaModalOpen(true);
+        } else {
+          setActiveTab('alumnos');
+          setAlumnosModalOpen(true);
+        }
       },
       visible: true
     },
     {
       id: 'reportes',
-      label: 'Reportes y Estadísticas',
+      label: isStudent ? 'Mi Boleta Oficial' : 'Reportes y Estadísticas',
       icon: BarChart3,
       action: () => {
-        setActiveTab('reportes');
-        setReportsModalOpen(true);
+        if (isStudent) {
+          setActiveTab('reportes');
+          setBoletaModalOpen(true);
+        } else {
+          setActiveTab('reportes');
+          setReportsModalOpen(true);
+        }
       },
       visible: true
     },
@@ -226,6 +242,10 @@ export default function LeftSidebarMenu() {
       label: 'Configuración',
       icon: Settings,
       action: () => {
+        if (isStudent) {
+          showToast('Acceso Denegado', 'Los alumnos no tienen acceso al panel de configuración institucional.', 'error');
+          return;
+        }
         setActiveTab('configuracion');
         if (canManageUsers) {
           setUserManagerModalOpen(true);
@@ -233,7 +253,7 @@ export default function LeftSidebarMenu() {
           showToast('Configuración', 'Acceso exclusivo para Rectoría, Dirección y Super Admin.', 'warning');
         }
       },
-      visible: true
+      visible: !isStudent && canManageUsers // Students NEVER see Configuración
     }
   ].filter(i => i.visible);
 

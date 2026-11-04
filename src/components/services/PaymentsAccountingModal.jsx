@@ -4,7 +4,15 @@ import { useApp } from '../../context/AppContext';
 import { CreditCard, DollarSign, Plus, CheckCircle, FileText, Search, ArrowUpRight, ShieldCheck, Download } from 'lucide-react';
 
 export default function PaymentsAccountingModal({ isOpen, onClose }) {
-  const { payments, addPayment, showToast } = useApp();
+  const { payments, addPayment, showToast, currentUser, isSuperAdmin } = useApp();
+
+  const isStudent = currentUser?.role === 'student';
+  const canManageAccounting = !isStudent && (
+    isSuperAdmin || 
+    currentUser?.role === 'director' || 
+    currentUser?.role === 'rector' || 
+    currentUser?.role === 'coordinator'
+  );
 
   const [isAdding, setIsAdding] = useState(false);
   const [student, setStudent] = useState('');
@@ -17,6 +25,10 @@ export default function PaymentsAccountingModal({ isOpen, onClose }) {
 
   const handleRegisterPayment = (e) => {
     e.preventDefault();
+    if (!canManageAccounting) {
+      showToast('Acceso Denegado', 'Solo personal administrativo puede capturar cobros.', 'error');
+      return;
+    }
     if (!student.trim() || !amount) {
       showToast('Datos Incompletos', 'Ingresa el nombre del alumno y el monto.', 'warning');
       return;
@@ -33,13 +45,18 @@ export default function PaymentsAccountingModal({ isOpen, onClose }) {
     setIsAdding(false);
   };
 
-  const filteredPayments = (payments || []).filter(p => 
+  // If student, strictly only show their own payments
+  const basePayments = isStudent 
+    ? (payments || []).filter(p => p.student?.toLowerCase() === currentUser?.name?.toLowerCase())
+    : (payments || []);
+
+  const filteredPayments = basePayments.filter(p => 
     p.student?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.concept?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.id?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalAmount = (payments || []).reduce((acc, p) => {
+  const totalAmount = basePayments.reduce((acc, p) => {
     const raw = String(p.amount || '').replace(/[^0-9.]/g, '');
     return acc + (Number(raw) || 0);
   }, 0);
@@ -70,13 +87,15 @@ export default function PaymentsAccountingModal({ isOpen, onClose }) {
               <span className="text-[11px] font-bold uppercase tracking-wider text-pink-100">Caja y Tesorería</span>
               <p className="text-xs text-pink-100 mt-0.5">Control financiero institucional</p>
             </div>
-            <button
-              onClick={() => setIsAdding(!isAdding)}
-              className="mt-2 w-full py-2 px-3 text-xs font-bold bg-white text-ipsur-navy-900 hover:bg-slate-100 rounded-xl transition flex items-center justify-center gap-1.5 shadow"
-            >
-              <Plus className="w-4 h-4 text-ipsur-pink-600" />
-              <span>{isAdding ? 'Ver Lista de Pagos' : 'Registrar Nuevo Pago'}</span>
-            </button>
+            {canManageAccounting && (
+              <button
+                onClick={() => setIsAdding(!isAdding)}
+                className="mt-2 w-full py-2 px-3 text-xs font-bold bg-white text-ipsur-navy-900 hover:bg-slate-100 rounded-xl transition flex items-center justify-center gap-1.5 shadow"
+              >
+                <Plus className="w-4 h-4 text-ipsur-pink-600" />
+                <span>{isAdding ? 'Ver Lista de Pagos' : 'Registrar Nuevo Pago'}</span>
+              </button>
+            )}
           </div>
         </div>
 

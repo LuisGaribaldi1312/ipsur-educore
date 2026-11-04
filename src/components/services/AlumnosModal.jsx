@@ -22,11 +22,25 @@ export default function AlumnosModal({
   onOpenRegisterStudent,
   onOpenBoleta
 }) {
-  const { users, classrooms, showToast } = useApp();
+  const { users, classrooms, currentUser, isSuperAdmin, showToast } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterGroup, setFilterGroup] = useState('all');
 
   if (!isOpen) return null;
+
+  const isStudent = currentUser?.role === 'student';
+  const canEnrollStudents = !isStudent && (
+    isSuperAdmin || 
+    currentUser?.role === 'director' || 
+    currentUser?.role === 'rector' || 
+    currentUser?.role === 'coordinator'
+  );
+  const canManageStudents = !isStudent && (
+    isSuperAdmin || 
+    currentUser?.role === 'director' || 
+    currentUser?.role === 'rector' || 
+    currentUser?.role === 'coordinator'
+  );
 
   // Filter students from users
   const students = (users || []).filter(u => u.role === 'student');
@@ -69,16 +83,18 @@ export default function AlumnosModal({
             </div>
           </div>
 
-          <button
-            onClick={() => {
-              onClose();
-              if (onOpenRegisterStudent) onOpenRegisterStudent();
-            }}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white font-bold text-xs shadow-md transition-transform hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>+ Inscribir Alumno</span>
-          </button>
+          {canEnrollStudents && (
+            <button
+              onClick={() => {
+                onClose();
+                if (onOpenRegisterStudent) onOpenRegisterStudent();
+              }}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white font-bold text-xs shadow-md transition-transform hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>+ Inscribir Alumno</span>
+            </button>
+          )}
         </div>
 
         {/* Filter and Search Bar */}
@@ -156,17 +172,19 @@ export default function AlumnosModal({
                       </span>
                     </td>
                     <td className="py-3 px-3 text-right">
-                      <button
-                        onClick={() => {
-                          onClose();
-                          if (onOpenBoleta) onOpenBoleta(student);
-                        }}
-                        className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-ipsur-navy-800 hover:text-white text-slate-700 text-xs font-bold transition inline-flex items-center gap-1 cursor-pointer"
-                        title="Ver Boleta Oficial de Calificaciones"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                        <span>Boleta</span>
-                      </button>
+                      {(!isStudent || student.id === currentUser?.id) && (
+                        <button
+                          onClick={() => {
+                            onClose();
+                            if (onOpenBoleta) onOpenBoleta(student);
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-ipsur-navy-800 hover:text-white text-slate-700 text-xs font-bold transition inline-flex items-center gap-1 cursor-pointer"
+                          title="Ver Boleta Oficial de Calificaciones"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Boleta</span>
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))

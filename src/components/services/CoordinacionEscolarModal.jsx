@@ -24,11 +24,14 @@ export default function CoordinacionEscolarModal({
   onOpenRubric,
   onSelectClassroom 
 }) {
-  const { classrooms, users, showToast } = useApp();
+  const { classrooms, users, currentUser, showToast } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLevel, setFilterLevel] = useState('all');
 
   if (!isOpen) return null;
+
+  const isStudent = currentUser?.role === 'student';
+  if (isStudent) return null;
 
   const filteredClassrooms = (classrooms || []).filter(c => {
     const matchesSearch = c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||

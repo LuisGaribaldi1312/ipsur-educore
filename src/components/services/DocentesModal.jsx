@@ -24,7 +24,12 @@ export default function DocentesModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const canManage = isSuperAdmin || currentUser?.role === 'director' || currentUser?.role === 'coordinator';
+  const isStudent = currentUser?.role === 'student';
+  const canManageTeachers = !isStudent && (
+    isSuperAdmin || 
+    currentUser?.role === 'director' || 
+    currentUser?.role === 'rector'
+  );
 
   // Filter teachers from users
   const teachers = (users || []).filter(u => u.role === 'teacher' || u.role === 'coordinator');
@@ -77,7 +82,7 @@ export default function DocentesModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          {canManage && (
+          {canManageTeachers && (
             <button
               onClick={() => {
                 onClose();

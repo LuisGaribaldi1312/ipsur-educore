@@ -19,13 +19,15 @@ import {
 } from 'lucide-react';
 
 export default function InstitutionalReportsModal({ isOpen, onClose }) {
-  const { classrooms, users, showToast } = useApp();
+  const { classrooms, users, currentUser, showToast } = useApp();
+  const isStudent = currentUser?.role === 'student';
+
   const [activeTab, setActiveTab] = useState('actas'); // 'actas' | 'estadisticas' | 'boletas'
   const [selectedClassroomId, setSelectedClassroomId] = useState(classrooms[0]?.id || '');
   const [selectedActaModalOpen, setSelectedActaModalOpen] = useState(false);
   const [selectedBoletaModalOpen, setSelectedBoletaModalOpen] = useState(false);
 
-  if (!isOpen) return null;
+  if (!isOpen || isStudent) return null;
 
   const selectedClassroom = classrooms.find(c => c.id === selectedClassroomId) || classrooms[0];
   const totalStudents = (users || []).filter(u => u.role === 'student').length;
