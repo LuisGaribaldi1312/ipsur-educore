@@ -51,11 +51,11 @@ export default function LoginModal({ isOpen, onClose }) {
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
         {/* Top Strip */}
         <div className="bg-gradient-to-r from-[#0E1026] via-[#1E1F5C] to-[#990054] p-6 text-center text-white relative">
-          <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-white/10 backdrop-blur-md p-2 flex items-center justify-center border border-white/20 shadow-xl">
+          <div className="w-20 h-20 mx-auto mb-3.5 rounded-[24px] bg-white p-2.5 flex items-center justify-center border-2 border-white/90 shadow-[0_10px_25px_rgba(0,0,0,0.35)]">
             <img 
               src="/ipsur-logo.png" 
               alt="IPSUR Logo Oficial" 
-              className="w-full h-full object-contain filter drop-shadow-md"
+              className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(46,48,146,0.2)]"
             />
           </div>
           <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">

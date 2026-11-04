@@ -53,12 +53,12 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
       <div className="bg-gradient-to-r from-[#0A0D1B] via-[#151945] to-[#750042] rounded-3xl p-6 sm:p-9 text-white shadow-xl border border-white/10 relative overflow-hidden">
         <div className="relative z-10 max-w-3xl">
           <div className="flex items-center gap-3.5 mb-3.5">
-            {/* Enhanced IPSUR Logo: Pure White High-Contrast Container with Sharp Rendering */}
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white p-2 sm:p-2.5 flex items-center justify-center border-2 border-white/90 shadow-[0_10px_30px_rgba(0,0,0,0.35)] flex-shrink-0 transition-transform duration-300 hover:scale-105">
+            {/* Enhanced IPSUR Logo: Pure White High-Contrast Container with Squircle Rounded Corners */}
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[24px] sm:rounded-[28px] bg-white p-2.5 sm:p-3 flex items-center justify-center border-2 border-white/90 shadow-[0_12px_32px_rgba(0,0,0,0.35)] flex-shrink-0 transition-transform duration-300 hover:scale-105">
               <img 
                 src="/ipsur-logo.png" 
                 alt="IPSUR Logo Oficial" 
-                className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(46,48,146,0.2)]" 
+                className="w-full h-full object-contain filter drop-shadow-[0_4px_12px_rgba(46,48,146,0.22)]" 
               />
             </div>
             <div>

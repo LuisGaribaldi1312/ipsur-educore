@@ -106,34 +106,34 @@ export default function Navbar() {
       </div>
 
       {/* Main Executive Navbar */}
-      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-40 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-40 shadow-[0_4px_25px_rgba(0,0,0,0.04)]">
         <div className="w-full max-w-[1920px] mx-auto px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
-          <div className="flex items-center justify-between h-20 sm:h-24 md:h-28">
-            {/* Logo and Brand Title with enlarged executive presentation */}
+          <div className="flex items-center justify-between h-24 sm:h-28 md:h-32">
+            {/* Logo and Brand Title with enlarged executive presentation and rounded corners */}
             <div 
-              className="flex items-center gap-3.5 sm:gap-5 md:gap-6 cursor-pointer select-none min-w-0 py-2 group"
+              className="flex items-center gap-4 sm:gap-5 md:gap-6 cursor-pointer select-none min-w-0 py-2 group"
               onClick={() => setActiveClassroomId(null)}
               title="Ir al inicio de IPSUR EDUCORE"
             >
-              {/* Enlarged Official Logo */}
-              <div className="relative flex-shrink-0 flex items-center justify-center p-1 sm:p-1.5 rounded-2xl bg-gradient-to-b from-slate-50 to-white border border-slate-200/80 shadow-[0_4px_12px_rgba(46,48,146,0.08)] group-hover:shadow-[0_6px_20px_rgba(230,0,126,0.18)] group-hover:border-pink-300 transition-all duration-300">
+              {/* Enlarged Official Logo with Rounded Squircle Corners */}
+              <div className="relative flex-shrink-0 flex items-center justify-center p-2 sm:p-2.5 md:p-3 rounded-[24px] sm:rounded-[30px] bg-white border border-slate-200/90 shadow-[0_8px_25px_rgba(46,48,146,0.10)] group-hover:shadow-[0_12px_32px_rgba(230,0,126,0.22)] group-hover:border-pink-300 transition-all duration-300">
                 <img 
                   src="/ipsur-logo.png" 
                   alt="IPSUR Logo Oficial" 
-                  className="h-14 sm:h-18 md:h-22 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(46,48,146,0.2)] transition-transform duration-300 group-hover:scale-105"
+                  className="h-16 sm:h-20 md:h-24 w-auto object-contain filter drop-shadow-[0_4px_12px_rgba(46,48,146,0.18)] transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
 
               <div className="min-w-0 flex flex-col justify-center">
-                <div className="flex items-center gap-2 sm:gap-2.5">
-                  <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-ipsur-navy-900 truncate">
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-black tracking-[-0.03em] text-[#0E1033] truncate leading-none">
                     IPSUR <span className="bg-gradient-to-r from-ipsur-pink-500 via-rose-500 to-ipsur-pink-600 bg-clip-text text-transparent">EDUCORE</span>
                   </h1>
-                  <span className="hidden sm:inline-flex items-center text-[10px] md:text-[11px] font-black uppercase tracking-widest bg-gradient-to-r from-ipsur-navy-50 to-indigo-50 text-ipsur-navy-800 border border-ipsur-navy-200/80 px-2.5 py-0.5 rounded-full shadow-sm flex-shrink-0">
+                  <span className="hidden sm:inline-flex items-center text-[10px] md:text-[11px] font-extrabold uppercase tracking-widest bg-gradient-to-r from-slate-50 to-indigo-50/70 text-ipsur-navy-800 border border-slate-200/90 px-3 py-1 rounded-full shadow-2xs flex-shrink-0">
                     Academic MS
                   </span>
                 </div>
-                <p className="text-[10px] sm:text-xs md:text-[13px] font-bold text-slate-600 tracking-[0.22em] uppercase leading-snug truncate mt-0.5">
+                <p className="font-display text-[10px] sm:text-xs md:text-[13px] font-bold text-slate-500 tracking-[0.22em] uppercase leading-snug truncate mt-1">
                   ACADEMIC MANAGEMENT SYSTEM
                 </p>
                 <p className="text-[11px] text-slate-400 font-medium hidden xl:block leading-tight mt-0.5">

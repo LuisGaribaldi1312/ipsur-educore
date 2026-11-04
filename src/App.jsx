@@ -49,11 +49,11 @@ function MainLayout() {
         <div className="w-full px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 max-w-[1920px] mx-auto space-y-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="p-1.5 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center">
+              <div className="p-2.5 rounded-[24px] bg-white border border-slate-200/90 shadow-sm flex items-center justify-center">
                 <img
                   src="/ipsur-logo.png"
                   alt="IPSUR Logo Oficial"
-                  className="h-14 sm:h-16 w-auto object-contain filter drop-shadow"
+                  className="h-16 sm:h-20 w-auto object-contain filter drop-shadow"
                 />
               </div>
               <div>

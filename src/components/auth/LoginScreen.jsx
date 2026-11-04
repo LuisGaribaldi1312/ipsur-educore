@@ -78,12 +78,12 @@ export default function LoginScreen() {
       <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-6 my-4">
         <div className="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.45)] border border-white/20 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           {/* Header Card */}
-          <div className="bg-gradient-to-r from-[#0A0D1B] via-[#1E1F5C] to-[#800045] p-6 sm:p-7 text-center text-white relative">
-            <div className="w-20 h-20 mx-auto mb-3.5 rounded-2xl bg-white p-2 flex items-center justify-center shadow-2xl border-2 border-white/80 transition-transform duration-300 hover:scale-105">
+          <div className="bg-gradient-to-r from-[#0A0D1B] via-[#1E1F5C] to-[#800045] p-6 sm:p-8 text-center text-white relative">
+            <div className="w-24 h-24 mx-auto mb-4 rounded-[28px] bg-white p-3 flex items-center justify-center shadow-[0_12px_32px_rgba(0,0,0,0.4)] border-2 border-white/90 transition-transform duration-300 hover:scale-105">
               <img 
                 src="/ipsur-logo.png" 
                 alt="IPSUR Logo Oficial" 
-                className="w-full h-full object-contain filter drop-shadow"
+                className="w-full h-full object-contain filter drop-shadow-[0_4px_12px_rgba(46,48,146,0.22)]"
               />
             </div>
             <h1 className="font-display text-2xl sm:text-3xl font-black tracking-tight text-white">
