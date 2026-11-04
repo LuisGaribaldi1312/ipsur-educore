@@ -53,8 +53,13 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
       <div className="bg-gradient-to-r from-[#0A0D1B] via-[#151945] to-[#750042] rounded-3xl p-6 sm:p-9 text-white shadow-xl border border-white/10 relative overflow-hidden">
         <div className="relative z-10 max-w-3xl">
           <div className="flex items-center gap-3.5 mb-3.5">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-md p-2 flex items-center justify-center border border-white/20 shadow-2xl flex-shrink-0">
-              <img src="/ipsur-logo.png" alt="IPSUR Emblem" className="w-full h-full object-contain filter drop-shadow-[0_2px_10px_rgba(255,255,255,0.25)]" />
+            {/* Enhanced IPSUR Logo: Pure White High-Contrast Container with Sharp Rendering */}
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white p-2 sm:p-2.5 flex items-center justify-center border-2 border-white/90 shadow-[0_10px_30px_rgba(0,0,0,0.35)] flex-shrink-0 transition-transform duration-300 hover:scale-105">
+              <img 
+                src="/ipsur-logo.png" 
+                alt="IPSUR Logo Oficial" 
+                className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(46,48,146,0.2)]" 
+              />
             </div>
             <div>
               <div className="inline-flex items-center gap-2 bg-white/15 px-3 py-0.5 rounded-full text-[11px] font-bold text-pink-200 border border-white/15">
@@ -72,10 +77,8 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
           </div>
 
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
-            {isSuperAdmin 
-              ? 'Panel de Control y Gobierno Institucional' 
-              : isDirector 
-              ? 'Panel de Dirección General Institucional' 
+            {isSuperAdmin || isDirector
+              ? 'Panel de Control Institucional' 
               : 'Panel de Coordinación Académica'}
           </h1>
           <p className="text-xs sm:text-sm text-indigo-100/90 mt-2.5 leading-relaxed font-normal max-w-2xl">
