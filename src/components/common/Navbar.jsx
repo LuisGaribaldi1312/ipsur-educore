@@ -138,14 +138,17 @@ export default function Navbar() {
                   const event = new CustomEvent('toggle-ipsur-sidebar');
                   window.dispatchEvent(event);
                 }}
-                className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
-                title="Menú"
+                className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
+                title="Menú lateral: Haz clic para mostrar u ocultar la barra de opciones de navegación"
               >
                 <Menu className="w-5 h-5" />
               </button>
 
               {/* Real-Time Date & Time in IPSUR Gradient Capsule (Replaces Panel de Control) */}
-              <div className="flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-[#0A0D1B] via-[#1E1F5C] to-[#8A004B] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl shadow-md border border-white/15 select-none">
+              <div 
+                className="flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-[#0A0D1B] via-[#1E1F5C] to-[#8A004B] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl shadow-md border border-white/15 select-none"
+                title="Fecha y hora oficial de México sincronizadas en tiempo real en la plataforma escolar"
+              >
                 {/* Live pulsing dot in IPSUR Pink */}
                 <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5 flex-shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ipsur-pink-400 opacity-75"></span>
@@ -173,7 +176,8 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setActiveClassroomId(null)}
-                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow-xs transition"
+                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow-xs transition cursor-pointer"
+                  title="Volver a la vista general de todas las salas de clases virtuales"
                 >
                   <span>← Mis Salas</span>
                 </button>
@@ -188,8 +192,8 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setNotificationsOpen(!notificationsOpen)}
-                  className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
-                  title="Mensajes y Notificaciones"
+                  className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
+                  title="Notificaciones: Consulta avisos institucionales, convocatorias de exámenes y alertas urgentes"
                 >
                   <Bell className="w-5 h-5" />
                   {(notificationsList || []).length > 0 && (
@@ -252,6 +256,7 @@ export default function Navbar() {
                   type="button"
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                   className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer"
+                  title="Tu perfil escolar: Datos personales, cambio de rol para pruebas y cierre seguro de sesión"
                 >
                   <img
                     src={currentUser?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80'}

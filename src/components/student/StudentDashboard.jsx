@@ -216,7 +216,8 @@ export default function StudentDashboard({ onSelectClassroom }) {
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setMainTab('monitoreo')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            title="Monitoreo de Actividades: Consulta todas tus tareas pendientes, próximas entregas y fechas de cierre"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
               mainTab === 'monitoreo'
                 ? 'bg-gradient-to-r from-ipsur-navy-800 to-indigo-900 text-white shadow-md'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -233,7 +234,8 @@ export default function StudentDashboard({ onSelectClassroom }) {
 
           <button
             onClick={() => setMainTab('materias')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            title="Mis Aulas Virtuales: Ingresa a tus salas de clases en línea y enlaces de Meet para clases en vivo"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
               mainTab === 'materias'
                 ? 'bg-gradient-to-r from-ipsur-navy-800 to-indigo-900 text-white shadow-md'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -245,7 +247,8 @@ export default function StudentDashboard({ onSelectClassroom }) {
 
           <button
             onClick={() => setMainTab('boleta')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            title="Mi Boleta Oficial: Consulta tu promedio general acumulado y desglose de calificaciones por asignatura"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
               mainTab === 'boleta'
                 ? 'bg-gradient-to-r from-ipsur-navy-800 to-indigo-900 text-white shadow-md'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'

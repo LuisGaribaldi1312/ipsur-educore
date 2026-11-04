@@ -139,6 +139,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
                 type="button"
                 onClick={() => setTutorialModalOpen(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-ipsur-pink-500 to-rose-600 hover:from-ipsur-pink-600 hover:to-rose-700 text-white font-bold text-xs sm:text-sm shadow-md transition active:scale-95 cursor-pointer"
+                title="Tutorial del sistema: Conoce cómo operar las salas, capturar calificaciones y rúbricas al 100%"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
                 <span>Ver tutorial</span>
@@ -148,6 +149,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
                 type="button"
                 onClick={() => setCreateModalOpen(true)}
                 className="inline-flex items-center gap-1.5 px-4 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs border border-white/20 transition active:scale-95 cursor-pointer"
+                title="Nueva Sala: Aperturar una nueva aula virtual y asignar docente, materias, horario y alumnos"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Nueva Sala</span>
@@ -174,6 +176,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
         <div 
           onClick={() => setRegisterStudentModalOpen(true)}
           className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:shadow-md transition cursor-pointer relative overflow-hidden flex flex-col justify-between"
+          title="Alumnos Activos: Total de estudiantes matriculados formalmente en el ciclo escolar"
         >
           <div className="flex items-center justify-between">
             <div className="w-10 h-10 rounded-full bg-ipsur-navy-100 text-ipsur-navy-700 flex items-center justify-center">
@@ -200,6 +203,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
         <div 
           onClick={() => setSchedulesModalOpen(true)}
           className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:shadow-md transition cursor-pointer relative overflow-hidden flex flex-col justify-between"
+          title="Docentes Titulares: Claustro de profesores y catedráticos asignados a materias virtuales"
         >
           <div className="flex items-center justify-between">
             <div className="w-10 h-10 rounded-full bg-pink-100 text-ipsur-pink-600 flex items-center justify-center">
@@ -226,6 +230,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
         <div 
           onClick={() => setCreateModalOpen(true)}
           className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:shadow-md transition cursor-pointer relative overflow-hidden flex flex-col justify-between"
+          title="Salas de Clases Virtuales: Aulas activas con rúbricas al 100% y enlaces de Meet/Zoom"
         >
           <div className="flex items-center justify-between">
             <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center">
@@ -252,6 +257,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
         <div 
           onClick={() => showToast('Asistencia Institucional', 'Control de asistencias y participación virtual', 'info')}
           className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:shadow-md transition cursor-pointer relative overflow-hidden flex flex-col justify-between"
+          title="Asistencia Promedio: Porcentaje de alumnos al corriente en las sesiones en vivo por Meet"
         >
           <div className="flex items-center justify-between">
             <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center">
@@ -278,6 +284,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
         <div 
           onClick={() => setProceduresModalOpen(true)}
           className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:shadow-md transition cursor-pointer relative overflow-hidden flex flex-col justify-between col-span-2 md:col-span-1"
+          title="Trámites Escolares: Solicitudes de constancias, credenciales y kárdex en ventanilla digital"
         >
           <div className="flex items-center justify-between">
             <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center">
@@ -418,6 +425,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
               type="button"
               onClick={() => setRegisterStudentModalOpen(true)}
               className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 hover:border-pink-300 hover:bg-pink-50/50 transition group cursor-pointer"
+              title="Registrar Alumno: Inscribir un nuevo estudiante al padrón escolar y generar su matrícula oficial"
             >
               <div className="w-10 h-10 rounded-full bg-pink-100 text-ipsur-pink-600 flex items-center justify-center mb-1.5 group-hover:scale-105 transition">
                 <UserPlus className="w-5 h-5" />
@@ -432,6 +440,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
               type="button"
               onClick={() => setActaModalOpen(true)}
               className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 transition group cursor-pointer"
+              title="Calificaciones: Capturar y consultar evaluaciones oficiales de alumnos y rúbricas al 100%"
             >
               <div className="w-10 h-10 rounded-full bg-indigo-100 text-ipsur-navy-700 flex items-center justify-center mb-1.5 group-hover:scale-105 transition">
                 <span className="font-display font-black text-sm">A+</span>
@@ -446,6 +455,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
               type="button"
               onClick={() => setSchedulesModalOpen(true)}
               className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 transition group cursor-pointer"
+              title="Horarios: Consultar la parrilla semanal de horarios y sesiones sincrónicas en vivo por Meet"
             >
               <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center mb-1.5 group-hover:scale-105 transition">
                 <Calendar className="w-5 h-5" />
@@ -460,6 +470,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
               type="button"
               onClick={() => setActaModalOpen(true)}
               className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 hover:border-pink-300 hover:bg-pink-50/50 transition group cursor-pointer"
+              title="Reportes: Generar actas oficiales SEP, reportes de retención escolar y boletas de calificaciones"
             >
               <div className="w-10 h-10 rounded-full bg-pink-100 text-ipsur-pink-600 flex items-center justify-center mb-1.5 group-hover:scale-105 transition">
                 <BarChart3 className="w-5 h-5" />
@@ -474,6 +485,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
               type="button"
               onClick={() => setPaymentsModalOpen(true)}
               className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 transition group cursor-pointer"
+              title="Pagos y Tesorería: Registrar cobro de colegiaturas, emitir recibos con folio oficial y consultar balance"
             >
               <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1.5 group-hover:scale-105 transition">
                 <CreditCard className="w-5 h-5" />
@@ -488,6 +500,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
               type="button"
               onClick={() => setAnnouncementsModalOpen(true)}
               className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 transition group cursor-pointer"
+              title="Comunicados: Redactar y publicar avisos institucionales para alumnos y catedráticos"
             >
               <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center mb-1.5 group-hover:scale-105 transition">
                 <Mail className="w-5 h-5" />

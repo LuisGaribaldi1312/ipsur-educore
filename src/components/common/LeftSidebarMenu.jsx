@@ -129,6 +129,7 @@ export default function LeftSidebarMenu() {
       id: 'inicio',
       label: 'Inicio',
       icon: Home,
+      tooltip: 'Regresar al panel de control principal y resumen del campus virtual',
       isActive: activeTab === 'inicio' && !activeClassroomId,
       action: () => {
         setActiveTab('inicio');
@@ -142,6 +143,7 @@ export default function LeftSidebarMenu() {
       label: 'Rectoría',
       icon: ShieldCheck,
       hasChevron: true,
+      tooltip: 'Decretos rectorales, planeación estratégica y validez RVOE SEP',
       action: () => {
         setActiveTab('rectoria');
         setRectoriaModalOpen(true);
@@ -153,6 +155,7 @@ export default function LeftSidebarMenu() {
       label: 'Dirección',
       icon: School,
       hasChevron: true,
+      tooltip: 'Resoluciones de Consejo Técnico Escolar y supervisión académica',
       action: () => {
         setActiveTab('direccion');
         setDireccionModalOpen(true);
@@ -165,6 +168,7 @@ export default function LeftSidebarMenu() {
       icon: FileText,
       hasChevron: true,
       badge: pendingProceduresCount > 0 ? String(pendingProceduresCount) : null,
+      tooltip: 'Ventanilla digital para tramitar constancias de estudio, credencial escolar y kárdex',
       action: () => {
         setActiveTab('servicios_escolares');
         setProceduresModalOpen(true);
@@ -178,6 +182,9 @@ export default function LeftSidebarMenu() {
       badge: isTeacher 
         ? (teacherClassrooms.length > 0 ? String(teacherClassrooms.length) : null)
         : (!isStudent && classrooms.length > 0 ? String(classrooms.length) : null),
+      tooltip: isStudent 
+        ? 'Consulta tus asignaturas matriculadas y enlaces de clases en vivo' 
+        : (isTeacher ? 'Gestiona tus materias asignadas, tareas y calificaciones' : 'Apertura de salas virtuales, asignación de materias y rúbricas al 100%'),
       action: () => {
         if (isStudent || isTeacher) {
           setActiveTab('coordinacion');
@@ -194,6 +201,7 @@ export default function LeftSidebarMenu() {
       id: 'administrativo',
       label: isStudent ? 'Mis Pagos y Colegiaturas' : 'Administrativo y Contabilidad',
       icon: CreditCard,
+      tooltip: 'Control de tesorería, registro de colegiaturas y comprobantes digitales',
       action: () => {
         if (isTeacher) {
           showToast('Acceso Restringido', 'El perfil docente no tiene acceso a la administración y contabilidad.', 'warning');
@@ -209,6 +217,7 @@ export default function LeftSidebarMenu() {
       label: isTeacher ? 'Claustro y Horarios' : (isStudent ? 'Mis Docentes y Horarios' : 'Docentes'),
       icon: Users,
       badge: !isStudent && !isTeacher && totalTeachers > 0 ? String(totalTeachers) : null,
+      tooltip: 'Directorio de catedráticos titulares y parrilla de horarios en vivo (Meet)',
       action: () => {
         setActiveTab('docentes');
         setDocentesModalOpen(true);
@@ -220,6 +229,9 @@ export default function LeftSidebarMenu() {
       label: isStudent ? 'Mi Expediente y Boleta' : (isTeacher ? 'Alumnos de Mis Clases' : 'Alumnos'),
       icon: GraduationCap,
       badge: !isStudent && !isTeacher && totalStudents > 0 ? String(totalStudents) : null,
+      tooltip: isStudent 
+        ? 'Consulta tu boleta oficial de calificaciones y expediente escolar SEP'
+        : (isTeacher ? 'Listado de alumnos inscritos en tus materias asignadas' : 'Padrón escolar oficial, expedientes estudiantiles y nuevas inscripciones'),
       action: () => {
         if (isStudent) {
           setActiveTab('alumnos');
@@ -235,6 +247,9 @@ export default function LeftSidebarMenu() {
       id: 'reportes',
       label: isStudent ? 'Mi Boleta Oficial' : (isTeacher ? 'Actas de Evaluación' : 'Reportes y Estadísticas'),
       icon: BarChart3,
+      tooltip: isStudent
+        ? 'Descarga o imprime tu boleta oficial de calificaciones'
+        : (isTeacher ? 'Generación de actas oficiales de evaluación de tus materias' : 'Actas oficiales de evaluación SEP, estadísticas de aprobación y boletas'),
       action: () => {
         if (isStudent) {
           setActiveTab('reportes');
@@ -250,6 +265,7 @@ export default function LeftSidebarMenu() {
       id: 'configuracion',
       label: 'Configuración',
       icon: Settings,
+      tooltip: 'Gestión de usuarios, roles, contraseñas y permisos del sistema',
       action: () => {
         if (isStudent || isTeacher) {
           showToast('Acceso Denegado', 'No cuentas con autorización para el panel de configuración institucional.', 'error');
@@ -335,6 +351,7 @@ export default function LeftSidebarMenu() {
                   <button
                     key={item.id}
                     onClick={item.action}
+                    title={`${item.label} — ${item.tooltip}`}
                     className={`group relative flex items-center rounded-xl transition-all duration-150 cursor-pointer ${
                       isExpanded
                         ? `px-3.5 py-2.5 gap-3 w-full text-left ${
@@ -369,16 +386,21 @@ export default function LeftSidebarMenu() {
                       </div>
                     )}
 
-                    {/* Tooltip when collapsed */}
+                    {/* Rich Floating Tooltip when collapsed */}
                     {!isExpanded && (
-                      <div className="absolute left-full ml-3.5 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[#0A0D1B] text-white text-xs font-bold rounded-xl shadow-2xl border border-white/20 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 flex items-center gap-2">
-                        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#0A0D1B] border-l border-b border-white/20 rotate-45"></div>
-                        <span>{item.label}</span>
-                        {item.badge && (
-                          <span className="text-[9px] font-mono bg-ipsur-pink-500 text-white px-1.5 rounded-full">
-                            {item.badge}
-                          </span>
-                        )}
+                      <div className="absolute left-full ml-3.5 top-1/2 -translate-y-1/2 px-3 py-2 bg-[#0A0D1B] text-white text-xs rounded-xl shadow-2xl border border-ipsur-pink-500/40 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 flex flex-col gap-0.5 min-w-[200px] max-w-[250px]">
+                        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#0A0D1B] border-l border-b border-ipsur-pink-500/40 rotate-45"></div>
+                        <div className="flex items-center justify-between font-bold">
+                          <span className="text-pink-300 text-xs">{item.label}</span>
+                          {item.badge && (
+                            <span className="text-[9px] font-mono bg-ipsur-pink-500 text-white px-1.5 rounded-full">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-300 font-normal leading-tight">
+                          {item.tooltip}
+                        </span>
                       </div>
                     )}
                   </button>

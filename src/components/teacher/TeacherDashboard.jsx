@@ -156,6 +156,7 @@ export default function TeacherDashboard({ onSelectClassroom }) {
                           </span>
                           <button
                             onClick={() => setConfiguringClassroom(cls)}
+                            title="Editar y ajustar los porcentajes de evaluación (Actividades, Examen, Asistencia, Participación) para esta materia"
                             className="text-[11px] underline text-emerald-700 hover:text-emerald-900"
                           >
                             Editar
@@ -180,6 +181,7 @@ export default function TeacherDashboard({ onSelectClassroom }) {
                         </p>
                         <button
                           onClick={() => setConfiguringClassroom(cls)}
+                          title="Fijar la ponderación oficial (debe sumar exactamente 100%) para desbloquear la asignación de actividades y tareas"
                           className="w-full text-center py-1.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition"
                         >
                           Configurar Criterios Ahora
@@ -207,6 +209,7 @@ export default function TeacherDashboard({ onSelectClassroom }) {
 
                     <button
                       onClick={() => onSelectClassroom(cls.id)}
+                      title={`Ingresar al Classroom de ${cls.name}: publicar tareas, subir materiales, pasar lista y calificar entregas`}
                       className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-ipsur-navy-700 hover:bg-ipsur-navy-800 rounded-xl shadow-sm transition"
                     >
                       <span>Abrir Classroom</span>
