@@ -90,6 +90,19 @@ export default function LeftSidebarMenu() {
     });
   };
 
+  // Listen to hamburger toggle button from top navbar
+  React.useEffect(() => {
+    const handleToggle = () => {
+      if (window.innerWidth < 1024) {
+        setIsMobileOpen(prev => !prev);
+      } else {
+        toggleSidebar();
+      }
+    };
+    window.addEventListener('toggle-ipsur-sidebar', handleToggle);
+    return () => window.removeEventListener('toggle-ipsur-sidebar', handleToggle);
+  }, []);
+
   const isStudent = currentUser.role === 'student';
   const isTeacher = currentUser.role === 'teacher';
   const canManageUsers = isSuperAdmin || currentUser.role === 'director' || currentUser.role === 'rector';

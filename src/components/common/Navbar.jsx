@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import LiveClock from './LiveClock';
 import UserManagerModal from '../admin/UserManagerModal';
@@ -12,20 +12,22 @@ import {
   ChevronDown, 
   RotateCcw, 
   Sparkles, 
-  School,
-  ExternalLink,
-  Layers,
-  LayoutGrid,
-  Menu,
-  Bell,
-  CheckCircle2,
-  AlertCircle,
-  Info,
-  X,
-  LogOut,
-  UserPlus,
-  KeyRound,
-  Lock
+  School, 
+  ExternalLink, 
+  Layers, 
+  LayoutGrid, 
+  Menu, 
+  Bell, 
+  Calendar,
+  Clock,
+  CheckCircle2, 
+  AlertCircle, 
+  Info, 
+  X, 
+  LogOut, 
+  UserPlus, 
+  KeyRound, 
+  Lock 
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -49,6 +51,29 @@ export default function Navbar() {
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  // Real-time ticking clock (ticks every second)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedDay = currentDateTime.toLocaleDateString('es-MX', { weekday: 'long' });
+  const formattedDayCapitalized = formattedDay.charAt(0).toUpperCase() + formattedDay.slice(1);
+  const formattedDate = currentDateTime.toLocaleDateString('es-MX', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
+  const formattedTime12 = currentDateTime.toLocaleTimeString('es-MX', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
 
   const activePeriod = periods.find(p => p.status === 'Activo') || periods[0];
 
@@ -119,27 +144,40 @@ export default function Navbar() {
                 <Menu className="w-5 h-5" />
               </button>
 
-              <div 
-                className="flex items-center gap-2.5 cursor-pointer select-none"
-                onClick={() => setActiveClassroomId(null)}
-              >
-                <div className="w-8 h-8 rounded-lg bg-pink-50 text-ipsur-pink-600 flex items-center justify-center">
-                  <LayoutGrid className="w-4 h-4" />
-                </div>
-                <div>
-                  <h1 className="font-display text-base sm:text-lg font-black text-slate-900 tracking-tight leading-none">
-                    Panel de Control
-                  </h1>
-                  <span className="text-[10px] font-bold text-ipsur-pink-600 tracking-wider uppercase block">
-                    IPSUR EDUCORE
+              {/* Real-Time Date & Time in IPSUR Gradient Capsule (Replaces Panel de Control) */}
+              <div className="flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-[#0A0D1B] via-[#1E1F5C] to-[#8A004B] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl shadow-md border border-white/15 select-none">
+                {/* Live pulsing dot in IPSUR Pink */}
+                <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5 flex-shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ipsur-pink-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-ipsur-pink-500"></span>
+                </span>
+
+                {/* Real-Time Date */}
+                <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-medium text-white/95">
+                  <Calendar className="w-3.5 h-3.5 text-pink-300 flex-shrink-0" />
+                  <span className="font-sans font-semibold tracking-wide capitalize">
+                    {formattedDayCapitalized}, {formattedDate}
                   </span>
                 </div>
-                {activeClassroomId && (
-                  <span className="hidden md:inline-flex items-center text-xs font-bold text-ipsur-navy-700 bg-indigo-50 px-2 py-0.5 rounded-md">
-                    / Sala de Clases
-                  </span>
-                )}
+
+                <span className="text-white/30 text-xs hidden sm:inline">•</span>
+
+                {/* Real-Time Clock */}
+                <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-mono font-black text-pink-200 tracking-wider">
+                  <Clock className="w-3.5 h-3.5 text-pink-300 flex-shrink-0" />
+                  <span>{formattedTime12}</span>
+                </div>
               </div>
+
+              {activeClassroomId && (
+                <button
+                  type="button"
+                  onClick={() => setActiveClassroomId(null)}
+                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow-xs transition"
+                >
+                  <span>← Mis Salas</span>
+                </button>
+              )}
             </div>
 
             {/* Right Header Section: Notifications + Divider + Profile Info */}
