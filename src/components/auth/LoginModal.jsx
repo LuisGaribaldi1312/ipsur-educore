@@ -58,11 +58,11 @@ export default function LoginModal({ isOpen, onClose }) {
               className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(46,48,146,0.2)]"
             />
           </div>
-          <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-            IPSUR <span className="text-pink-300">EDUCORE</span>
+          <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white font-display">
+            IPSUR <span className="text-sky-300">Manager School</span>
           </h2>
-          <p className="text-[11px] text-pink-200/90 font-semibold tracking-wider uppercase mt-0.5">
-            Portal de Autenticación Institucional
+          <p className="text-[11px] text-sky-200/90 font-semibold tracking-wider uppercase mt-0.5">
+            Innovación Educativa para un Mejor Futuro
           </p>
         </div>
 

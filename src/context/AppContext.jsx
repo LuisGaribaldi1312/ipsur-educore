@@ -1,5 +1,16 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { USERS, INITIAL_CLASSROOMS, PERIODS, INSTITUTIONAL_INFO, DEFAULT_ROLE_PERMISSIONS } from '../data/initialData';
+import { 
+  USERS, 
+  INITIAL_CLASSROOMS, 
+  PERIODS, 
+  INSTITUTIONAL_INFO, 
+  DEFAULT_ROLE_PERMISSIONS,
+  SAMPLE_ACTIVITIES,
+  SAMPLE_NOTIFICATIONS,
+  SAMPLE_PROCEDURES,
+  SAMPLE_PAYMENTS,
+  ACADEMIC_STATS
+} from '../data/initialData';
 import { validateCriteria } from '../utils/calculations';
 import { getDeadlineStatus } from '../utils/dateFormatter';
 
@@ -31,14 +42,29 @@ export function AppProvider({ children }) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           // Normalize existing users with proper scopes and permissions
-          const normalized = parsed.map(u => ({
-            ...u,
-            scope: u.scope || DEFAULT_ROLE_PERMISSIONS[u.role]?.scope || 'assigned',
-            permissions: {
-              ...(DEFAULT_ROLE_PERMISSIONS[u.role] || DEFAULT_ROLE_PERMISSIONS.student),
-              ...(u.permissions || {})
+          const normalized = parsed.map(u => {
+            if (u.id === 'usr-superadmin' || u.isSuperAdmin) {
+              return {
+                ...u,
+                name: USERS[0].name,
+                title: USERS[0].title,
+                avatar: USERS[0].avatar,
+                scope: 'global',
+                permissions: {
+                  ...DEFAULT_ROLE_PERMISSIONS.superadmin,
+                  ...(u.permissions || {})
+                }
+              };
             }
-          }));
+            return {
+              ...u,
+              scope: u.scope || DEFAULT_ROLE_PERMISSIONS[u.role]?.scope || 'assigned',
+              permissions: {
+                ...(DEFAULT_ROLE_PERMISSIONS[u.role] || DEFAULT_ROLE_PERMISSIONS.student),
+                ...(u.permissions || {})
+              }
+            };
+          });
 
           // Guarantee that the superadmin account is always present with its secret flag and permissions
           const hasSuperAdmin = normalized.some(u => u.isSuperAdmin || u.role === 'superadmin');
@@ -78,6 +104,76 @@ export function AppProvider({ children }) {
   const [notification, setNotification] = useState(null);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [userManagerModalOpen, setUserManagerModalOpen] = useState(false);
+
+  // Manager School additional services datasets
+  const [activities, setActivities] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ipsur_activities_v1');
+      return saved ? JSON.parse(saved) : SAMPLE_ACTIVITIES;
+    } catch {
+      return SAMPLE_ACTIVITIES;
+    }
+  });
+
+  const [notificationsList, setNotificationsList] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ipsur_notifications_v1');
+      return saved ? JSON.parse(saved) : SAMPLE_NOTIFICATIONS;
+    } catch {
+      return SAMPLE_NOTIFICATIONS;
+    }
+  });
+
+  const [procedures, setProcedures] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ipsur_procedures_v1');
+      return saved ? JSON.parse(saved) : SAMPLE_PROCEDURES;
+    } catch {
+      return SAMPLE_PROCEDURES;
+    }
+  });
+
+  const [payments, setPayments] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ipsur_payments_v1');
+      return saved ? JSON.parse(saved) : SAMPLE_PAYMENTS;
+    } catch {
+      return SAMPLE_PAYMENTS;
+    }
+  });
+
+  // Sync to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('ipsur_activities_v1', JSON.stringify(activities));
+      localStorage.setItem('ipsur_notifications_v1', JSON.stringify(notificationsList));
+      localStorage.setItem('ipsur_procedures_v1', JSON.stringify(procedures));
+      localStorage.setItem('ipsur_payments_v1', JSON.stringify(payments));
+    } catch (e) {
+      // Ignore
+    }
+  }, [activities, notificationsList, procedures, payments]);
+
+  const addActivity = (act) => {
+    setActivities(prev => [{ id: `act-${Date.now()}`, time: 'Hoy, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' h', ...act }, ...prev]);
+  };
+
+  const addPayment = (payment) => {
+    setPayments(prev => [{ id: `pay-${Date.now()}`, date: 'Hoy, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' h', status: 'Completado', ...payment }, ...prev]);
+    addActivity({
+      type: 'payment',
+      title: 'Pago recibido',
+      subtitle: `${payment.concept || 'Colegiatura'} · ${payment.student || 'Alumno'}`,
+      badge: 'Contabilidad',
+      color: 'emerald'
+    });
+    showToast('Pago Registrado', 'El pago fue procesado y registrado con éxito en contabilidad.', 'success');
+  };
+
+  const updateProcedureStatus = (procId, newStatus) => {
+    setProcedures(prev => prev.map(p => p.id === procId ? { ...p, status: newStatus } : p));
+    showToast('Trámite Actualizado', `El estado del trámite cambió a: ${newStatus}`, 'info');
+  };
 
   const toastTimerRef = useRef(null);
 
@@ -767,7 +863,15 @@ export function AppProvider({ children }) {
         gradeSubmission,
         updateStudentAssessment,
         updateVirtualSession,
-        showToast
+        showToast,
+        activities,
+        addActivity,
+        notificationsList,
+        procedures,
+        updateProcedureStatus,
+        payments,
+        addPayment,
+        academicStats: ACADEMIC_STATS
       }}
     >
       {children}

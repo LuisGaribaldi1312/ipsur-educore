@@ -3,30 +3,34 @@ import { useApp } from '../../context/AppContext';
 import VirtualSessionPortalModal from '../classroom/VirtualSessionPortalModal';
 import InstitutionalActaModal from '../reports/InstitutionalActaModal';
 import StudentGeneralBoletaModal from '../student/StudentGeneralBoletaModal';
+import RegisterStudentModal from '../services/RegisterStudentModal';
+import PaymentsAccountingModal from '../services/PaymentsAccountingModal';
+import SchedulesModal from '../services/SchedulesModal';
+import AnnouncementsModal from '../services/AnnouncementsModal';
+import PendingProceduresModal from '../services/PendingProceduresModal';
+import SystemTutorialModal from '../services/SystemTutorialModal';
+import RectoriaDirectivaModal from '../services/RectoriaDirectivaModal';
 import Modal from './Modal';
 import { 
-  School, 
-  Users, 
-  Video, 
-  Award, 
-  Calendar, 
+  Home,
   ShieldCheck, 
-  LogOut, 
-  ChevronLeft, 
-  ChevronRight, 
-  Sparkles, 
-  Clock, 
+  School, 
+  FileText, 
   BookOpen, 
+  CreditCard, 
+  Users, 
   GraduationCap, 
-  Phone, 
-  Mail, 
-  ExternalLink,
-  CheckCircle2,
-  Lock,
-  Layers,
+  BarChart3, 
+  Settings, 
+  ChevronRight, 
+  ChevronLeft, 
+  LogOut, 
+  Sparkles, 
+  Calendar,
+  Compass,
   Menu,
   X,
-  Compass
+  ExternalLink
 } from 'lucide-react';
 
 export default function LeftSidebarMenu() {
@@ -43,7 +47,7 @@ export default function LeftSidebarMenu() {
     showToast
   } = useApp();
 
-  // Expanded menu state (defaults to expanded on desktop, can be collapsed/hidden with arrow click)
+  // Expanded menu state (defaults to expanded on desktop)
   const [isExpanded, setIsExpanded] = useState(() => {
     try {
       const saved = localStorage.getItem('ipsur_sidebar_expanded');
@@ -54,13 +58,21 @@ export default function LeftSidebarMenu() {
   });
 
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('inicio');
 
-  // Modals controlled by menu
-  const [virtualPortalOpen, setVirtualPortalOpen] = useState(false);
+  // Modals controlled by menu services
+  const [rectoriaModalOpen, setRectoriaModalOpen] = useState(false);
+  const [direccionModalOpen, setDireccionModalOpen] = useState(false);
+  const [proceduresModalOpen, setProceduresModalOpen] = useState(false);
+  const [paymentsModalOpen, setPaymentsModalOpen] = useState(false);
+  const [schedulesModalOpen, setSchedulesModalOpen] = useState(false);
+  const [announcementsModalOpen, setAnnouncementsModalOpen] = useState(false);
+  const [registerStudentModalOpen, setRegisterStudentModalOpen] = useState(false);
+  const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
   const [actaModalOpen, setActaModalOpen] = useState(false);
   const [boletaModalOpen, setBoletaModalOpen] = useState(false);
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
-  const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const [virtualPortalOpen, setVirtualPortalOpen] = useState(false);
 
   if (!currentUser) return null;
 
@@ -70,7 +82,7 @@ export default function LeftSidebarMenu() {
       try {
         localStorage.setItem('ipsur_sidebar_expanded', String(next));
       } catch (e) {
-        // Ignore localStorage error in private mode
+        // Ignore
       }
       return next;
     });
@@ -78,224 +90,239 @@ export default function LeftSidebarMenu() {
 
   const isStudent = currentUser.role === 'student';
   const isTeacher = currentUser.role === 'teacher';
-  // STRICT ACCESS: Only Super Admin and Director General can manage users and permissions
-  const canManageUsers = isSuperAdmin || currentUser.role === 'director';
+  const canManageUsers = isSuperAdmin || currentUser.role === 'director' || currentUser.role === 'rector';
 
-  // Teacher classrooms filter
   const teacherClassrooms = classrooms.filter(c => c.teacherId === currentUser.id);
-
-  // Active target classroom for acts/sessions
-  const targetClassroom = classrooms.find(c => c.id === activeClassroomId) || 
-    (isTeacher ? teacherClassrooms[0] : classrooms[0]) || null;
 
   const handleOpenGrades = () => {
     if (isStudent) {
       setBoletaModalOpen(true);
-    } else if (isTeacher) {
-      if (teacherClassrooms.length === 0) {
-        showToast('Sin Salas Asignadas', 'Aún no tienes salas virtuales a tu cargo para emitir actas oficiales.', 'info');
-        return;
-      }
-      setActaModalOpen(true);
     } else {
-      if (classrooms.length === 0) {
-        showToast('Sin Salas Registradas', 'Crea una sala virtual primero para emitir actas oficiales.', 'info');
-        return;
-      }
       setActaModalOpen(true);
     }
   };
 
-  const handleOpenVirtualSessions = () => {
-    if (classrooms.length === 0) {
-      showToast('Sin Salas de Clases', 'Debes registrar al menos una sala para acceder a las sesiones virtuales.', 'info');
-      return;
-    }
-    setVirtualPortalOpen(true);
-  };
-
-  // Menu items list (Strictly filtered according to user role and scope)
+  // Menu items list matching the official IPSUR Manager School screenshot
   const menuItems = [
     {
-      id: 'dashboard',
-      label: isStudent ? 'Mis Materias' : (isTeacher ? 'Mis Salas Virtuales' : 'Salas Virtuales'),
-      sublabel: 'Panel Principal',
-      icon: School,
-      color: 'from-blue-500 to-indigo-600',
+      id: 'inicio',
+      label: 'Inicio',
+      icon: Home,
+      isActive: activeTab === 'inicio' && !activeClassroomId,
       action: () => {
+        setActiveTab('inicio');
         setActiveClassroomId(null);
-        showToast('Navegación', 'Regresaste al panel principal de salas.', 'info');
+        showToast('Inicio', 'Bienvenido a IPSUR Manager School', 'info');
       },
-      badge: (isTeacher ? teacherClassrooms.length : classrooms.length) > 0 
-        ? (isTeacher ? teacherClassrooms.length : classrooms.length) 
-        : null,
       visible: true
     },
     {
-      id: 'users',
-      label: 'Gestión de Usuarios',
-      sublabel: 'Permisos y Alcance',
-      icon: Users,
-      color: 'from-purple-500 to-indigo-600',
-      action: () => setUserManagerModalOpen(true),
-      badge: isSuperAdmin ? 'Master' : 'Directivo',
-      visible: canManageUsers // Strictly Super Admin and Director only
-    },
-    {
-      id: 'virtual_sessions',
-      label: 'Clases en Vivo',
-      sublabel: 'Aula Virtual y Meet',
-      icon: Video,
-      color: 'from-rose-500 to-pink-600',
-      action: handleOpenVirtualSessions,
-      live: true,
-      visible: true
-    },
-    {
-      id: 'grades',
-      label: isStudent ? 'Mi Boleta Oficial' : 'Actas de Calificaciones',
-      sublabel: isStudent ? 'Expediente Personal SEP' : (isTeacher ? 'Mis Actas de Grupo' : 'Control Institucional'),
-      icon: Award,
-      color: 'from-amber-500 to-orange-600',
-      action: handleOpenGrades,
-      visible: true
-    },
-    {
-      id: 'calendar',
-      label: 'Calendario Escolar',
-      sublabel: 'Periodos y Cierres',
-      icon: Calendar,
-      color: 'from-emerald-500 to-teal-600',
-      action: () => setCalendarModalOpen(true),
-      visible: true
-    },
-    {
-      id: 'institution',
-      label: 'Normativa y RVOE',
-      sublabel: 'Ficha Institucional',
+      id: 'rectoria',
+      label: 'Rectoría',
       icon: ShieldCheck,
-      color: 'from-ipsur-navy-600 to-ipsur-pink-600',
-      action: () => setInfoModalOpen(true),
+      hasChevron: true,
+      action: () => {
+        setActiveTab('rectoria');
+        setRectoriaModalOpen(true);
+      },
       visible: true
     },
     {
-      id: 'logout',
-      label: 'Cerrar Sesión',
-      sublabel: 'Salida Segura',
-      icon: LogOut,
-      color: 'from-slate-600 to-slate-800',
-      action: logout,
-      danger: true,
+      id: 'direccion',
+      label: 'Dirección',
+      icon: School,
+      hasChevron: true,
+      action: () => {
+        setActiveTab('direccion');
+        setDireccionModalOpen(true);
+      },
+      visible: true
+    },
+    {
+      id: 'servicios_escolares',
+      label: 'Servicios Escolares',
+      icon: FileText,
+      hasChevron: true,
+      badge: '24',
+      action: () => {
+        setActiveTab('servicios_escolares');
+        setProceduresModalOpen(true);
+      },
+      visible: true
+    },
+    {
+      id: 'coordinacion',
+      label: 'Coordinación Escolar',
+      icon: BookOpen,
+      action: () => {
+        setActiveTab('coordinacion');
+        setActiveClassroomId(null);
+        showToast('Coordinación Escolar', 'Aulas virtuales y temarios activos', 'info');
+      },
+      visible: true
+    },
+    {
+      id: 'administrativo',
+      label: 'Administrativo y Contabilidad',
+      icon: CreditCard,
+      action: () => {
+        setActiveTab('administrativo');
+        setPaymentsModalOpen(true);
+      },
+      visible: true
+    },
+    {
+      id: 'docentes',
+      label: 'Docentes',
+      icon: Users,
+      badge: '86',
+      action: () => {
+        setActiveTab('docentes');
+        setSchedulesModalOpen(true);
+      },
+      visible: true
+    },
+    {
+      id: 'alumnos',
+      label: 'Alumnos',
+      icon: GraduationCap,
+      badge: '1,248',
+      action: () => {
+        setActiveTab('alumnos');
+        setRegisterStudentModalOpen(true);
+      },
+      visible: true
+    },
+    {
+      id: 'reportes',
+      label: 'Reportes y Estadísticas',
+      icon: BarChart3,
+      action: () => {
+        setActiveTab('reportes');
+        handleOpenGrades();
+      },
+      visible: true
+    },
+    {
+      id: 'configuracion',
+      label: 'Configuración',
+      icon: Settings,
+      action: () => {
+        setActiveTab('configuracion');
+        if (canManageUsers) {
+          setUserManagerModalOpen(true);
+        } else {
+          showToast('Configuración', 'Acceso exclusivo para Rectoría, Dirección y Super Admin.', 'warning');
+        }
+      },
       visible: true
     }
-  ].filter(item => item.visible);
+  ].filter(i => i.visible);
 
   return (
     <>
-      {/* Desktop Left Sidebar: Adhered directly to the portal layout structure (not floating) */}
-      <aside 
-        aria-label="Menú Lateral Izquierdo Adherido"
-        className={`hidden lg:flex flex-col shrink-0 bg-[#0E1026] text-white border-r border-slate-200/20 shadow-md transition-all duration-300 select-none relative min-h-[calc(100vh-140px)] ${
+      {/* Desktop Left Sidebar: Adhered directly to layout structure */}
+      <aside
+        aria-label="Menú Lateral IPSUR Manager School"
+        className={`hidden lg:flex flex-col shrink-0 bg-[#0B1528] text-white border-r border-slate-800 shadow-xl transition-all duration-300 select-none relative min-h-[calc(100vh-80px)] ${
           isExpanded ? 'w-64' : 'w-16'
         }`}
       >
-        {/* Border Toggle Button (anchored right on the vertical seam between sidebar and main content) */}
+        {/* Toggle Collapse/Expand Button */}
         <button
           onClick={toggleSidebar}
           aria-label={isExpanded ? 'Ocultar menú lateral' : 'Mostrar menú lateral'}
-          title={isExpanded ? 'Ocultar menú lateral (Contraer)' : 'Mostrar menú lateral (Expandir)'}
-          className="absolute -right-3.5 top-6 z-30 w-7 h-7 rounded-full bg-[#1E1F5C] hover:bg-ipsur-pink-600 text-white border border-white/30 flex items-center justify-center shadow-lg transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+          title={isExpanded ? 'Contraer menú lateral' : 'Expandir menú lateral'}
+          className="absolute -right-3.5 top-6 z-30 w-7 h-7 rounded-full bg-[#1877F2] hover:bg-blue-600 text-white border border-white/40 flex items-center justify-center shadow-lg transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
         >
           {isExpanded ? (
             <ChevronLeft className="w-4 h-4 text-white" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-pink-300" />
+            <ChevronRight className="w-4 h-4 text-white" />
           )}
         </button>
 
-        <div className="w-full flex-1 flex flex-col justify-between p-2.5 relative">
-          
+        <div className="w-full flex-1 flex flex-col justify-between p-3 relative">
           <div>
-            {/* Sidebar Top Header */}
-            <div className={`flex items-center pb-3 mb-2 border-b border-white/10 ${
-              isExpanded ? 'justify-start px-2' : 'justify-center'
+            {/* Sidebar Top Header matching screenshot emblem */}
+            <div className={`pb-4 mb-3 border-b border-white/10 ${
+              isExpanded ? 'flex flex-col items-center text-center' : 'flex justify-center'
             }`}>
               {isExpanded ? (
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-ipsur-pink-500 to-indigo-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
-                    <Compass className="w-4 h-4" />
+                <div className="flex flex-col items-center">
+                  {/* Graduation cap & shield icon emblem */}
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#0066FF] via-[#1E70EB] to-sky-400 p-2.5 flex items-center justify-center text-white shadow-lg mb-2 border border-white/20">
+                    <GraduationCap className="w-8 h-8 text-white filter drop-shadow" />
                   </div>
-                  <div className="min-w-0">
-                    <span className="text-[11px] font-black tracking-wider uppercase text-white/90 truncate block">
-                      Menú Principal
-                    </span>
-                    <span className="text-[9px] text-pink-300 font-medium block truncate">
-                      Navegación IPSUR
-                    </span>
-                  </div>
+                  <h2 className="font-display text-xl font-black tracking-tight text-white leading-none">
+                    IPSUR
+                  </h2>
+                  <span className="font-display text-xs font-bold text-sky-300 tracking-wider uppercase mt-0.5">
+                    Manager School
+                  </span>
+                  <p className="italic text-[10px] text-slate-300 font-light mt-1 max-w-[200px]">
+                    Innovación Educativa para un Mejor Futuro
+                  </p>
                 </div>
               ) : (
-                <div 
+                <div
                   onClick={toggleSidebar}
-                  className="w-8 h-8 rounded-xl bg-gradient-to-tr from-ipsur-pink-500 to-indigo-600 text-white flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-all"
-                  title="Menú Principal (Clic para expandir)"
+                  className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0066FF] to-sky-400 text-white flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition"
+                  title="IPSUR Manager School (Clic para expandir)"
                 >
-                  <Compass className="w-4 h-4 text-white" />
+                  <GraduationCap className="w-5 h-5 text-white" />
                 </div>
               )}
             </div>
 
-            {/* Menu Navigation Items */}
-            <nav className="flex flex-col gap-1.5 mt-1">
+            {/* Menu Items */}
+            <nav className="flex flex-col gap-1">
               {menuItems.map(item => {
                 const Icon = item.icon;
+                const isActive = item.isActive;
                 return (
                   <button
                     key={item.id}
                     onClick={item.action}
-                    className={`group relative flex items-center rounded-2xl transition-all duration-200 cursor-pointer ${
-                      isExpanded 
-                        ? 'px-3 py-2.5 gap-3 hover:bg-white/10 text-left w-full' 
-                        : 'w-11 h-11 justify-center hover:bg-white/15 mx-auto'
-                    } ${item.danger ? 'hover:bg-rose-500/20 text-rose-300' : 'text-white'}`}
+                    className={`group relative flex items-center rounded-xl transition-all duration-150 cursor-pointer ${
+                      isExpanded
+                        ? `px-3.5 py-2.5 gap-3 w-full text-left ${
+                            isActive
+                              ? 'bg-[#0077FF] text-white shadow-md font-bold'
+                              : 'text-slate-300 hover:text-white hover:bg-white/10 font-medium'
+                          }`
+                        : `w-10 h-10 justify-center mx-auto ${
+                            isActive
+                              ? 'bg-[#0077FF] text-white shadow-md'
+                              : 'text-slate-300 hover:text-white hover:bg-white/10'
+                          }`
+                    }`}
                   >
-                    {/* Icon Container */}
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-tr ${item.color} text-white shadow-md group-hover:scale-105 transition-transform`}>
-                      <Icon className="w-4 h-4" />
-                    </div>
+                    <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'}`} />
 
-                    {/* Expanded Content with Titles and Badges */}
                     {isExpanded && (
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold truncate leading-tight block text-white group-hover:text-pink-200">
-                            {item.label}
-                          </span>
-                          {item.live && (
-                            <span className="text-[9px] font-bold text-rose-300 bg-rose-500/30 px-1.5 py-0.2 rounded-full border border-rose-400/40 animate-pulse">
-                              VIVO
-                            </span>
-                          )}
+                      <div className="flex-1 flex items-center justify-between min-w-0">
+                        <span className="text-xs truncate tracking-wide">
+                          {item.label}
+                        </span>
+                        <div className="flex items-center gap-1.5 ml-2">
                           {item.badge && (
-                            <span className="text-[9px] font-mono font-bold bg-white/20 text-white px-1.5 py-0.2 rounded-full">
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white font-mono">
                               {item.badge}
                             </span>
                           )}
+                          {item.hasChevron && (
+                            <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-transform" />
+                          )}
                         </div>
-                        <span className="text-[10px] text-white/50 block truncate leading-tight mt-0.5">
-                          {item.sublabel}
-                        </span>
                       </div>
                     )}
 
-                    {/* Hover Tooltip (When collapsed, opens to the RIGHT) */}
+                    {/* Tooltip when collapsed */}
                     {!isExpanded && (
-                      <div className="absolute left-full ml-3.5 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[#0A0D1B] text-white text-xs font-bold rounded-xl shadow-2xl border border-white/20 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 flex items-center gap-2">
-                        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#0A0D1B] border-l border-b border-white/20 rotate-45"></div>
+                      <div className="absolute left-full ml-3.5 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[#091122] text-white text-xs font-bold rounded-xl shadow-2xl border border-white/20 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 flex items-center gap-2">
+                        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#091122] border-l border-b border-white/20 rotate-45"></div>
                         <span>{item.label}</span>
-                        {item.live && (
-                          <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-                        )}
                         {item.badge && (
                           <span className="text-[9px] font-mono bg-white/20 px-1.5 rounded-full">
                             {item.badge}
@@ -309,65 +336,71 @@ export default function LeftSidebarMenu() {
             </nav>
           </div>
 
-          {/* Bottom Sidebar Info */}
+          {/* Bottom Sidebar Card: Campus building photo with wave graphic */}
           {isExpanded ? (
-            <div className="pt-3 border-t border-white/10 px-2 text-[10px] text-white/40 space-y-1">
-              <div className="flex items-center gap-1.5 text-white/70 font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span className="truncate">{institutionalInfo?.schoolName || 'IPSUR EDUCORE'}</span>
+            <div className="mt-6 pt-3 border-t border-white/10">
+              <div className="relative rounded-2xl overflow-hidden border border-white/15 bg-gradient-to-t from-slate-950 via-slate-900 to-blue-950 shadow-lg p-3 text-center group">
+                <img
+                  src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=400&q=80"
+                  alt="Campus IPSUR"
+                  className="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:scale-105 transition duration-500"
+                />
+                <div className="relative z-10">
+                  <p className="font-display font-bold text-white text-xs leading-snug">
+                    Educación sin límites
+                  </p>
+                  <p className="text-[10px] text-blue-200 font-medium leading-tight mt-0.5">
+                    con tecnología de vanguardia
+                  </p>
+                </div>
               </div>
-              <p className="text-[9px] text-white/30 truncate">
-                RVOE: {institutionalInfo?.rvoe || 'SEP-DGB Oficial'}
-              </p>
             </div>
           ) : (
             <div className="pt-3 border-t border-white/10 flex justify-center">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Sistema en Línea"></span>
             </div>
           )}
-
         </div>
       </aside>
 
-      {/* Floating Trigger Button for Mobile & Tablets (Bottom-Left) */}
+      {/* Floating Trigger Button for Mobile & Tablets */}
       <div className="fixed bottom-5 left-4 z-40 lg:hidden">
         <button
           onClick={() => setIsMobileOpen(true)}
-          className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-ipsur-navy-800 to-ipsur-pink-600 text-white font-bold rounded-2xl shadow-2xl border border-white/20 active:scale-95 transition"
+          className="flex items-center gap-2 px-4 py-3 bg-[#0077FF] text-white font-bold rounded-2xl shadow-2xl border border-white/20 active:scale-95 transition"
         >
           <Menu className="w-5 h-5" />
           <span className="text-xs font-bold tracking-wide">Menú</span>
-          <span className="w-2 h-2 rounded-full bg-pink-300 animate-pulse"></span>
         </button>
       </div>
 
-      {/* Mobile Slide-out Drawer (From Left) */}
+      {/* Mobile Drawer */}
       {isMobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex justify-start bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-72 max-w-[85%] h-full bg-[#0E1026] text-white p-5 flex flex-col justify-between shadow-2xl border-r border-white/10 animate-in slide-in-from-left duration-250">
+          <div className="w-72 max-w-[85%] h-full bg-[#0B1528] text-white p-5 flex flex-col justify-between shadow-2xl border-r border-white/10 animate-in slide-in-from-left duration-250">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-white p-1 flex items-center justify-center">
-                    <img src="/ipsur-logo.png" alt="IPSUR" className="w-full h-full object-contain" />
+                  <div className="w-10 h-10 rounded-xl bg-[#0077FF] flex items-center justify-center text-white">
+                    <GraduationCap className="w-6 h-6" />
                   </div>
                   <div>
-                    <span className="text-xs font-black tracking-tight block">IPSUR EDUCORE</span>
-                    <span className="text-[10px] text-pink-300 font-medium">Menú de Navegación</span>
+                    <h3 className="font-display font-bold text-white text-sm">IPSUR Manager</h3>
+                    <p className="text-[10px] text-sky-300">Menú Móvil</p>
                   </div>
                 </div>
-
                 <button
                   onClick={() => setIsMobileOpen(false)}
-                  className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white"
+                  className="p-1.5 rounded-lg text-white/70 hover:bg-white/10"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="space-y-1.5">
+              <nav className="flex flex-col gap-1.5">
                 {menuItems.map(item => {
                   const Icon = item.icon;
+                  const isActive = item.isActive;
                   return (
                     <button
                       key={item.id}
@@ -375,171 +408,95 @@ export default function LeftSidebarMenu() {
                         item.action();
                         setIsMobileOpen(false);
                       }}
-                      className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition ${
-                        item.danger ? 'hover:bg-rose-500/20 text-rose-300' : 'hover:bg-white/10 text-white'
+                      className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition ${
+                        isActive
+                          ? 'bg-[#0077FF] text-white'
+                          : 'text-slate-300 hover:bg-white/10'
                       }`}
                     >
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-tr ${item.color} text-white shadow`}>
+                      <div className="flex items-center gap-3">
                         <Icon className="w-4 h-4" />
+                        <span>{item.label}</span>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold truncate">{item.label}</span>
-                          {item.live && (
-                            <span className="text-[9px] bg-rose-500/30 text-rose-300 px-1.5 rounded border border-rose-400/30 font-bold">
-                              VIVO
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-white/50 block truncate">{item.sublabel}</span>
-                      </div>
+                      {item.hasChevron && <ChevronRight className="w-4 h-4 text-slate-400" />}
                     </button>
                   );
                 })}
-              </div>
+              </nav>
             </div>
 
-            <div className="pt-4 border-t border-white/10 text-[10px] text-white/40 text-center">
-              IPSUR EDUCORE · Campus Virtual Oficial
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 1: CALENDARIO ESCOLAR Y PERIODOS */}
-      <Modal
-        isOpen={calendarModalOpen}
-        onClose={() => setCalendarModalOpen(false)}
-        title="Calendario Oficial y Periodos Escolares"
-        subtitle="Programación oficial del ciclo académico, bimestres y fechas límite institucionales."
-        maxWidth="max-w-2xl"
-      >
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {periods.map(p => (
-              <div 
-                key={p.id}
-                className={`p-4 rounded-2xl border transition ${
-                  p.status === 'Activo'
-                    ? 'bg-gradient-to-br from-indigo-50/70 to-pink-50/70 border-indigo-300 ring-2 ring-indigo-200'
-                    : 'bg-slate-50 border-slate-200'
-                }`}
+            <div className="pt-4 border-t border-white/10">
+              <button
+                onClick={logout}
+                className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-bold text-rose-300 hover:bg-rose-500/20 rounded-xl border border-rose-400/30 transition"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                    p.status === 'Activo' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
-                  }`}>
-                    {p.status}
-                  </span>
-                  <span className="text-[10px] font-semibold text-slate-500">{p.type}</span>
-                </div>
-                <h4 className="text-sm font-bold text-slate-900">{p.name}</h4>
-                <div className="mt-3 space-y-1 text-xs text-slate-600">
-                  <p className="flex items-center justify-between">
-                    <span>Inicio:</span>
-                    <strong className="text-slate-800 font-mono">{p.startDate}</strong>
-                  </p>
-                  <p className="flex items-center justify-between">
-                    <span>Cierre:</span>
-                    <strong className="text-slate-800 font-mono">{p.endDate}</strong>
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 space-y-1.5">
-            <h5 className="font-bold text-slate-800 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-ipsur-pink-500" />
-              <span>Normativa de Plazos y Evaluación Sincrónica</span>
-            </h5>
-            <p className="leading-relaxed">
-              Las fechas de entrega de tareas y evaluaciones cuentan con control de tiempo regresivo estricto. Al concluir la hora límite establecida por el docente o la institución, la plataforma cierra automáticamente el formulario de entrega para garantizar la equidad académica.
-            </p>
+                <LogOut className="w-4 h-4" />
+                <span>Cerrar Sesión</span>
+              </button>
+            </div>
           </div>
         </div>
-      </Modal>
-
-      {/* MODAL 2: FICHA INSTITUCIONAL Y RVOE SEP */}
-      <Modal
-        isOpen={infoModalOpen}
-        onClose={() => setInfoModalOpen(false)}
-        title="Ficha Oficial Institucional"
-        subtitle="Registro de validez oficial, datos de contacto y acreditación ante la autoridad educativa."
-        maxWidth="max-w-2xl"
-      >
-        <div className="space-y-4">
-          <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-            <div className="w-16 h-16 rounded-2xl bg-white p-2 flex items-center justify-center border border-slate-200 shadow-sm flex-shrink-0">
-              <img src="/ipsur-logo.png" alt="IPSUR Logo" className="w-full h-full object-contain" />
-            </div>
-            <div>
-              <h4 className="text-base font-black text-slate-900">
-                {institutionalInfo?.schoolName || 'Instituto Peninsular del Sur'}
-              </h4>
-              <p className="text-xs text-slate-600 font-medium italic">
-                "{institutionalInfo?.schoolMotto || 'La educación es el camino'}"
-              </p>
-              <div className="mt-1.5 flex flex-wrap gap-2 text-[11px]">
-                <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
-                  {institutionalInfo?.rvoe || 'RVOE-SEP-DGB-2024-09882'}
-                </span>
-                <span className="bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded-full">
-                  Validez SEP / DGB
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-              <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-ipsur-pink-500" />
-                <span>Correo de Soporte Técnico:</span>
-              </span>
-              <p className="text-slate-600 font-mono text-[11px]">{institutionalInfo?.supportEmail || 'soporte.educore@ipsur.edu.mx'}</p>
-            </div>
-
-            <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-              <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-ipsur-pink-500" />
-                <span>Atención Telefónica:</span>
-              </span>
-              <p className="text-slate-600 font-mono text-[11px]">{institutionalInfo?.phone || '+52 (998) 845-2100'}</p>
-            </div>
-          </div>
-
-          <div className="p-3.5 bg-blue-50/70 rounded-xl border border-blue-200 text-xs text-blue-900 leading-relaxed">
-            <strong>Campus Virtual Peninsular:</strong> El sistema IPSUR EDUCORE opera bajo los estándares de educación media superior y superior en línea, con firma electrónica de actas y trazabilidad académica en tiempo real.
-          </div>
-        </div>
-      </Modal>
-
-      {/* MODAL 3: CENTRO DE SESIONES VIRTUALES (AULA VIRTUAL Y MEET) */}
-      {targetClassroom && (
-        <VirtualSessionPortalModal
-          isOpen={virtualPortalOpen}
-          onClose={() => setVirtualPortalOpen(false)}
-          classroom={targetClassroom}
-        />
       )}
 
-      {/* MODAL 4: ACTA OFICIAL INSTITUCIONAL (DOCENTES / DIRECTIVOS) */}
-      {targetClassroom && !isStudent && (
-        <InstitutionalActaModal
-          isOpen={actaModalOpen}
-          onClose={() => setActaModalOpen(false)}
-          classroom={targetClassroom}
-        />
-      )}
+      {/* Interactive Service Modals */}
+      <RegisterStudentModal
+        isOpen={registerStudentModalOpen}
+        onClose={() => setRegisterStudentModalOpen(false)}
+      />
 
-      {/* MODAL 5: BOLETA OFICIAL PERSONAL (ALUMNO) */}
-      {isStudent && (
-        <StudentGeneralBoletaModal
-          isOpen={boletaModalOpen}
-          onClose={() => setBoletaModalOpen(false)}
-        />
-      )}
+      <PaymentsAccountingModal
+        isOpen={paymentsModalOpen}
+        onClose={() => setPaymentsModalOpen(false)}
+      />
+
+      <SchedulesModal
+        isOpen={schedulesModalOpen}
+        onClose={() => setSchedulesModalOpen(false)}
+      />
+
+      <AnnouncementsModal
+        isOpen={announcementsModalOpen}
+        onClose={() => setAnnouncementsModalOpen(false)}
+      />
+
+      <PendingProceduresModal
+        isOpen={proceduresModalOpen}
+        onClose={() => setProceduresModalOpen(false)}
+      />
+
+      <SystemTutorialModal
+        isOpen={tutorialModalOpen}
+        onClose={() => setTutorialModalOpen(false)}
+      />
+
+      <RectoriaDirectivaModal
+        isOpen={rectoriaModalOpen}
+        onClose={() => setRectoriaModalOpen(false)}
+        initialTab="rectoria"
+      />
+
+      <RectoriaDirectivaModal
+        isOpen={direccionModalOpen}
+        onClose={() => setDireccionModalOpen(false)}
+        initialTab="direccion"
+      />
+
+      <InstitutionalActaModal
+        isOpen={actaModalOpen}
+        onClose={() => setActaModalOpen(false)}
+        classroom={classrooms[0] || null}
+      />
+
+      <StudentGeneralBoletaModal
+        isOpen={boletaModalOpen}
+        onClose={() => setBoletaModalOpen(false)}
+      />
+
+      <VirtualSessionPortalModal
+        isOpen={virtualPortalOpen}
+        onClose={() => setVirtualPortalOpen(false)}
+        classroom={classrooms[0] || null}
+      />
     </>
   );
 }

@@ -87,10 +87,10 @@ export default function LoginScreen() {
               />
             </div>
             <h1 className="font-display text-2xl sm:text-3xl font-black tracking-tight text-white">
-              IPSUR <span className="bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent">EDUCORE</span>
+              IPSUR <span className="bg-gradient-to-r from-blue-400 to-sky-300 bg-clip-text text-transparent">Manager School</span>
             </h1>
-            <p className="text-[11px] font-bold text-pink-200/90 tracking-widest uppercase mt-1">
-              ACCESO AL CAMPUS VIRTUAL OFICIAL
+            <p className="text-[11px] font-bold text-sky-200/90 tracking-wider uppercase mt-1">
+              Innovación Educativa para un Mejor Futuro
             </p>
           </div>
 
