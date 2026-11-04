@@ -221,9 +221,9 @@ export default function LeftSidebarMenu() {
               isExpanded ? 'justify-start px-2' : 'justify-center'
             }`}>
               {isExpanded ? (
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-ipsur-pink-500 to-indigo-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
-                    <Compass className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-ipsur-pink-500 to-indigo-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
+                    <Compass className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
                     <span className="text-[11px] font-black tracking-wider uppercase text-white/90 truncate block">
@@ -237,10 +237,10 @@ export default function LeftSidebarMenu() {
               ) : (
                 <div 
                   onClick={toggleSidebar}
-                  className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition"
-                  title="Expandir menú lateral"
+                  className="w-8 h-8 rounded-xl bg-gradient-to-tr from-ipsur-pink-500 to-indigo-600 text-white flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-all"
+                  title="Menú Principal (Clic para expandir)"
                 >
-                  <ChevronRight className="w-4 h-4 text-pink-300" />
+                  <Compass className="w-4 h-4 text-white" />
                 </div>
               )}
             </div>
