@@ -5,16 +5,19 @@ import { getDeadlineStatus } from '../utils/dateFormatter';
 
 const AppContext = createContext();
 
-const STORAGE_KEY_CLASSROOMS = 'ipsur_educore_classrooms_v2';
-const STORAGE_KEY_USERS = 'ipsur_educore_users_v2';
-const STORAGE_KEY_USER = 'ipsur_educore_current_user_v2';
+const STORAGE_KEY_CLASSROOMS = 'ipsur_educore_classrooms_v3';
+const STORAGE_KEY_USERS = 'ipsur_educore_users_v3';
+const STORAGE_KEY_USER = 'ipsur_educore_current_user_v3';
 
 export function AppProvider({ children }) {
-  // Purge legacy demo keys if present
+  // Purge legacy demo keys and previous sample data
   useEffect(() => {
     try {
       localStorage.removeItem('ipsur_educore_classrooms_v1');
       localStorage.removeItem('ipsur_educore_current_user_v1');
+      localStorage.removeItem('ipsur_educore_classrooms_v2');
+      localStorage.removeItem('ipsur_educore_users_v2');
+      localStorage.removeItem('ipsur_educore_current_user_v2');
     } catch (e) {
       // Ignore
     }
@@ -37,23 +40,12 @@ export function AppProvider({ children }) {
             }
           }));
 
-          // Guarantee that all official seed users are present in the list
-          const existingIds = new Set(normalized.map(u => u.id));
-          const existingEmails = new Set(normalized.map(u => u.email?.toLowerCase()));
-          
-          const missingSeedUsers = USERS.filter(u => 
-            !existingIds.has(u.id) && !existingEmails.has(u.email?.toLowerCase())
-          );
-
           // Guarantee that the superadmin account is always present with its secret flag and permissions
-          const hasSuperAdmin = normalized.some(u => u.isSuperAdmin || u.role === 'superadmin') || 
-                                missingSeedUsers.some(u => u.isSuperAdmin || u.role === 'superadmin');
-
-          let result = [...missingSeedUsers, ...normalized];
+          const hasSuperAdmin = normalized.some(u => u.isSuperAdmin || u.role === 'superadmin');
           if (!hasSuperAdmin) {
-            result = [USERS[0], ...result];
+            return [USERS[0], ...normalized];
           }
-          return result;
+          return normalized;
         }
       }
     } catch (e) {
