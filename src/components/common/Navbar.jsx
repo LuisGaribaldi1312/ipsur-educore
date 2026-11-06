@@ -194,20 +194,16 @@ export default function Navbar() {
             {/* Right Header Section: Cloud Sync + Notifications + Divider + Profile Info */}
             <div className="flex items-center gap-2.5 sm:gap-4">
               
-              {/* Decentralized P2P Mesh Real-Time Sync Indicator */}
+              {/* Real-Time Cloud & P2P Sync Indicator */}
               <button
                 type="button"
                 onClick={() => setP2PModalOpen(true)}
                 className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer border bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
-                title="Red P2P Descentralizada: Sincronización WebRTC en tiempo real directa entre dispositivos (PC, Celular, Tablet) sin servidores ni bases de datos externas"
+                title="Sincronización en Tiempo Real Activa: Los datos se actualizan automáticamente entre tu Laptop (Wi-Fi) y Celular (Datos Móviles 4G/5G)"
               >
-                <span className={`w-2 h-2 rounded-full ${p2pPeersCount > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-blue-500'}`} />
-                <Share2 className="w-3.5 h-3.5 text-ipsur-pink-600" />
-                <span>
-                  {p2pPeersCount > 0 
-                    ? `Red P2P (${p2pPeersCount} ${p2pPeersCount === 1 ? 'dispositivo' : 'dispositivos'})`
-                    : 'Red P2P (Activa)'}
-                </span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <Cloud className="w-3.5 h-3.5 text-ipsur-pink-600" />
+                <span>Sincronización en Vivo</span>
               </button>
 
               {/* Notifications Bell */}
