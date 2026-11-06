@@ -333,22 +333,22 @@ export function AppProvider({ children }) {
     const unsubscribe = subscribeToCloudData((cloudData) => {
       if (!cloudData) return;
       if (Array.isArray(cloudData.users) && cloudData.users.length > 0) {
-        setUsers(prev => mergeEntities(prev, cloudData.users));
+        setUsers(cloudData.users);
       }
       if (Array.isArray(cloudData.classrooms) && cloudData.classrooms.length > 0) {
-        setClassrooms(prev => mergeClassrooms(prev, cloudData.classrooms));
+        setClassrooms(cloudData.classrooms);
       }
-      if (Array.isArray(cloudData.activities) && cloudData.activities.length > 0) {
-        setActivities(prev => mergeEntities(prev, cloudData.activities));
+      if (Array.isArray(cloudData.activities)) {
+        setActivities(cloudData.activities);
       }
-      if (Array.isArray(cloudData.payments) && cloudData.payments.length > 0) {
-        setPayments(prev => mergeEntities(prev, cloudData.payments));
+      if (Array.isArray(cloudData.payments)) {
+        setPayments(cloudData.payments);
       }
-      if (Array.isArray(cloudData.procedures) && cloudData.procedures.length > 0) {
-        setProcedures(prev => mergeEntities(prev, cloudData.procedures));
+      if (Array.isArray(cloudData.procedures)) {
+        setProcedures(cloudData.procedures);
       }
-      if (Array.isArray(cloudData.notifications) && cloudData.notifications.length > 0) {
-        setNotificationsList(prev => mergeEntities(prev, cloudData.notifications));
+      if (Array.isArray(cloudData.notifications)) {
+        setNotificationsList(cloudData.notifications);
       }
     });
 

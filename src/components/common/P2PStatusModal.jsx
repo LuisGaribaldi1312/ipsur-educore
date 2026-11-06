@@ -2,7 +2,6 @@ import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   Wifi, 
-  WifiOff, 
   Smartphone, 
   Laptop, 
   Users, 
@@ -12,10 +11,12 @@ import {
   ShieldCheck, 
   X, 
   Share2, 
-  HardDrive,
-  Sparkles,
-  CheckCircle2
+  Cloud,
+  CheckCircle2,
+  Globe,
+  Sparkles
 } from 'lucide-react';
+import { uploadAllLocalDataToCloud } from '../../services/firebaseSync';
 
 export default function P2PStatusModal() {
   const { 
@@ -28,14 +29,24 @@ export default function P2PStatusModal() {
     classrooms,
     payments,
     activities,
+    notificationsList,
+    procedures,
     showToast 
   } = useApp();
 
   if (!p2pModalOpen) return null;
 
-  const handleForceSync = () => {
+  const handleForceSync = async () => {
     syncP2PManually();
-    showToast('Sincronización P2P Enviada', 'Transmitiendo estado local a todos los dispositivos conectados en la red.', 'info');
+    await uploadAllLocalDataToCloud({
+      users,
+      classrooms,
+      activities,
+      notificationsList,
+      procedures,
+      payments
+    });
+    showToast('Sincronización Completa', 'Todos tus datos locales se han subido a la nube y transmitido a los dispositivos.', 'success');
   };
 
   return (
@@ -53,26 +64,26 @@ export default function P2PStatusModal() {
 
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-2xl bg-white/15 p-2 flex items-center justify-center border border-white/20">
-              <Share2 className="w-6 h-6 text-pink-300" />
+              <Cloud className="w-6 h-6 text-pink-300" />
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-widest bg-white/15 px-2.5 py-0.5 rounded-full border border-white/15 text-pink-200">
-                Red Descentralizada WebRTC
+                Google Cloud & WebRTC Mesh
               </span>
               <h2 className="text-xl font-bold text-white mt-0.5">
-                Sincronización P2P entre Dispositivos
+                Sincronización en Tiempo Real
               </h2>
             </div>
           </div>
           <p className="text-xs text-indigo-100/90 leading-relaxed max-w-md">
-            Todos los datos se almacenan en tu dispositivo y se sincronizan directamente de celular a computadora sin depender de servidores o bases de datos externas.
+            Sincronización continua de datos entre Celulares (4G/5G) y Laptops (Wi-Fi) con respaldo instantáneo en la nube y persistencia local en tu equipo.
           </p>
         </div>
 
         {/* Body Content */}
         <div className="p-5 sm:p-6 space-y-4 overflow-y-auto">
           
-          {/* Realtime Status Badge */}
+          {/* Cloud Realtime Status Badge */}
           <div className="p-4 rounded-2xl border bg-emerald-50/90 border-emerald-200 text-emerald-950 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="relative flex h-3.5 w-3.5 flex-shrink-0">
@@ -81,12 +92,10 @@ export default function P2PStatusModal() {
               </span>
               <div>
                 <strong className="text-sm font-bold block">
-                  Red P2P Activa y Operando
+                  Nube de Google Conectada (En Línea)
                 </strong>
                 <span className="text-xs text-emerald-800">
-                  {p2pPeersCount > 0 
-                    ? `${p2pPeersCount} dispositivo(s) conectado(s) en tiempo real`
-                    : 'Buscando dispositivos en la red local/remota...'}
+                  Base de datos: ipsur-educore-20c1f · Reglas activas
                 </span>
               </div>
             </div>
@@ -94,7 +103,7 @@ export default function P2PStatusModal() {
             <button
               onClick={handleForceSync}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-white text-emerald-800 border border-emerald-300 rounded-xl shadow-xs hover:bg-emerald-100 transition cursor-pointer"
-              title="Transmitir estado a la red"
+              title="Forzar actualización completa"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Sincronizar</span>
@@ -104,7 +113,7 @@ export default function P2PStatusModal() {
           {/* Local Storage Metrics Grid */}
           <div className="space-y-1.5">
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-              Almacenamiento Local en este Dispositivo
+              Datos Sincronizados en este Dispositivo
             </span>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
               <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-xl">
@@ -130,23 +139,17 @@ export default function P2PStatusModal() {
             </div>
           </div>
 
-          {/* How P2P Works Guide */}
+          {/* Cross-Network explanation */}
           <div className="bg-indigo-50/70 border border-indigo-200/80 rounded-2xl p-4 text-xs text-indigo-950 space-y-2">
             <h4 className="font-bold flex items-center gap-2 text-indigo-900">
-              <ShieldCheck className="w-4 h-4 text-ipsur-pink-600" />
-              <span>¿Cómo funciona el protocolo P2P Gossip?</span>
+              <Globe className="w-4 h-4 text-ipsur-pink-600" />
+              <span>Compatibilidad Multi-Dispositivo y Multi-Red</span>
             </h4>
             <ul className="space-y-1.5 text-[11px] text-indigo-900/90 leading-relaxed list-disc list-inside">
-              <li><strong>Local-First:</strong> Todos los cambios se guardan primero en la memoria segura de tu dispositivo, funcionando incluso sin internet.</li>
-              <li><strong>Intercambio automático:</strong> En cuanto otro dispositivo (como tu celular) abre el portal, se conecta por WebRTC con los demás equipos activos y se transfieren las novedades en milisegundos.</li>
-              <li><strong>Dispositivos apagados:</strong> Si tu celular estaba apagado, al encenderse y abrir el portal recibe todas las actividades y usuarios generados por los demás equipos.</li>
+              <li><strong>Celulares en Datos Móviles (4G/5G):</strong> Se comunican con la nube sin bloqueos de operadora (Telcel, AT&T, Movistar).</li>
+              <li><strong>Laptops en Wi-Fi:</strong> Se actualizan automáticamente en tiempo real en cuanto realizas cualquier cambio en tu teléfono o viceversa.</li>
+              <li><strong>Dispositivos apagados:</strong> Toda la información permanece guardada en la nube; al encender tu equipo y abrir el portal, se descarga de inmediato.</li>
             </ul>
-          </div>
-
-          {/* Device ID */}
-          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-            <span>ID de Nodo WebRTC:</span>
-            <span className="font-bold text-slate-700 truncate max-w-[200px]">{p2pSelfId || 'Iniciando...'}</span>
           </div>
 
           {/* Footer Action */}
@@ -155,7 +158,7 @@ export default function P2PStatusModal() {
               onClick={() => setP2PModalOpen(false)}
               className="px-5 py-2 text-xs font-bold text-white bg-ipsur-navy-700 hover:bg-ipsur-navy-800 rounded-xl shadow transition cursor-pointer"
             >
-              Entendido
+              Cerrar
             </button>
           </div>
 

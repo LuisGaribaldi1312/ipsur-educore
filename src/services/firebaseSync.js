@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getDatabase, ref, set, get, onValue, update, remove } from 'firebase/database';
+import { mergeEntities, mergeClassrooms } from './p2pSync';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAEyM8ValXbGXbAqE6H2KuY-xo5nUr_ElU",
@@ -32,40 +33,45 @@ export const DB_PATHS = {
   PAYMENTS: 'ipsur/payments'
 };
 
+export const ensureArray = (val) => {
+  if (!val) return [];
+  if (Array.isArray(val)) return val.filter(Boolean);
+  return Object.values(val).filter(Boolean);
+};
+
 /**
- * Uploads all local data to Firebase Realtime Database if cloud is empty or merges them
+ * Uploads all local data to Firebase Realtime Database and reconciles bidirectionally
  */
 export async function uploadAllLocalDataToCloud(localData) {
   if (!db) return;
   try {
     const snapshot = await get(ref(db, 'ipsur'));
-    const cloudVal = snapshot.val();
+    const cloudVal = snapshot.val() || {};
 
-    if (!cloudVal) {
-      // Cloud is completely empty, populate with local state
-      console.log('[IPSUR Firebase] Base de datos vacía, inicializando datos locales...');
-      await set(ref(db, 'ipsur'), {
-        users: localData.users || [],
-        classrooms: localData.classrooms || [],
-        activities: localData.activities || [],
-        notifications: localData.notificationsList || [],
-        procedures: localData.procedures || [],
-        payments: localData.payments || [],
-        lastUpdated: new Date().toISOString()
-      });
-    } else {
-      // Cloud already has data: ensure users or classrooms are not missing
-      const updates = {};
-      if (Array.isArray(localData.users) && localData.users.length > 0 && (!cloudVal.users || cloudVal.users.length === 0)) {
-        updates['ipsur/users'] = localData.users;
-      }
-      if (Array.isArray(localData.classrooms) && localData.classrooms.length > 0 && (!cloudVal.classrooms || cloudVal.classrooms.length === 0)) {
-        updates['ipsur/classrooms'] = localData.classrooms;
-      }
-      if (Object.keys(updates).length > 0) {
-        await update(ref(db), updates);
-      }
-    }
+    const cloudUsers = ensureArray(cloudVal.users);
+    const cloudClassrooms = ensureArray(cloudVal.classrooms);
+    const cloudActivities = ensureArray(cloudVal.activities);
+    const cloudPayments = ensureArray(cloudVal.payments);
+    const cloudProcedures = ensureArray(cloudVal.procedures);
+    const cloudNotifications = ensureArray(cloudVal.notifications);
+
+    const mergedUsers = mergeEntities(cloudUsers, ensureArray(localData.users));
+    const mergedClassrooms = mergeClassrooms(cloudClassrooms, ensureArray(localData.classrooms));
+    const mergedActivities = mergeEntities(cloudActivities, ensureArray(localData.activities));
+    const mergedPayments = mergeEntities(cloudPayments, ensureArray(localData.payments));
+    const mergedProcedures = mergeEntities(cloudProcedures, ensureArray(localData.procedures));
+    const mergedNotifications = mergeEntities(cloudNotifications, ensureArray(localData.notificationsList));
+
+    await set(ref(db, 'ipsur'), {
+      users: mergedUsers,
+      classrooms: mergedClassrooms,
+      activities: mergedActivities,
+      payments: mergedPayments,
+      procedures: mergedProcedures,
+      notifications: mergedNotifications,
+      lastUpdated: new Date().toISOString()
+    });
+    console.log('[IPSUR Firebase] Sincronización bidireccional completada con la nube.');
   } catch (error) {
     console.warn('[IPSUR Firebase] Aviso al sincronizar datos iniciales:', error.message);
   }
@@ -81,7 +87,14 @@ export function subscribeToCloudData(onDataMerged) {
     const unsubscribe = onValue(ipsurRef, (snapshot) => {
       const data = snapshot.val();
       if (data && onDataMerged) {
-        onDataMerged(data);
+        onDataMerged({
+          users: ensureArray(data.users),
+          classrooms: ensureArray(data.classrooms),
+          activities: ensureArray(data.activities),
+          payments: ensureArray(data.payments),
+          procedures: ensureArray(data.procedures),
+          notifications: ensureArray(data.notifications)
+        });
       }
     }, (error) => {
       console.warn('[IPSUR Firebase] Permisos o error en suscripción:', error.message);
@@ -100,10 +113,7 @@ export async function syncClassroomToCloud(classroom) {
   if (!db || !classroom?.id) return;
   try {
     const snapshot = await get(ref(db, DB_PATHS.CLASSROOMS));
-    let classrooms = snapshot.val() || [];
-    if (!Array.isArray(classrooms)) {
-      classrooms = Object.values(classrooms);
-    }
+    let classrooms = ensureArray(snapshot.val());
     const index = classrooms.findIndex(c => c && c.id === classroom.id);
     if (index >= 0) {
       classrooms[index] = classroom;
@@ -123,9 +133,7 @@ export async function deleteClassroomFromCloud(classroomId) {
   if (!db || !classroomId) return;
   try {
     const snapshot = await get(ref(db, DB_PATHS.CLASSROOMS));
-    let classrooms = snapshot.val() || [];
-    if (!Array.isArray(classrooms)) classrooms = Object.values(classrooms);
-    classrooms = classrooms.filter(c => c && c.id !== classroomId);
+    let classrooms = ensureArray(snapshot.val()).filter(c => c && c.id !== classroomId);
     await set(ref(db, DB_PATHS.CLASSROOMS), classrooms);
   } catch (error) {
     console.warn('[IPSUR Firebase] Error eliminando sala de la nube:', error.message);
@@ -139,8 +147,7 @@ export async function syncUserToCloud(user) {
   if (!db || !user?.id) return;
   try {
     const snapshot = await get(ref(db, DB_PATHS.USERS));
-    let users = snapshot.val() || [];
-    if (!Array.isArray(users)) users = Object.values(users);
+    let users = ensureArray(snapshot.val());
     const index = users.findIndex(u => u && u.id === user.id);
     if (index >= 0) {
       users[index] = user;
@@ -160,9 +167,7 @@ export async function deleteUserFromCloud(userId) {
   if (!db || !userId) return;
   try {
     const snapshot = await get(ref(db, DB_PATHS.USERS));
-    let users = snapshot.val() || [];
-    if (!Array.isArray(users)) users = Object.values(users);
-    users = users.filter(u => u && u.id !== userId);
+    let users = ensureArray(snapshot.val()).filter(u => u && u.id !== userId);
     await set(ref(db, DB_PATHS.USERS), users);
   } catch (error) {
     console.warn('[IPSUR Firebase] Error eliminando usuario:', error.message);
@@ -176,8 +181,7 @@ export async function syncItemToCloud(path, item) {
   if (!db || !item?.id) return;
   try {
     const snapshot = await get(ref(db, path));
-    let list = snapshot.val() || [];
-    if (!Array.isArray(list)) list = Object.values(list);
+    let list = ensureArray(snapshot.val());
     const index = list.findIndex(i => i && i.id === item.id);
     if (index >= 0) {
       list[index] = item;
