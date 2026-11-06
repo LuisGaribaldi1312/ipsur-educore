@@ -14,20 +14,13 @@ import {
 import { validateCriteria } from '../utils/calculations';
 import { getDeadlineStatus } from '../utils/dateFormatter';
 import { 
-  isFirebaseConfigured, 
-  saveFirebaseConfig, 
-  firebaseConfig 
-} from '../firebase/config';
-import { 
-  uploadAllLocalDataToCloud,
-  subscribeToUsers, 
-  subscribeToClassrooms, 
-  syncUserToCloud, 
-  syncClassroomToCloud, 
-  deleteClassroomFromCloud,
-  syncItemToCloud,
-  PATHS 
-} from '../services/firebaseSync';
+  initP2PMesh,
+  broadcastMutation,
+  mergeEntities,
+  mergeClassrooms,
+  triggerManualSync,
+  getPeerId
+} from '../services/p2pSync';
 
 const AppContext = createContext();
 
@@ -123,7 +116,9 @@ export function AppProvider({ children }) {
   const [notification, setNotification] = useState(null);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [userManagerModalOpen, setUserManagerModalOpen] = useState(false);
-  const [firebaseModalOpen, setFirebaseModalOpen] = useState(false);
+  const [p2pModalOpen, setP2PModalOpen] = useState(false);
+  const [p2pPeersCount, setP2PPeersCount] = useState(0);
+  const [p2pSelfId, setP2PSelfId] = useState('');
 
   // IPSUR EDUCORE live services datasets (Zero demo data)
   const [activities, setActivities] = useState(() => {
@@ -177,13 +172,13 @@ export function AppProvider({ children }) {
   const addActivity = (act) => {
     const newAct = { id: `act-${Date.now()}`, time: 'Hoy, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' h', ...act };
     setActivities(prev => [newAct, ...prev]);
-    syncItemToCloud(PATHS.ACTIVITIES, newAct);
+    broadcastMutation('ACTIVITY_ADDED', newAct);
   };
 
   const addPayment = (payment) => {
     const newPay = { id: `pay-${Date.now()}`, date: 'Hoy, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' h', status: 'Completado', ...payment };
     setPayments(prev => [newPay, ...prev]);
-    syncItemToCloud(PATHS.PAYMENTS, newPay);
+    broadcastMutation('PAYMENT_ADDED', newPay);
     addActivity({
       type: 'payment',
       title: 'Pago recibido',
@@ -198,7 +193,7 @@ export function AppProvider({ children }) {
     setProcedures(prev => prev.map(p => {
       if (p.id !== procId) return p;
       const updated = { ...p, status: newStatus };
-      syncItemToCloud(PATHS.PROCEDURES, updated);
+      broadcastMutation('PROCEDURE_UPDATED', updated);
       return updated;
     }));
     showToast('Trámite Actualizado', `El estado del trámite cambió a: ${newStatus}`, 'info');
@@ -245,36 +240,66 @@ export function AppProvider({ children }) {
     }
   }, [currentUserId]);
 
-  // Real-time Cloud Sync with Firebase Realtime Database across all devices (PC, Phone, Tablet)
+  // Real-time Decentralized P2P Mesh Sync between devices (PC <-> Phone <-> Tablet)
   useEffect(() => {
-    if (isFirebaseConfigured) {
-      // Sync and merge ALL existing local data into the cloud
-      uploadAllLocalDataToCloud({
+    initP2PMesh({
+      getCurrentState: () => ({
         users,
         classrooms,
         activities,
-        notifications: notificationsList,
+        notificationsList,
         procedures,
         payments
-      });
+      }),
+      onMergeState: (payload, senderId, isMutation = false) => {
+        if (!payload) return;
 
-      const unsubUsers = subscribeToUsers((cloudUsers) => {
-        if (Array.isArray(cloudUsers) && cloudUsers.length > 0) {
-          setUsers(cloudUsers);
+        if (isMutation) {
+          const { type, data } = payload;
+          if (type === 'USER_CREATED' || type === 'USER_UPDATED') {
+            setUsers(prev => mergeEntities(prev, [data]));
+          } else if (type === 'USER_DELETED') {
+            setUsers(prev => prev.filter(u => u.id !== data.id));
+          } else if (type === 'CLASSROOM_CREATED' || type === 'CLASSROOM_UPDATED') {
+            setClassrooms(prev => mergeClassrooms(prev, [data]));
+          } else if (type === 'CLASSROOM_DELETED') {
+            setClassrooms(prev => prev.filter(c => c.id !== data.id));
+          } else if (type === 'PAYMENT_ADDED') {
+            setPayments(prev => mergeEntities(prev, [data]));
+          } else if (type === 'ACTIVITY_ADDED') {
+            setActivities(prev => mergeEntities(prev, [data]));
+          } else if (type === 'PROCEDURE_UPDATED') {
+            setProcedures(prev => mergeEntities(prev, [data]));
+          }
+        } else {
+          // Full gossip synchronization with connected peer
+          if (Array.isArray(payload.users) && payload.users.length > 0) {
+            setUsers(prev => mergeEntities(prev, payload.users));
+          }
+          if (Array.isArray(payload.classrooms) && payload.classrooms.length > 0) {
+            setClassrooms(prev => mergeClassrooms(prev, payload.classrooms));
+          }
+          if (Array.isArray(payload.activities) && payload.activities.length > 0) {
+            setActivities(prev => mergeEntities(prev, payload.activities));
+          }
+          if (Array.isArray(payload.payments) && payload.payments.length > 0) {
+            setPayments(prev => mergeEntities(prev, payload.payments));
+          }
+          if (Array.isArray(payload.procedures) && payload.procedures.length > 0) {
+            setProcedures(prev => mergeEntities(prev, payload.procedures));
+          }
+          if (Array.isArray(payload.notificationsList) && payload.notificationsList.length > 0) {
+            setNotificationsList(prev => mergeEntities(prev, payload.notificationsList));
+          }
         }
-      });
+      },
+      onPeersChange: (count) => {
+        setP2PPeersCount(count);
+        setP2PSelfId(getPeerId());
+      }
+    });
 
-      const unsubClassrooms = subscribeToClassrooms((cloudClassrooms) => {
-        if (Array.isArray(cloudClassrooms) && cloudClassrooms.length > 0) {
-          setClassrooms(cloudClassrooms);
-        }
-      });
-
-      return () => {
-        unsubUsers();
-        unsubClassrooms();
-      };
-    }
+    setP2PSelfId(getPeerId());
   }, []);
 
   // Clean up timer on unmount
@@ -449,7 +474,7 @@ export function AppProvider({ children }) {
     };
 
     setUsers(prev => [newUser, ...prev]);
-    syncUserToCloud(newUser);
+    broadcastMutation('USER_CREATED', newUser);
     showToast('Usuario Creado', `El usuario ${newUser.name} ha sido dado de alta exitosamente con rol de ${newUser.title}.`);
     return newUser;
   };
@@ -477,11 +502,12 @@ export function AppProvider({ children }) {
       permissions: {
         ...(target.permissions || DEFAULT_ROLE_PERMISSIONS[target.role] || {}),
         ...(updatedFields.permissions || {})
-      }
+      },
+      updatedAt: new Date().toISOString()
     };
 
     setUsers(prev => prev.map(u => (u.id === userId ? updatedUser : u)));
-    syncUserToCloud(updatedUser);
+    broadcastMutation('USER_UPDATED', updatedUser);
 
     showToast('Usuario Actualizado', 'Los datos y permisos del usuario han sido guardados.');
     return true;
@@ -509,6 +535,7 @@ export function AppProvider({ children }) {
     }
 
     setUsers(prev => prev.filter(u => u.id !== userId));
+    broadcastMutation('USER_DELETED', { id: userId });
     showToast('Usuario Eliminado', `El usuario ${target.name} ha sido eliminado permanentemente.`);
     return true;
   };
@@ -530,10 +557,9 @@ export function AppProvider({ children }) {
     }
 
     const newStatus = target.status === 'inactive' ? 'active' : 'inactive';
-    setUsers(prev => prev.map(u => {
-      if (u.id !== userId) return u;
-      return { ...u, status: newStatus };
-    }));
+    const updatedUser = { ...target, status: newStatus, updatedAt: new Date().toISOString() };
+    setUsers(prev => prev.map(u => (u.id === userId ? updatedUser : u)));
+    broadcastMutation('USER_UPDATED', updatedUser);
 
     showToast(
       'Estado Actualizado',
@@ -636,7 +662,7 @@ export function AppProvider({ children }) {
     };
 
     setClassrooms(prev => [newClassroom, ...prev]);
-    syncClassroomToCloud(newClassroom);
+    broadcastMutation('CLASSROOM_CREATED', newClassroom);
     showToast('Sala creada con éxito', `La sala "${name}" ha sido creada con código ${cleanCode}.`);
     return newClassroom;
   };
@@ -671,7 +697,7 @@ export function AppProvider({ children }) {
         periodName: updatedFields.periodName || periodName,
         updatedAt: new Date().toISOString()
       };
-      syncClassroomToCloud(updated);
+      broadcastMutation('CLASSROOM_UPDATED', updated);
       return updated;
     }));
 
@@ -692,7 +718,7 @@ export function AppProvider({ children }) {
           uploadedAt: new Date().toISOString()
         }
       };
-      syncClassroomToCloud(updated);
+      broadcastMutation('CLASSROOM_UPDATED', updated);
       return updated;
     }));
     showToast('Rúbrica y Temario actualizados', 'El temario oficial de la sala ha sido actualizado correctamente.');
@@ -706,7 +732,7 @@ export function AppProvider({ children }) {
         ...cls,
         enrolledStudentIds: studentIds
       };
-      syncClassroomToCloud(updated);
+      broadcastMutation('CLASSROOM_UPDATED', updated);
       return updated;
     }));
     showToast('Matrícula actualizada', `Se han asignado ${studentIds.length} estudiantes a la sala.`);
@@ -732,7 +758,7 @@ export function AppProvider({ children }) {
           participation: Number(criteriaValues.participation)
         }
       };
-      syncClassroomToCloud(updated);
+      broadcastMutation('CLASSROOM_UPDATED', updated);
       return updated;
     }));
 
@@ -772,7 +798,7 @@ export function AppProvider({ children }) {
         ...cls,
         activities: [newActivity, ...cls.activities]
       };
-      syncClassroomToCloud(updated);
+      broadcastMutation('CLASSROOM_UPDATED', updated);
       return updated;
     }));
 
@@ -802,7 +828,7 @@ export function AppProvider({ children }) {
         ...cls,
         materials: [newMaterial, ...cls.materials]
       };
-      syncClassroomToCloud(updated);
+      broadcastMutation('CLASSROOM_UPDATED', updated);
       return updated;
     }));
 
@@ -860,7 +886,7 @@ export function AppProvider({ children }) {
         ...cls,
         submissions: newSubmissions
       };
-      syncClassroomToCloud(updated);
+      broadcastMutation('CLASSROOM_UPDATED', updated);
       return updated;
     }));
 
@@ -893,7 +919,7 @@ export function AppProvider({ children }) {
         ...cls,
         submissions: updatedSubmissions
       };
-      syncClassroomToCloud(updated);
+      broadcastMutation('CLASSROOM_UPDATED', updated);
       return updated;
     }));
 
@@ -919,7 +945,7 @@ export function AppProvider({ children }) {
           }
         }
       };
-      syncClassroomToCloud(updated);
+      broadcastMutation('CLASSROOM_UPDATED', updated);
       return updated;
     }));
 
@@ -938,12 +964,23 @@ export function AppProvider({ children }) {
         },
         roomLink: sessionData.link || cls.roomLink
       };
-      syncClassroomToCloud(updated);
+      broadcastMutation('CLASSROOM_UPDATED', updated);
       return updated;
     }));
 
     showToast('Sesión Virtual Actualizada', 'La configuración de la videoconferencia ha sido guardada.');
     return true;
+  };
+
+  const syncP2PManually = () => {
+    return triggerManualSync(() => ({
+      users,
+      classrooms,
+      activities,
+      notificationsList,
+      procedures,
+      payments
+    }));
   };
 
   return (
@@ -992,11 +1029,11 @@ export function AppProvider({ children }) {
         payments,
         addPayment,
         academicStats: ACADEMIC_STATS,
-        firebaseModalOpen,
-        setFirebaseModalOpen,
-        isFirebaseConfigured,
-        saveFirebaseConfig,
-        firebaseConfig
+        p2pModalOpen,
+        setP2PModalOpen,
+        p2pPeersCount,
+        p2pSelfId,
+        syncP2PManually
       }}
     >
       {children}

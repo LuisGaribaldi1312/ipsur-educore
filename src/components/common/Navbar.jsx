@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import LiveClock from './LiveClock';
 import UserManagerModal from '../admin/UserManagerModal';
 import LoginModal from '../auth/LoginModal';
-import FirebaseConfigModal from './FirebaseConfigModal';
+import P2PStatusModal from './P2PStatusModal';
 import { 
   GraduationCap, 
   Users, 
@@ -30,7 +30,9 @@ import {
   KeyRound, 
   Lock,
   Cloud,
-  CloudOff
+  CloudOff,
+  Share2,
+  Wifi
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -50,8 +52,8 @@ export default function Navbar() {
     setUserManagerModalOpen,
     logout,
     isSuperAdmin,
-    isFirebaseConfigured,
-    setFirebaseModalOpen
+    p2pPeersCount,
+    setP2PModalOpen
   } = useApp();
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -192,22 +194,20 @@ export default function Navbar() {
             {/* Right Header Section: Cloud Sync + Notifications + Divider + Profile Info */}
             <div className="flex items-center gap-2.5 sm:gap-4">
               
-              {/* Cloud Real-Time Sync Indicator Button */}
+              {/* Decentralized P2P Mesh Real-Time Sync Indicator */}
               <button
                 type="button"
-                onClick={() => setFirebaseModalOpen(true)}
-                className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer border ${
-                  isFirebaseConfigured
-                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
-                    : 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100 animate-pulse'
-                }`}
-                title={isFirebaseConfigured 
-                  ? "Sincronización en la Nube Activa (Firebase Firestore): Los datos se sincronizan en tiempo real entre tu PC, celular y tablet" 
-                  : "Modo Local: Haz clic para vincular Firebase Firestore y sincronizar datos en tiempo real con tu celular"}
+                onClick={() => setP2PModalOpen(true)}
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer border bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
+                title="Red P2P Descentralizada: Sincronización WebRTC en tiempo real directa entre dispositivos (PC, Celular, Tablet) sin servidores ni bases de datos externas"
               >
-                <span className={`w-2 h-2 rounded-full ${isFirebaseConfigured ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                <Cloud className="w-3.5 h-3.5 text-ipsur-pink-600" />
-                <span>{isFirebaseConfigured ? 'Nube Activa' : 'Vincular Nube (Celular)'}</span>
+                <span className={`w-2 h-2 rounded-full ${p2pPeersCount > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-blue-500'}`} />
+                <Share2 className="w-3.5 h-3.5 text-ipsur-pink-600" />
+                <span>
+                  {p2pPeersCount > 0 
+                    ? `Red P2P (${p2pPeersCount} ${p2pPeersCount === 1 ? 'dispositivo' : 'dispositivos'})`
+                    : 'Red P2P (Activa)'}
+                </span>
               </button>
 
               {/* Notifications Bell */}
@@ -326,12 +326,12 @@ export default function Navbar() {
                         <button
                           onClick={() => {
                             setProfileMenuOpen(false);
-                            setFirebaseModalOpen(true);
+                            setP2PModalOpen(true);
                           }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-xl transition cursor-pointer"
                         >
-                          <Cloud className="w-4 h-4 text-ipsur-pink-600" />
-                          <span>Sincronización Cloud (Firebase)</span>
+                          <Share2 className="w-4 h-4 text-ipsur-pink-600" />
+                          <span>Red P2P entre Dispositivos</span>
                         </button>
                       )}
 
@@ -391,7 +391,7 @@ export default function Navbar() {
         onClose={() => setLoginModalOpen(false)}
       />
 
-      <FirebaseConfigModal />
+      <P2PStatusModal />
     </>
   );
 }
