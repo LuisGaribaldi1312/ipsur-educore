@@ -24,7 +24,9 @@ import {
   subscribeToClassrooms, 
   syncUserToCloud, 
   syncClassroomToCloud, 
-  deleteClassroomFromCloud 
+  deleteClassroomFromCloud,
+  syncItemToCloud,
+  PATHS 
 } from '../services/firebaseSync';
 
 const AppContext = createContext();
@@ -173,11 +175,15 @@ export function AppProvider({ children }) {
   }, [activities, notificationsList, procedures, payments]);
 
   const addActivity = (act) => {
-    setActivities(prev => [{ id: `act-${Date.now()}`, time: 'Hoy, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' h', ...act }, ...prev]);
+    const newAct = { id: `act-${Date.now()}`, time: 'Hoy, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' h', ...act };
+    setActivities(prev => [newAct, ...prev]);
+    syncItemToCloud(PATHS.ACTIVITIES, newAct);
   };
 
   const addPayment = (payment) => {
-    setPayments(prev => [{ id: `pay-${Date.now()}`, date: 'Hoy, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' h', status: 'Completado', ...payment }, ...prev]);
+    const newPay = { id: `pay-${Date.now()}`, date: 'Hoy, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' h', status: 'Completado', ...payment };
+    setPayments(prev => [newPay, ...prev]);
+    syncItemToCloud(PATHS.PAYMENTS, newPay);
     addActivity({
       type: 'payment',
       title: 'Pago recibido',
@@ -189,7 +195,12 @@ export function AppProvider({ children }) {
   };
 
   const updateProcedureStatus = (procId, newStatus) => {
-    setProcedures(prev => prev.map(p => p.id === procId ? { ...p, status: newStatus } : p));
+    setProcedures(prev => prev.map(p => {
+      if (p.id !== procId) return p;
+      const updated = { ...p, status: newStatus };
+      syncItemToCloud(PATHS.PROCEDURES, updated);
+      return updated;
+    }));
     showToast('Trámite Actualizado', `El estado del trámite cambió a: ${newStatus}`, 'info');
   };
 
@@ -234,11 +245,18 @@ export function AppProvider({ children }) {
     }
   }, [currentUserId]);
 
-  // Real-time Cloud Sync with Firebase Firestore across all devices (PC, Phone, Tablet)
+  // Real-time Cloud Sync with Firebase Realtime Database across all devices (PC, Phone, Tablet)
   useEffect(() => {
     if (isFirebaseConfigured) {
-      // Sync all existing local users and classrooms to cloud Firestore
-      uploadAllLocalDataToCloud(users, classrooms);
+      // Sync and merge ALL existing local data into the cloud
+      uploadAllLocalDataToCloud({
+        users,
+        classrooms,
+        activities,
+        notifications: notificationsList,
+        procedures,
+        payments
+      });
 
       const unsubUsers = subscribeToUsers((cloudUsers) => {
         if (Array.isArray(cloudUsers) && cloudUsers.length > 0) {
