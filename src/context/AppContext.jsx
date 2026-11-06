@@ -20,6 +20,7 @@ import {
 } from '../firebase/config';
 import { 
   seedInitialCloudDataIfEmpty, 
+  uploadAllLocalDataToCloud,
   subscribeToUsers, 
   subscribeToClassrooms, 
   syncUserToCloud, 
@@ -237,7 +238,8 @@ export function AppProvider({ children }) {
   // Real-time Cloud Sync with Firebase Firestore across all devices (PC, Phone, Tablet)
   useEffect(() => {
     if (isFirebaseConfigured) {
-      seedInitialCloudDataIfEmpty(USERS, INITIAL_CLASSROOMS);
+      // Sync all existing local users and classrooms to cloud Firestore
+      uploadAllLocalDataToCloud(users, classrooms);
 
       const unsubUsers = subscribeToUsers((cloudUsers) => {
         if (Array.isArray(cloudUsers) && cloudUsers.length > 0) {

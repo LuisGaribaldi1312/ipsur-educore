@@ -14,6 +14,42 @@ const USERS_COLLECTION = 'ipsur_users';
 const CLASSROOMS_COLLECTION = 'ipsur_classrooms';
 
 /**
+ * Uploads all existing local data (including any users/classrooms created on this PC)
+ * to Firestore so they are immediately available on phones and other devices.
+ */
+export async function uploadAllLocalDataToCloud(localUsers = [], localClassrooms = []) {
+  if (!isFirebaseConfigured || !db) return;
+
+  try {
+    const batch = writeBatch(db);
+    let count = 0;
+
+    localUsers.forEach(u => {
+      if (u?.id) {
+        const ref = doc(db, USERS_COLLECTION, String(u.id));
+        batch.set(ref, u, { merge: true });
+        count++;
+      }
+    });
+
+    localClassrooms.forEach(c => {
+      if (c?.id) {
+        const ref = doc(db, CLASSROOMS_COLLECTION, String(c.id));
+        batch.set(ref, c, { merge: true });
+        count++;
+      }
+    });
+
+    if (count > 0) {
+      await batch.commit();
+      console.log(`[IPSUR Cloud Sync] ${count} registros locales sincronizados con Firestore exitosamente.`);
+    }
+  } catch (error) {
+    console.error('[IPSUR Cloud Sync] Error al sincronizar datos locales con la nube:', error);
+  }
+}
+
+/**
  * Checks if cloud Firestore has data. If completely empty, seeds initial data so
  * all new devices instantly load the complete academy catalog and staff.
  */
