@@ -19,7 +19,6 @@ import {
   firebaseConfig 
 } from '../firebase/config';
 import { 
-  seedInitialCloudDataIfEmpty, 
   uploadAllLocalDataToCloud,
   subscribeToUsers, 
   subscribeToClassrooms, 

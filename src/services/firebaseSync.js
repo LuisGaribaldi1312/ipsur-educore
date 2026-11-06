@@ -1,179 +1,145 @@
 import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDocs, 
-  onSnapshot, 
-  query, 
-  deleteDoc, 
-  writeBatch 
-} from 'firebase/firestore';
-import { db, isFirebaseConfigured } from '../firebase/config';
+  ref, 
+  set, 
+  update, 
+  onValue, 
+  remove, 
+  get 
+} from 'firebase/database';
+import { rtdb, isFirebaseConfigured } from '../firebase/config';
 
-const USERS_COLLECTION = 'ipsur_users';
-const CLASSROOMS_COLLECTION = 'ipsur_classrooms';
+const USERS_PATH = 'ipsur_users';
+const CLASSROOMS_PATH = 'ipsur_classrooms';
 
 /**
- * Uploads all existing local data (including any users/classrooms created on this PC)
- * to Firestore so they are immediately available on phones and other devices.
+ * Checks if Realtime Database has data. If empty, seeds current local data
+ * so all new devices instantly load the complete academy catalog and staff.
  */
 export async function uploadAllLocalDataToCloud(localUsers = [], localClassrooms = []) {
-  if (!isFirebaseConfigured || !db) return;
+  if (!isFirebaseConfigured || !rtdb) return;
 
   try {
-    const batch = writeBatch(db);
-    let count = 0;
+    const rootSnapshot = await get(ref(rtdb));
+    const currentData = rootSnapshot.val() || {};
 
-    localUsers.forEach(u => {
-      if (u?.id) {
-        const ref = doc(db, USERS_COLLECTION, String(u.id));
-        batch.set(ref, u, { merge: true });
-        count++;
-      }
-    });
+    const updates = {};
+    if (!currentData[USERS_PATH] && localUsers.length > 0) {
+      const usersMap = {};
+      localUsers.forEach(u => {
+        if (u?.id) usersMap[u.id] = u;
+      });
+      updates[USERS_PATH] = usersMap;
+    }
 
-    localClassrooms.forEach(c => {
-      if (c?.id) {
-        const ref = doc(db, CLASSROOMS_COLLECTION, String(c.id));
-        batch.set(ref, c, { merge: true });
-        count++;
-      }
-    });
+    if (!currentData[CLASSROOMS_PATH] && localClassrooms.length > 0) {
+      const classroomsMap = {};
+      localClassrooms.forEach(c => {
+        if (c?.id) classroomsMap[c.id] = c;
+      });
+      updates[CLASSROOMS_PATH] = classroomsMap;
+    }
 
-    if (count > 0) {
-      await batch.commit();
-      console.log(`[IPSUR Cloud Sync] ${count} registros locales sincronizados con Firestore exitosamente.`);
+    if (Object.keys(updates).length > 0) {
+      await update(ref(rtdb), updates);
+      console.log('[IPSUR Cloud Sync] Datos iniciales sincronizados en Realtime Database con éxito.');
     }
   } catch (error) {
-    console.error('[IPSUR Cloud Sync] Error al sincronizar datos locales con la nube:', error);
+    console.error('[IPSUR Cloud Sync] Error al sincronizar datos en Realtime Database:', error);
   }
 }
 
 /**
- * Checks if cloud Firestore has data. If completely empty, seeds initial data so
- * all new devices instantly load the complete academy catalog and staff.
- */
-export async function seedInitialCloudDataIfEmpty(initialUsers = [], initialClassrooms = []) {
-  if (!isFirebaseConfigured || !db) return;
-
-  try {
-    const usersSnap = await getDocs(collection(db, USERS_COLLECTION));
-    if (usersSnap.empty && initialUsers.length > 0) {
-      console.log('[IPSUR Cloud Sync] Sembrando usuarios iniciales en Firestore...');
-      const batch = writeBatch(db);
-      initialUsers.forEach(u => {
-        const ref = doc(db, USERS_COLLECTION, String(u.id));
-        batch.set(ref, u);
-      });
-      await batch.commit();
-      console.log('[IPSUR Cloud Sync] Usuarios iniciales sembrados con éxito.');
-    }
-
-    const classroomsSnap = await getDocs(collection(db, CLASSROOMS_COLLECTION));
-    if (classroomsSnap.empty && initialClassrooms.length > 0) {
-      console.log('[IPSUR Cloud Sync] Sembrando salas virtuales iniciales en Firestore...');
-      const batch = writeBatch(db);
-      initialClassrooms.forEach(c => {
-        const ref = doc(db, CLASSROOMS_COLLECTION, String(c.id));
-        batch.set(ref, c);
-      });
-      await batch.commit();
-      console.log('[IPSUR Cloud Sync] Salas virtuales sembradas con éxito.');
-    }
-  } catch (error) {
-    console.error('[IPSUR Cloud Sync] Error al sembrar datos iniciales:', error);
-  }
-}
-
-/**
- * Subscribes to real-time changes in Users collection across all devices
+ * Subscribes to real-time changes in Users across all devices (PC, Cell phone, Tablet)
  */
 export function subscribeToUsers(onUpdate) {
-  if (!isFirebaseConfigured || !db) return () => {};
+  if (!isFirebaseConfigured || !rtdb) return () => {};
 
   try {
-    const q = query(collection(db, USERS_COLLECTION));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const usersList = [];
-      snapshot.forEach(docSnap => {
-        usersList.push(docSnap.data());
-      });
-      if (usersList.length > 0) {
-        onUpdate(usersList);
+    const usersRef = ref(rtdb, USERS_PATH);
+    const unsubscribe = onValue(usersRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const usersList = Object.values(data);
+        if (usersList.length > 0) {
+          onUpdate(usersList);
+        }
       }
     }, (error) => {
-      console.error('[IPSUR Cloud Sync] Error en listener de usuarios:', error);
+      console.error('[IPSUR Cloud Sync] Error en listener RTDB de usuarios:', error);
     });
 
     return unsubscribe;
   } catch (error) {
-    console.error('[IPSUR Cloud Sync] Fallo al suscribirse a usuarios:', error);
+    console.error('[IPSUR Cloud Sync] Fallo al suscribirse a usuarios RTDB:', error);
     return () => {};
   }
 }
 
 /**
- * Subscribes to real-time changes in Classrooms collection across all devices
+ * Subscribes to real-time changes in Classrooms across all devices
  */
 export function subscribeToClassrooms(onUpdate) {
-  if (!isFirebaseConfigured || !db) return () => {};
+  if (!isFirebaseConfigured || !rtdb) return () => {};
 
   try {
-    const q = query(collection(db, CLASSROOMS_COLLECTION));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const classroomsList = [];
-      snapshot.forEach(docSnap => {
-        classroomsList.push(docSnap.data());
-      });
-      if (classroomsList.length > 0) {
-        onUpdate(classroomsList);
+    const classroomsRef = ref(rtdb, CLASSROOMS_PATH);
+    const unsubscribe = onValue(classroomsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const classroomsList = Object.values(data);
+        if (classroomsList.length > 0) {
+          onUpdate(classroomsList);
+        }
       }
     }, (error) => {
-      console.error('[IPSUR Cloud Sync] Error en listener de salas:', error);
+      console.error('[IPSUR Cloud Sync] Error en listener RTDB de salas:', error);
     });
 
     return unsubscribe;
   } catch (error) {
-    console.error('[IPSUR Cloud Sync] Fallo al suscribirse a salas:', error);
+    console.error('[IPSUR Cloud Sync] Fallo al suscribirse a salas RTDB:', error);
     return () => {};
   }
 }
 
 /**
- * Persists a user (or updated user) to Firestore
+ * Persists a user (or updated user) to Realtime Database
  */
 export async function syncUserToCloud(user) {
-  if (!isFirebaseConfigured || !db || !user?.id) return;
+  if (!isFirebaseConfigured || !rtdb || !user?.id) return;
   try {
-    const ref = doc(db, USERS_COLLECTION, String(user.id));
-    await setDoc(ref, user, { merge: true });
+    const userRef = ref(rtdb, `${USERS_PATH}/${user.id}`);
+    await set(userRef, user);
   } catch (error) {
-    console.error('[IPSUR Cloud Sync] Error guardando usuario en la nube:', error);
+    console.error('[IPSUR Cloud Sync] Error guardando usuario en RTDB:', error);
   }
 }
 
 /**
- * Persists a classroom (or updated classroom) to Firestore
+ * Persists a classroom (or updated classroom) to Realtime Database
  */
 export async function syncClassroomToCloud(classroom) {
-  if (!isFirebaseConfigured || !db || !classroom?.id) return;
+  if (!isFirebaseConfigured || !rtdb || !classroom?.id) return;
   try {
-    const ref = doc(db, CLASSROOMS_COLLECTION, String(classroom.id));
-    await setDoc(ref, classroom, { merge: true });
+    const classRef = ref(rtdb, `${CLASSROOMS_PATH}/${classroom.id}`);
+    await set(classRef, classroom);
   } catch (error) {
-    console.error('[IPSUR Cloud Sync] Error guardando sala en la nube:', error);
+    console.error('[IPSUR Cloud Sync] Error guardando sala en RTDB:', error);
   }
 }
 
 /**
- * Deletes a classroom from Firestore
+ * Deletes a classroom from Realtime Database
  */
 export async function deleteClassroomFromCloud(classroomId) {
-  if (!isFirebaseConfigured || !db || !classroomId) return;
+  if (!isFirebaseConfigured || !rtdb || !classroomId) return;
   try {
-    const ref = doc(db, CLASSROOMS_COLLECTION, String(classroomId));
-    await deleteDoc(ref);
+    const classRef = ref(rtdb, `${CLASSROOMS_PATH}/${classroomId}`);
+    await remove(classRef);
   } catch (error) {
-    console.error('[IPSUR Cloud Sync] Error eliminando sala de la nube:', error);
+    console.error('[IPSUR Cloud Sync] Error eliminando sala de RTDB:', error);
   }
 }
+
+export const seedInitialCloudDataIfEmpty = uploadAllLocalDataToCloud;
+
