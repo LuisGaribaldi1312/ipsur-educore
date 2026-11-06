@@ -13,6 +13,19 @@ import {
 } from '../data/initialData';
 import { validateCriteria } from '../utils/calculations';
 import { getDeadlineStatus } from '../utils/dateFormatter';
+import { 
+  isFirebaseConfigured, 
+  saveFirebaseConfig, 
+  firebaseConfig 
+} from '../firebase/config';
+import { 
+  seedInitialCloudDataIfEmpty, 
+  subscribeToUsers, 
+  subscribeToClassrooms, 
+  syncUserToCloud, 
+  syncClassroomToCloud, 
+  deleteClassroomFromCloud 
+} from '../services/firebaseSync';
 
 const AppContext = createContext();
 
@@ -108,6 +121,7 @@ export function AppProvider({ children }) {
   const [notification, setNotification] = useState(null);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [userManagerModalOpen, setUserManagerModalOpen] = useState(false);
+  const [firebaseModalOpen, setFirebaseModalOpen] = useState(false);
 
   // IPSUR EDUCORE live services datasets (Zero demo data)
   const [activities, setActivities] = useState(() => {
@@ -219,6 +233,30 @@ export function AppProvider({ children }) {
       // Ignore
     }
   }, [currentUserId]);
+
+  // Real-time Cloud Sync with Firebase Firestore across all devices (PC, Phone, Tablet)
+  useEffect(() => {
+    if (isFirebaseConfigured) {
+      seedInitialCloudDataIfEmpty(USERS, INITIAL_CLASSROOMS);
+
+      const unsubUsers = subscribeToUsers((cloudUsers) => {
+        if (Array.isArray(cloudUsers) && cloudUsers.length > 0) {
+          setUsers(cloudUsers);
+        }
+      });
+
+      const unsubClassrooms = subscribeToClassrooms((cloudClassrooms) => {
+        if (Array.isArray(cloudClassrooms) && cloudClassrooms.length > 0) {
+          setClassrooms(cloudClassrooms);
+        }
+      });
+
+      return () => {
+        unsubUsers();
+        unsubClassrooms();
+      };
+    }
+  }, []);
 
   // Clean up timer on unmount
   useEffect(() => {
@@ -392,6 +430,7 @@ export function AppProvider({ children }) {
     };
 
     setUsers(prev => [newUser, ...prev]);
+    syncUserToCloud(newUser);
     showToast('Usuario Creado', `El usuario ${newUser.name} ha sido dado de alta exitosamente con rol de ${newUser.title}.`);
     return newUser;
   };
@@ -413,17 +452,17 @@ export function AppProvider({ children }) {
       return false;
     }
 
-    setUsers(prev => prev.map(u => {
-      if (u.id !== userId) return u;
-      return {
-        ...u,
-        ...updatedFields,
-        permissions: {
-          ...(u.permissions || DEFAULT_ROLE_PERMISSIONS[u.role] || {}),
-          ...(updatedFields.permissions || {})
-        }
-      };
-    }));
+    const updatedUser = {
+      ...target,
+      ...updatedFields,
+      permissions: {
+        ...(target.permissions || DEFAULT_ROLE_PERMISSIONS[target.role] || {}),
+        ...(updatedFields.permissions || {})
+      }
+    };
+
+    setUsers(prev => prev.map(u => (u.id === userId ? updatedUser : u)));
+    syncUserToCloud(updatedUser);
 
     showToast('Usuario Actualizado', 'Los datos y permisos del usuario han sido guardados.');
     return true;
@@ -578,6 +617,7 @@ export function AppProvider({ children }) {
     };
 
     setClassrooms(prev => [newClassroom, ...prev]);
+    syncClassroomToCloud(newClassroom);
     showToast('Sala creada con éxito', `La sala "${name}" ha sido creada con código ${cleanCode}.`);
     return newClassroom;
   };
@@ -605,13 +645,15 @@ export function AppProvider({ children }) {
         if (foundPeriod) periodName = foundPeriod.name;
       }
 
-      return {
+      const updated = {
         ...cls,
         ...updatedFields,
         teacherName: updatedFields.teacherName || teacherName,
         periodName: updatedFields.periodName || periodName,
         updatedAt: new Date().toISOString()
       };
+      syncClassroomToCloud(updated);
+      return updated;
     }));
 
     showToast('Sala Actualizada', 'La información de la sala virtual ha sido actualizada exitosamente.', 'success');
@@ -622,7 +664,7 @@ export function AppProvider({ children }) {
   const updateClassroomRubric = (classroomId, updatedRubric) => {
     setClassrooms(prev => prev.map(cls => {
       if (cls.id !== classroomId) return cls;
-      return {
+      const updated = {
         ...cls,
         rubric: {
           ...cls.rubric,
@@ -631,6 +673,8 @@ export function AppProvider({ children }) {
           uploadedAt: new Date().toISOString()
         }
       };
+      syncClassroomToCloud(updated);
+      return updated;
     }));
     showToast('Rúbrica y Temario actualizados', 'El temario oficial de la sala ha sido actualizado correctamente.');
   };
@@ -639,10 +683,12 @@ export function AppProvider({ children }) {
   const updateClassroomEnrollment = (classroomId, studentIds) => {
     setClassrooms(prev => prev.map(cls => {
       if (cls.id !== classroomId) return cls;
-      return {
+      const updated = {
         ...cls,
         enrolledStudentIds: studentIds
       };
+      syncClassroomToCloud(updated);
+      return updated;
     }));
     showToast('Matrícula actualizada', `Se han asignado ${studentIds.length} estudiantes a la sala.`);
   };
@@ -657,7 +703,7 @@ export function AppProvider({ children }) {
 
     setClassrooms(prev => prev.map(cls => {
       if (cls.id !== classroomId) return cls;
-      return {
+      const updated = {
         ...cls,
         criteriaConfigured: true,
         criteria: {
@@ -667,6 +713,8 @@ export function AppProvider({ children }) {
           participation: Number(criteriaValues.participation)
         }
       };
+      syncClassroomToCloud(updated);
+      return updated;
     }));
 
     showToast('Ponderación Guardada', 'Los porcentajes de evaluación suman 100%. Ahora puedes crear y asignar actividades.', 'success');
@@ -701,10 +749,12 @@ export function AppProvider({ children }) {
 
     setClassrooms(prev => prev.map(cls => {
       if (cls.id !== classroomId) return cls;
-      return {
+      const updated = {
         ...cls,
         activities: [newActivity, ...cls.activities]
       };
+      syncClassroomToCloud(updated);
+      return updated;
     }));
 
     showToast('Actividad Asignada', `La actividad "${activityData.title}" fue publicada para los estudiantes.`);
@@ -729,10 +779,12 @@ export function AppProvider({ children }) {
 
     setClassrooms(prev => prev.map(cls => {
       if (cls.id !== classroomId) return cls;
-      return {
+      const updated = {
         ...cls,
         materials: [newMaterial, ...cls.materials]
       };
+      syncClassroomToCloud(updated);
+      return updated;
     }));
 
     showToast('Material Publicado', `El recurso "${materialData.title}" está disponible para la clase.`);
@@ -785,10 +837,12 @@ export function AppProvider({ children }) {
       } else {
         newSubmissions.push(newSubmission);
       }
-      return {
+      const updated = {
         ...cls,
         submissions: newSubmissions
       };
+      syncClassroomToCloud(updated);
+      return updated;
     }));
 
     showToast('Actividad Entregada', 'Tu tarea ha sido enviada exitosamente para revisión docente.');
@@ -816,10 +870,12 @@ export function AppProvider({ children }) {
         };
       });
 
-      return {
+      const updated = {
         ...cls,
         submissions: updatedSubmissions
       };
+      syncClassroomToCloud(updated);
+      return updated;
     }));
 
     showToast('Calificación Registrada', `Se asignó ${numGrade}/100 y retroalimentación al estudiante.`);
@@ -833,7 +889,7 @@ export function AppProvider({ children }) {
       const currentAssessments = cls.studentAssessments || {};
       const currentStudent = currentAssessments[studentId] || { examScore: 0, attendanceScore: 100, participationScore: 100 };
 
-      return {
+      const updated = {
         ...cls,
         studentAssessments: {
           ...currentAssessments,
@@ -844,6 +900,8 @@ export function AppProvider({ children }) {
           }
         }
       };
+      syncClassroomToCloud(updated);
+      return updated;
     }));
 
     showToast('Registro Actualizado', 'Evaluación de asistencia, participación y examen guardada con éxito.');
@@ -853,7 +911,7 @@ export function AppProvider({ children }) {
   const updateVirtualSession = (classroomId, sessionData) => {
     setClassrooms(prev => prev.map(cls => {
       if (cls.id !== classroomId) return cls;
-      return {
+      const updated = {
         ...cls,
         virtualSession: {
           ...(cls.virtualSession || {}),
@@ -861,6 +919,8 @@ export function AppProvider({ children }) {
         },
         roomLink: sessionData.link || cls.roomLink
       };
+      syncClassroomToCloud(updated);
+      return updated;
     }));
 
     showToast('Sesión Virtual Actualizada', 'La configuración de la videoconferencia ha sido guardada.');
@@ -912,7 +972,12 @@ export function AppProvider({ children }) {
         updateProcedureStatus,
         payments,
         addPayment,
-        academicStats: ACADEMIC_STATS
+        academicStats: ACADEMIC_STATS,
+        firebaseModalOpen,
+        setFirebaseModalOpen,
+        isFirebaseConfigured,
+        saveFirebaseConfig,
+        firebaseConfig
       }}
     >
       {children}

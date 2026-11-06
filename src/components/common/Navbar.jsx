@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import LiveClock from './LiveClock';
 import UserManagerModal from '../admin/UserManagerModal';
 import LoginModal from '../auth/LoginModal';
+import FirebaseConfigModal from './FirebaseConfigModal';
 import { 
   GraduationCap, 
   Users, 
@@ -27,7 +28,9 @@ import {
   LogOut, 
   UserPlus, 
   KeyRound, 
-  Lock 
+  Lock,
+  Cloud,
+  CloudOff
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -46,7 +49,9 @@ export default function Navbar() {
     userManagerModalOpen,
     setUserManagerModalOpen,
     logout,
-    isSuperAdmin
+    isSuperAdmin,
+    isFirebaseConfigured,
+    setFirebaseModalOpen
   } = useApp();
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -184,9 +189,27 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Right Header Section: Notifications + Divider + Profile Info */}
-            <div className="flex items-center gap-3 sm:gap-4">
+            {/* Right Header Section: Cloud Sync + Notifications + Divider + Profile Info */}
+            <div className="flex items-center gap-2.5 sm:gap-4">
               
+              {/* Cloud Real-Time Sync Indicator Button */}
+              <button
+                type="button"
+                onClick={() => setFirebaseModalOpen(true)}
+                className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer border ${
+                  isFirebaseConfigured
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                    : 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100 animate-pulse'
+                }`}
+                title={isFirebaseConfigured 
+                  ? "Sincronización en la Nube Activa (Firebase Firestore): Los datos se sincronizan en tiempo real entre tu PC, celular y tablet" 
+                  : "Modo Local: Haz clic para vincular Firebase Firestore y sincronizar datos en tiempo real con tu celular"}
+              >
+                <span className={`w-2 h-2 rounded-full ${isFirebaseConfigured ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                <Cloud className="w-3.5 h-3.5 text-ipsur-pink-600" />
+                <span>{isFirebaseConfigured ? 'Nube Activa' : 'Vincular Nube (Celular)'}</span>
+              </button>
+
               {/* Notifications Bell */}
               <div className="relative">
                 <button
@@ -292,10 +315,23 @@ export default function Navbar() {
                             setProfileMenuOpen(false);
                             setUserManagerModalOpen(true);
                           }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-xl transition"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-xl transition cursor-pointer"
                         >
                           <Users className="w-4 h-4 text-blue-600" />
                           <span>Gestión de Usuarios y Roles</span>
+                        </button>
+                      )}
+
+                      {canManageUsers && (
+                        <button
+                          onClick={() => {
+                            setProfileMenuOpen(false);
+                            setFirebaseModalOpen(true);
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-xl transition cursor-pointer"
+                        >
+                          <Cloud className="w-4 h-4 text-ipsur-pink-600" />
+                          <span>Sincronización Cloud (Firebase)</span>
                         </button>
                       )}
 
@@ -354,6 +390,8 @@ export default function Navbar() {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
       />
+
+      <FirebaseConfigModal />
     </>
   );
 }
