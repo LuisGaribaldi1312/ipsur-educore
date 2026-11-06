@@ -15,7 +15,8 @@ import {
   Layers,
   GraduationCap,
   Sparkles,
-  Edit
+  Edit,
+  Trash2
 } from 'lucide-react';
 
 export default function CoordinacionEscolarModal({ 
@@ -26,7 +27,7 @@ export default function CoordinacionEscolarModal({
   onOpenRubric,
   onSelectClassroom 
 }) {
-  const { classrooms, users, currentUser, isSuperAdmin, showToast } = useApp();
+  const { classrooms, users, currentUser, isSuperAdmin, deleteClassroom, showToast } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLevel, setFilterLevel] = useState('all');
 
@@ -36,7 +37,24 @@ export default function CoordinacionEscolarModal({
   const isTeacher = currentUser?.role === 'teacher';
   if (isStudent || isTeacher) return null;
 
-  const canEditClassrooms = isSuperAdmin || currentUser?.role === 'director' || currentUser?.role === 'coordinator';
+  const canManageClassrooms = isSuperAdmin || 
+    currentUser?.role === 'superadmin' || 
+    currentUser?.role === 'rector' || 
+    currentUser?.role === 'director' || 
+    currentUser?.role === 'coordinator';
+
+  const canEditClassrooms = canManageClassrooms;
+
+  const handleDeleteClassroom = (c) => {
+    if (!canManageClassrooms) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador, Director General y Coordinador Escolar pueden eliminar salas.', 'error');
+      return;
+    }
+    const confirmed = window.confirm(`¿Estás seguro de que deseas eliminar permanentemente la sala "${c.name}" (${c.code})?\n\nEsta acción borrará todas sus tareas, entregas y registros asociados en todos los dispositivos.`);
+    if (confirmed) {
+      deleteClassroom(c.id);
+    }
+  };
 
   const filteredClassrooms = (classrooms || []).filter(c => {
     const matchesSearch = c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,16 +94,18 @@ export default function CoordinacionEscolarModal({
             </div>
           </div>
 
-          <button
-            onClick={() => {
-              onClose();
-              if (onOpenCreateClassroom) onOpenCreateClassroom();
-            }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white font-bold text-xs shadow-lg transition-transform hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>+ Nueva Sala Virtual</span>
-          </button>
+          {canManageClassrooms && (
+            <button
+              onClick={() => {
+                onClose();
+                if (onOpenCreateClassroom) onOpenCreateClassroom();
+              }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white font-bold text-xs shadow-lg transition-transform hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Nueva Sala Virtual</span>
+            </button>
+          )}
         </div>
 
         {/* Controls Bar */}
@@ -179,6 +199,16 @@ export default function CoordinacionEscolarModal({
                   {/* Actions for this Classroom */}
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5">
+                      {canManageClassrooms && (
+                        <button
+                          onClick={() => handleDeleteClassroom(c)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                          title="Eliminar sala virtual permanentemente"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+
                       {canEditClassrooms && (
                         <button
                           onClick={() => {

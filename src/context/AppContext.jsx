@@ -627,7 +627,7 @@ export function AppProvider({ children }) {
     return true;
   };
 
-  // Coordinator/Director: Create Classroom
+  // Create Classroom (Strictly restricted to: Super Admin, Director, Coordinator)
   const createClassroom = ({
     name,
     code,
@@ -638,6 +638,17 @@ export function AppProvider({ children }) {
     rubricTopics,
     enrolledStudentIds
   }) => {
+    const canManage = isSuperAdmin || 
+      currentUser?.role === 'superadmin' || 
+      currentUser?.role === 'rector' || 
+      currentUser?.role === 'director' || 
+      currentUser?.role === 'coordinator';
+
+    if (!canManage) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador, Director General y Coordinador Escolar pueden crear salas.', 'error');
+      return false;
+    }
+
     const teacher = users.find(u => u.id === teacherId);
     const period = PERIODS.find(p => p.id === periodId) || PERIODS[0];
 
@@ -763,6 +774,34 @@ export function AppProvider({ children }) {
     }));
 
     showToast('Sala Actualizada', 'La información de la sala virtual ha sido actualizada exitosamente.', 'success');
+    return true;
+  };
+
+  // Delete Classroom (Strictly restricted to: Super Admin, Director, Coordinator)
+  const deleteClassroom = (classroomId) => {
+    const canDelete = isSuperAdmin || 
+      currentUser?.role === 'superadmin' || 
+      currentUser?.role === 'rector' || 
+      currentUser?.role === 'director' || 
+      currentUser?.role === 'coordinator';
+
+    if (!canDelete) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador, Director General y Coordinador Escolar pueden eliminar salas.', 'error');
+      return false;
+    }
+
+    const targetClass = classrooms.find(c => c.id === classroomId);
+    if (!targetClass) return false;
+
+    setClassrooms(prev => prev.filter(c => c.id !== classroomId));
+    broadcastMutation('CLASSROOM_DELETED', { id: classroomId });
+    deleteClassroomFromCloud(classroomId);
+
+    if (activeClassroomId === classroomId) {
+      setActiveClassroomId(null);
+    }
+
+    showToast('Sala Eliminada', `La sala "${targetClass.name}" (${targetClass.code}) ha sido eliminada permanentemente.`, 'info');
     return true;
   };
 
@@ -1081,6 +1120,7 @@ export function AppProvider({ children }) {
         toggleUserStatus,
         createClassroom,
         updateClassroom,
+        deleteClassroom,
         updateClassroomRubric,
         updateClassroomEnrollment,
         setEvaluationCriteria,

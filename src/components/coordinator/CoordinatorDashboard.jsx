@@ -39,7 +39,8 @@ import {
   ChevronDown,
   Building,
   Laptop,
-  Edit
+  Edit,
+  Trash2
 } from 'lucide-react';
 
 export default function CoordinatorDashboard({ onSelectClassroom }) {
@@ -53,8 +54,27 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
     procedures,
     setUserManagerModalOpen,
     isSuperAdmin,
+    deleteClassroom,
     showToast 
   } = useApp();
+
+  const canManageClassrooms = isSuperAdmin || 
+    currentUser?.role === 'superadmin' || 
+    currentUser?.role === 'rector' || 
+    currentUser?.role === 'director' || 
+    currentUser?.role === 'coordinator';
+
+  const handleDeleteClassroom = (cls, e) => {
+    if (e) e.stopPropagation();
+    if (!canManageClassrooms) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador, Director General y Coordinador Escolar pueden eliminar salas.', 'error');
+      return;
+    }
+    const confirmed = window.confirm(`¿Estás seguro de que deseas eliminar permanentemente la sala "${cls.name}" (${cls.code})?\n\nEsta acción borrará todas sus tareas, entregas y registros asociados en todos los dispositivos.`);
+    if (confirmed) {
+      deleteClassroom(cls.id);
+    }
+  };
 
   // Modals
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -145,15 +165,17 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
                 <span>Ver tutorial</span>
               </button>
 
-              <button
-                type="button"
-                onClick={() => setCreateModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs border border-white/20 transition active:scale-95 cursor-pointer"
-                title="Nueva Sala: Aperturar una nueva aula virtual y asignar docente, materias, horario y alumnos"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Nueva Sala</span>
-              </button>
+              {canManageClassrooms && (
+                <button
+                  type="button"
+                  onClick={() => setCreateModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs border border-white/20 transition active:scale-95 cursor-pointer"
+                  title="Nueva Sala: Aperturar una nueva aula virtual y asignar docente, materias, horario y alumnos"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Nueva Sala</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -228,8 +250,8 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
 
         {/* Card 3: Grupos / Salas */}
         <div 
-          onClick={() => setCreateModalOpen(true)}
-          className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:shadow-md transition cursor-pointer relative overflow-hidden flex flex-col justify-between"
+          onClick={() => canManageClassrooms && setCreateModalOpen(true)}
+          className={`bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:shadow-md transition relative overflow-hidden flex flex-col justify-between ${canManageClassrooms ? 'cursor-pointer' : ''}`}
           title="Salas de Clases Virtuales: Aulas activas con rúbricas al 100% y enlaces de Meet/Zoom"
         >
           <div className="flex items-center justify-between">
@@ -698,15 +720,17 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCreateModalOpen(true)}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow transition"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Nueva Sala de Clases</span>
-            </button>
-          </div>
+          {canManageClassrooms && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCreateModalOpen(true)}
+                className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow transition cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Nueva Sala de Clases</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Filter controls */}
@@ -742,13 +766,15 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
             <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
               Comienza creando una nueva sala de clases virtual para asignar temarios, rúbricas y docentes titulares.
             </p>
-            <button
-              onClick={() => setCreateModalOpen(true)}
-              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow transition"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Crear Primera Sala</span>
-            </button>
+            {canManageClassrooms && (
+              <button
+                onClick={() => setCreateModalOpen(true)}
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow transition cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Crear Primera Sala</span>
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -779,6 +805,16 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
                     <strong>{cls.enrolledStudentIds?.length || 0}</strong> alumnos
                   </span>
                   <div className="flex items-center gap-1.5">
+                    {canManageClassrooms && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleDeleteClassroom(cls, e)}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                        title="Eliminar sala virtual permanentemente"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => setEditingClassroom(cls)}

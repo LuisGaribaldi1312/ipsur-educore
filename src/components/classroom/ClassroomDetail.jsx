@@ -42,7 +42,8 @@ import {
   Filter,
   Search,
   Download,
-  GraduationCap
+  GraduationCap,
+  Trash2
 } from 'lucide-react';
 
 export default function ClassroomDetail({ classroomId, onBack }) {
@@ -50,7 +51,9 @@ export default function ClassroomDetail({ classroomId, onBack }) {
     classrooms, 
     currentUser, 
     users,
-    isSuperAdmin
+    isSuperAdmin,
+    deleteClassroom,
+    showToast
   } = useApp();
 
   const classroom = classrooms.find(c => c.id === classroomId);
@@ -73,6 +76,27 @@ export default function ClassroomDetail({ classroomId, onBack }) {
   const [gradingActivity, setGradingActivity] = useState(null);
   const [submittingActivity, setSubmittingActivity] = useState(null);
 
+  const isTeacher = currentUser.role === 'teacher';
+  const isCoordinator = currentUser.role === 'coordinator';
+  const isStudent = currentUser.role === 'student';
+  const canManageClassrooms = isSuperAdmin || 
+    currentUser.role === 'superadmin' || 
+    currentUser.role === 'rector' || 
+    currentUser.role === 'director' || 
+    currentUser.role === 'coordinator';
+
+  const handleDeleteClassroom = () => {
+    if (!canManageClassrooms) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador, Director General y Coordinador Escolar pueden eliminar salas.', 'error');
+      return;
+    }
+    const confirmed = window.confirm(`¿Estás seguro de que deseas eliminar permanentemente la sala "${classroom?.name}" (${classroom?.code})?\n\nEsta acción borrará todas sus tareas, entregas y registros asociados en todos los dispositivos.`);
+    if (confirmed) {
+      deleteClassroom(classroom.id);
+      onBack();
+    }
+  };
+
   if (!classroom) {
     return (
       <div className="p-8 text-center">
@@ -83,11 +107,6 @@ export default function ClassroomDetail({ classroomId, onBack }) {
       </div>
     );
   }
-
-  const isTeacher = currentUser.role === 'teacher';
-  const isCoordinator = currentUser.role === 'coordinator';
-  const isStudent = currentUser.role === 'student';
-  const canEditClassroom = isSuperAdmin || currentUser.role === 'director' || currentUser.role === 'coordinator';
 
   const enrolledStudents = users.filter(u => classroom.enrolledStudentIds?.includes(u.id));
 
@@ -119,15 +138,26 @@ export default function ClassroomDetail({ classroomId, onBack }) {
             <span>{classroom.modality || 'Prepa en Línea'}</span>
           </span>
 
-          {canEditClassroom && (
-            <button
-              onClick={() => setIsEditModalOpen(true)}
-              className="inline-flex items-center gap-1.5 bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer"
-              title="Modificar configuración de esta sala virtual"
-            >
-              <Edit className="w-3.5 h-3.5" />
-              <span>Editar Sala</span>
-            </button>
+          {canManageClassrooms && (
+            <>
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="inline-flex items-center gap-1.5 bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer"
+                title="Modificar configuración de esta sala virtual"
+              >
+                <Edit className="w-3.5 h-3.5" />
+                <span>Editar Sala</span>
+              </button>
+
+              <button
+                onClick={handleDeleteClassroom}
+                className="inline-flex items-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer"
+                title="Eliminar sala virtual permanentemente"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                <span>Eliminar Sala</span>
+              </button>
+            </>
           )}
         </div>
       </div>

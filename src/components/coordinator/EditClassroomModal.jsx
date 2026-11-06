@@ -13,7 +13,8 @@ import {
   CheckCircle2, 
   X,
   Laptop,
-  Layers
+  Layers,
+  Trash2
 } from 'lucide-react';
 
 export default function EditClassroomModal({ isOpen, onClose, classroom }) {
@@ -23,10 +24,30 @@ export default function EditClassroomModal({ isOpen, onClose, classroom }) {
     users, 
     periods, 
     updateClassroom, 
+    deleteClassroom,
     showToast 
   } = useApp();
 
-  const canEdit = isSuperAdmin || currentUser?.role === 'director' || currentUser?.role === 'coordinator';
+  const canManageClassrooms = isSuperAdmin || 
+    currentUser?.role === 'superadmin' || 
+    currentUser?.role === 'rector' || 
+    currentUser?.role === 'director' || 
+    currentUser?.role === 'coordinator';
+
+  const canEdit = canManageClassrooms;
+
+  const handleDelete = () => {
+    if (!classroom) return;
+    if (!canManageClassrooms) {
+      showToast('Acceso Denegado', 'Solo el Super Administrador, Director General y Coordinador Escolar pueden eliminar salas.', 'error');
+      return;
+    }
+    const confirmed = window.confirm(`¿Estás seguro de que deseas eliminar permanentemente la sala "${classroom.name}" (${classroom.code})?\n\nEsta acción borrará todas sus tareas, entregas y registros asociados en todos los dispositivos.`);
+    if (confirmed) {
+      deleteClassroom(classroom.id);
+      onClose();
+    }
+  };
 
   const teachers = (users || []).filter(u => u.role === 'teacher' || u.role === 'coordinator');
   const allStudents = (users || []).filter(u => u.role === 'student');
@@ -401,21 +422,37 @@ export default function EditClassroomModal({ isOpen, onClose, classroom }) {
 
         {/* Modal Footer Actions */}
         <div className="pt-3 border-t border-slate-200 flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer"
-          >
-            Cancelar
-          </button>
+          <div>
+            {canManageClassrooms && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-600 rounded-xl border border-rose-200 transition cursor-pointer"
+                title="Eliminar sala permanentemente"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Eliminar Sala</span>
+              </button>
+            )}
+          </div>
 
-          <button
-            type="submit"
-            className="flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow-md transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <Save className="w-4 h-4" />
-            <span>Guardar Cambios de la Sala</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              className="flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 hover:from-ipsur-navy-800 hover:to-ipsur-pink-700 rounded-xl shadow-md transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <Save className="w-4 h-4" />
+              <span>Guardar Cambios</span>
+            </button>
+          </div>
         </div>
       </form>
     </Modal>

@@ -66,6 +66,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
     permissions: {
       canManageUsers: false,
       canCreateClassrooms: false,
+      canDeleteClassrooms: false,
       canGrade: true,
       canScheduleLive: true,
       canPublishAnnouncements: false,
@@ -127,6 +128,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
       permissions: {
         canManageUsers: newRole === 'director' || newRole === 'superadmin',
         canCreateClassrooms: Boolean(roleDefaults.canCreateClassrooms),
+        canDeleteClassrooms: Boolean(roleDefaults.canDeleteClassrooms),
         canGrade: Boolean(roleDefaults.canGrade),
         canScheduleLive: Boolean(roleDefaults.canScheduleLive),
         canPublishAnnouncements: Boolean(roleDefaults.canPublishAnnouncements),
@@ -198,6 +200,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
       permissions: {
         canManageUsers: user.role === 'director' || user.role === 'superadmin',
         canCreateClassrooms: user.permissions?.canCreateClassrooms ?? roleDefaults.canCreateClassrooms,
+        canDeleteClassrooms: user.permissions?.canDeleteClassrooms ?? roleDefaults.canDeleteClassrooms,
         canGrade: user.permissions?.canGrade ?? roleDefaults.canGrade,
         canScheduleLive: user.permissions?.canScheduleLive ?? roleDefaults.canScheduleLive,
         canPublishAnnouncements: user.permissions?.canPublishAnnouncements ?? roleDefaults.canPublishAnnouncements,
@@ -508,6 +511,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                 {[
                   { key: 'canCreateClassrooms', label: 'Crear / Editar Salas', desc: 'Apertura de materias y temarios' },
+                  { key: 'canDeleteClassrooms', label: 'Eliminar Salas Virtuales', desc: 'Baja permanente de aulas' },
                   { key: 'canGrade', label: 'Calificar y Asentar Actas', desc: 'Evaluar tareas y emitir calificaciones' },
                   { key: 'canScheduleLive', label: 'Clases en Vivo (Meet)', desc: 'Transmitir sesiones virtuales' },
                   { key: 'canPublishAnnouncements', label: 'Avisos Institucionales', desc: 'Publicar comunicados en el muro' },
