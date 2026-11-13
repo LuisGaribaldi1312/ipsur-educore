@@ -1,5 +1,5 @@
 /* IPSUR EDUCORE Progressive Web App (PWA) Service Worker */
-const CACHE_NAME = 'ipsur-educore-pwa-v2';
+const CACHE_NAME = 'ipsur-educore-pwa-v3';
 
 const STATIC_ASSETS = [
   '/',

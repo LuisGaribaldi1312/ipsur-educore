@@ -5,13 +5,13 @@ export default function AppSplashScreen({ onFinish }) {
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    // Splash screen visible for 1.8 seconds, then 300ms fade-out
+    // Dynamic loading effect runs for 1.4 seconds then smoothly transitions to Login Screen
     const timer = setTimeout(() => {
       setIsFadingOut(true);
       setTimeout(() => {
         if (onFinish) onFinish();
-      }, 350);
-    }, 1800);
+      }, 250);
+    }, 1400);
 
     return () => clearTimeout(timer);
   }, [onFinish]);

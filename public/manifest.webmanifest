@@ -8,8 +8,8 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "window-controls-overlay"],
   "orientation": "any",
-  "background_color": "#070D1B",
-  "theme_color": "#0A0D1B",
+  "background_color": "#060814",
+  "theme_color": "#060814",
   "lang": "es-MX",
   "dir": "ltr",
   "categories": ["education", "productivity"],
@@ -38,10 +38,9 @@
       "type": "image/png"
     },
     {
-      "src": "/ipsur-logo.png",
-      "sizes": "339x301",
-      "type": "image/png",
-      "purpose": "any"
+      "src": "/favicon.png",
+      "sizes": "96x96",
+      "type": "image/png"
     }
   ],
   "shortcuts": [
