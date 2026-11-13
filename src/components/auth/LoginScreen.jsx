@@ -110,7 +110,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between bg-[#060813] text-slate-100 relative overflow-x-hidden selection:bg-ipsur-pink-500 selection:text-white">
+    <div className="min-h-screen w-full flex flex-col justify-between bg-[#060813] text-slate-100 relative overflow-x-hidden selection:bg-ipsur-pink-500 selection:text-white animate-in fade-in duration-500">
       
       {/* Dynamic Background Ambient Gradients */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">

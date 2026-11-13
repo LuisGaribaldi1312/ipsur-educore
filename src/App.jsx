@@ -89,23 +89,8 @@ function AppContent() {
     logout
   } = useApp();
 
-  // 1. Initial Application Boot Splash Screen (shows on first app click)
-  const [showSplash, setShowSplash] = useState(() => {
-    try {
-      return !sessionStorage.getItem('ipsur_splash_seen');
-    } catch {
-      return false;
-    }
-  });
-
-  const handleFinishSplash = () => {
-    try {
-      sessionStorage.setItem('ipsur_splash_seen', 'true');
-    } catch {
-      // Ignore
-    }
-    setShowSplash(false);
-  };
+  // 1. Initial Application Boot Splash Screen (shows every time app is opened from mobile icon)
+  const [showSplash, setShowSplash] = useState(true);
 
   // 2. Mobile Double-Back to Exit / Minimize Logic
   const [doubleBackToast, setDoubleBackToast] = useState(false);
@@ -161,12 +146,14 @@ function AppContent() {
     };
   }, [currentUserId, currentUser, activeClassroomId, pwaModalOpen, setActiveClassroomId, setPwaModalOpen, logout]);
 
+  // If still in boot splash loading sequence, exclusively render the animated splash screen
+  if (showSplash) {
+    return <AppSplashScreen onFinish={() => setShowSplash(false)} />;
+  }
+
   return (
     <>
-      {/* Cinematic App Launch Splash Screen */}
-      {showSplash && <AppSplashScreen onFinish={handleFinishSplash} />}
-
-      {/* Main App Screens */}
+      {/* Main App Screens: Directly displays Login Screen upon loading completion */}
       {!currentUserId || !currentUser ? <LoginScreen /> : <MainLayout />}
 
       {/* Mobile Double-Back Exit Warning Toast */}
