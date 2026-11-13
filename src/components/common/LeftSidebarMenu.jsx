@@ -37,7 +37,9 @@ import {
   Compass,
   Menu,
   X,
-  ExternalLink
+  ExternalLink,
+  Smartphone,
+  Download
 } from 'lucide-react';
 
 export default function LeftSidebarMenu() {
@@ -53,7 +55,9 @@ export default function LeftSidebarMenu() {
     setUserManagerModalOpen, 
     logout,
     isSuperAdmin,
-    showToast
+    showToast,
+    installPwa,
+    isPwaInstalled
   } = useApp();
 
   // Expanded menu state (defaults to expanded on desktop)
@@ -279,6 +283,17 @@ export default function LeftSidebarMenu() {
         }
       },
       visible: !isStudent && !isTeacher && canManageUsers // Teachers and students NEVER see Configuración
+    },
+    {
+      id: 'appMovil',
+      label: 'Instalar App Móvil',
+      icon: Smartphone,
+      tooltip: 'Descargar e instalar IPSUR EDUCORE como app nativa en tu celular Android o iPhone',
+      badge: 'PWA',
+      action: () => {
+        installPwa();
+      },
+      visible: !isPwaInstalled
     }
   ].filter(i => i.visible);
 

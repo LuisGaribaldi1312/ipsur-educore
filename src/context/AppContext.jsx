@@ -133,6 +133,59 @@ export function AppProvider({ children }) {
   const [p2pPeersCount, setP2PPeersCount] = useState(0);
   const [p2pSelfId, setP2PSelfId] = useState('');
 
+  // Progressive Web App (PWA) Install Management for Android, iOS & Desktop
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isPwaInstalled, setIsPwaInstalled] = useState(false);
+  const [pwaModalOpen, setPwaModalOpen] = useState(false);
+
+  useEffect(() => {
+    // Check if app is running in standalone mode (installed PWA)
+    const isStandalone = 
+      (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+      (typeof window !== 'undefined' && window.navigator && window.navigator.standalone === true);
+    setIsPwaInstalled(Boolean(isStandalone));
+
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    const handleAppInstalled = () => {
+      setIsPwaInstalled(true);
+      setDeferredPrompt(null);
+      setPwaModalOpen(false);
+      showToast('¡App Instalada!', 'IPSUR EDUCORE se instaló exitosamente en tu dispositivo.', 'success');
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  const installPwa = () => {
+    if (deferredPrompt) {
+      try {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult && choiceResult.outcome === 'accepted') {
+            setIsPwaInstalled(true);
+            setDeferredPrompt(null);
+          }
+        }).catch(() => {
+          setPwaModalOpen(true);
+        });
+      } catch (e) {
+        setPwaModalOpen(true);
+      }
+    } else {
+      setPwaModalOpen(true);
+    }
+  };
+
   // MSN Messenger Style Real-Time Login Alerts State
   const [msnAlerts, setMsnAlerts] = useState([]);
 
@@ -1249,7 +1302,12 @@ export function AppProvider({ children }) {
         p2pSelfId,
         syncP2PManually,
         msnAlerts,
-        dismissMsnAlert
+        dismissMsnAlert,
+        pwaModalOpen,
+        setPwaModalOpen,
+        deferredPrompt,
+        isPwaInstalled,
+        installPwa
       }}
     >
       {children}

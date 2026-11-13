@@ -8,6 +8,7 @@ import StudentDashboard from './components/student/StudentDashboard';
 import ClassroomDetail from './components/classroom/ClassroomDetail';
 import LoginScreen from './components/auth/LoginScreen';
 import MsnLoginToast from './components/common/MsnLoginToast';
+import PwaInstallModal from './components/common/PwaInstallModal';
 import { INSTITUTIONAL_INFO } from './data/initialData';
 
 function MainLayout() {
@@ -74,14 +75,29 @@ function MainLayout() {
 }
 
 function AppContent() {
-  const { currentUserId, currentUser } = useApp();
+  const { 
+    currentUserId, 
+    currentUser, 
+    pwaModalOpen, 
+    setPwaModalOpen, 
+    deferredPrompt, 
+    isPwaInstalled 
+  } = useApp();
 
-  // If no user is authenticated or page was reopened, strictly show the Login Screen
-  if (!currentUserId || !currentUser) {
-    return <LoginScreen />;
-  }
+  return (
+    <>
+      {/* If no user is authenticated or page was reopened, strictly show the Login Screen */}
+      {!currentUserId || !currentUser ? <LoginScreen /> : <MainLayout />}
 
-  return <MainLayout />;
+      {/* Global PWA Mobile App Installation Guide Modal */}
+      <PwaInstallModal
+        isOpen={pwaModalOpen}
+        onClose={() => setPwaModalOpen(false)}
+        deferredPrompt={deferredPrompt}
+        isInstalled={isPwaInstalled}
+      />
+    </>
+  );
 }
 
 export default function App() {

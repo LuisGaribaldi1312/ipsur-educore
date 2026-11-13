@@ -32,7 +32,9 @@ import {
   Cloud,
   CloudOff,
   Share2,
-  Wifi
+  Wifi,
+  Smartphone,
+  Download
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -53,7 +55,9 @@ export default function Navbar() {
     logout,
     isSuperAdmin,
     p2pPeersCount,
-    setP2PModalOpen
+    setP2PModalOpen,
+    installPwa,
+    isPwaInstalled
   } = useApp();
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -194,6 +198,20 @@ export default function Navbar() {
             {/* Right Header Section: Cloud Sync + Notifications + Divider + Profile Info */}
             <div className="flex items-center gap-2.5 sm:gap-4">
               
+              {/* PWA Mobile App Install Button */}
+              {!isPwaInstalled && (
+                <button
+                  type="button"
+                  onClick={installPwa}
+                  className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer border bg-gradient-to-r from-pink-500/10 to-indigo-500/10 text-ipsur-pink-700 border-pink-200/80 hover:bg-pink-100/50 hover:border-pink-300"
+                  title="Instalar IPSUR EDUCORE como aplicación en tu celular (Android / iOS) o computadora"
+                >
+                  <Smartphone className="w-3.5 h-3.5 text-ipsur-pink-600" />
+                  <span className="hidden sm:inline">Instalar App</span>
+                  <span className="sm:hidden">App</span>
+                </button>
+              )}
+
               {/* Real-Time Cloud & P2P Sync Indicator */}
               <button
                 type="button"

@@ -26,11 +26,13 @@ import {
   Globe,
   Compass,
   Check,
-  X
+  X,
+  Smartphone,
+  Download
 } from 'lucide-react';
 
 export default function LoginScreen() {
-  const { login, institutionalInfo, users } = useApp();
+  const { login, institutionalInfo, users, installPwa, isPwaInstalled } = useApp();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -134,6 +136,19 @@ export default function LoginScreen() {
 
           {/* Right Live Indicators */}
           <div className="flex items-center gap-2.5 sm:gap-4 ml-auto text-xs">
+            {/* PWA Mobile App Install Pill */}
+            {!isPwaInstalled && (
+              <button
+                type="button"
+                onClick={installPwa}
+                className="inline-flex items-center gap-1.5 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-indigo-500/20 hover:from-pink-500/30 hover:to-indigo-500/30 text-pink-200 border border-pink-400/40 px-3 py-1 rounded-full text-[11px] font-bold transition shadow-xs cursor-pointer group"
+                title="Descargar e instalar IPSUR EDUCORE como aplicación en Android o iPhone"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-pink-300 group-hover:scale-110 transition-transform" />
+                <span>Instalar App Móvil</span>
+              </button>
+            )}
+
             <LiveClock variant="topbar" className="hidden sm:flex" />
 
             <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full text-emerald-300 text-[11px] font-bold">
@@ -433,7 +448,7 @@ export default function LoginScreen() {
                 </button>
 
                 {/* Direct quick credentials loader for Super Admin (Owner) */}
-                <div className="pt-3 border-t border-white/10 text-center">
+                <div className="pt-3 border-t border-white/10 text-center flex flex-col items-center gap-2">
                   <button
                     type="button"
                     onClick={() => handleQuickFill('superadmin')}
@@ -443,6 +458,18 @@ export default function LoginScreen() {
                     <Lock className="w-3 h-3 text-amber-400" />
                     <span>Acceso Directo: Super Administrador</span>
                   </button>
+
+                  {/* PWA Mobile App Install Action for Students & Teachers */}
+                  {!isPwaInstalled && (
+                    <button
+                      type="button"
+                      onClick={installPwa}
+                      className="w-full mt-1 py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-500/15 to-teal-500/15 hover:from-emerald-500/25 hover:to-teal-500/25 border border-emerald-400/30 text-emerald-300 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs group"
+                    >
+                      <Smartphone className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <span>📲 Descargar / Instalar App Móvil (Android / iOS)</span>
+                    </button>
+                  )}
                 </div>
 
               </form>
