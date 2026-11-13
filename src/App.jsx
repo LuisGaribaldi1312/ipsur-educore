@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import Navbar from './components/common/Navbar';
 import LeftSidebarMenu from './components/common/LeftSidebarMenu';
@@ -9,6 +9,8 @@ import ClassroomDetail from './components/classroom/ClassroomDetail';
 import LoginScreen from './components/auth/LoginScreen';
 import MsnLoginToast from './components/common/MsnLoginToast';
 import PwaInstallModal from './components/common/PwaInstallModal';
+import AppSplashScreen from './components/common/AppSplashScreen';
+import DoubleBackExitToast from './components/common/DoubleBackExitToast';
 import { INSTITUTIONAL_INFO } from './data/initialData';
 
 function MainLayout() {
@@ -78,16 +80,97 @@ function AppContent() {
   const { 
     currentUserId, 
     currentUser, 
+    activeClassroomId,
+    setActiveClassroomId,
     pwaModalOpen, 
     setPwaModalOpen, 
     deferredPrompt, 
-    isPwaInstalled 
+    isPwaInstalled,
+    logout
   } = useApp();
+
+  // 1. Initial Application Boot Splash Screen (shows on first app click)
+  const [showSplash, setShowSplash] = useState(() => {
+    try {
+      return !sessionStorage.getItem('ipsur_splash_seen');
+    } catch {
+      return false;
+    }
+  });
+
+  const handleFinishSplash = () => {
+    try {
+      sessionStorage.setItem('ipsur_splash_seen', 'true');
+    } catch {
+      // Ignore
+    }
+    setShowSplash(false);
+  };
+
+  // 2. Mobile Double-Back to Exit / Minimize Logic
+  const [doubleBackToast, setDoubleBackToast] = useState(false);
+  const lastBackPressRef = useRef(0);
+  const backToastTimerRef = useRef(null);
+
+  useEffect(() => {
+    // Only intercept when authenticated on mobile/standalone or browser
+    if (!currentUserId || !currentUser) return;
+
+    // Seed history state so system Back triggers popstate instead of immediately closing
+    window.history.pushState({ app: 'ipsur-home' }, '');
+
+    const handlePopState = () => {
+      // Step A: If inside a classroom detail view, close classroom first
+      if (activeClassroomId) {
+        setActiveClassroomId(null);
+        window.history.pushState({ app: 'ipsur-home' }, '');
+        return;
+      }
+
+      // Step B: If PWA install modal is open, close modal first
+      if (pwaModalOpen) {
+        setPwaModalOpen(false);
+        window.history.pushState({ app: 'ipsur-home' }, '');
+        return;
+      }
+
+      // Step C: Root View - Double press detection within 2.5 seconds
+      const now = Date.now();
+      if (now - lastBackPressRef.current < 2500) {
+        // Second press: Exit session / logout
+        if (backToastTimerRef.current) clearTimeout(backToastTimerRef.current);
+        setDoubleBackToast(false);
+        logout();
+      } else {
+        // First press: warn user and retain session
+        lastBackPressRef.current = now;
+        window.history.pushState({ app: 'ipsur-home' }, '');
+        setDoubleBackToast(true);
+
+        if (backToastTimerRef.current) clearTimeout(backToastTimerRef.current);
+        backToastTimerRef.current = setTimeout(() => {
+          setDoubleBackToast(false);
+        }, 2500);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      if (backToastTimerRef.current) clearTimeout(backToastTimerRef.current);
+    };
+  }, [currentUserId, currentUser, activeClassroomId, pwaModalOpen, setActiveClassroomId, setPwaModalOpen, logout]);
 
   return (
     <>
-      {/* If no user is authenticated or page was reopened, strictly show the Login Screen */}
+      {/* Cinematic App Launch Splash Screen */}
+      {showSplash && <AppSplashScreen onFinish={handleFinishSplash} />}
+
+      {/* Main App Screens */}
       {!currentUserId || !currentUser ? <LoginScreen /> : <MainLayout />}
+
+      {/* Mobile Double-Back Exit Warning Toast */}
+      <DoubleBackExitToast visible={doubleBackToast} />
 
       {/* Global PWA Mobile App Installation Guide Modal */}
       <PwaInstallModal

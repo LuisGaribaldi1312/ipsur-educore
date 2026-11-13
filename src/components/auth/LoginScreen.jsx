@@ -30,6 +30,7 @@ import {
   Smartphone,
   Download
 } from 'lucide-react';
+import LoginWelcomeScreen from './LoginWelcomeScreen';
 
 export default function LoginScreen() {
   const { login, institutionalInfo, users, installPwa, isPwaInstalled } = useApp();
@@ -42,6 +43,7 @@ export default function LoginScreen() {
   const [rememberMe, setRememberMe] = useState(true);
   const [activeRoleTab, setActiveRoleTab] = useState('all'); // 'student' | 'teacher' | 'coordinator' | 'director' | 'superadmin' | 'all'
   const [supportModalOpen, setSupportModalOpen] = useState(false);
+  const [welcomeUser, setWelcomeUser] = useState(null);
 
   // Filter demo / quick profiles if user clicks on quick role tabs
   const studentUser = users.find(u => u.role === 'student');
@@ -53,15 +55,36 @@ export default function LoginScreen() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMessage('');
-    setIsLoading(true);
 
-    setTimeout(() => {
-      const res = login(identifier, password);
-      setIsLoading(false);
-      if (!res.success) {
-        setErrorMessage(res.message || 'Usuario o contraseña inválidos. Verifica tu correo institucional o matrícula.');
-      }
-    }, 250);
+    if (!identifier.trim() || !password.trim()) {
+      setErrorMessage('Por favor ingresa usuario/matrícula y contraseña.');
+      return;
+    }
+
+    const cleanIdentifier = identifier.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
+    const foundUser = users.find(u => 
+      (u.email?.toLowerCase() === cleanIdentifier || u.matricula?.toLowerCase() === cleanIdentifier) &&
+      u.password === cleanPassword
+    );
+
+    if (!foundUser) {
+      setErrorMessage('Correo institucional, matrícula o contraseña incorrectos.');
+      return;
+    }
+
+    if (foundUser.status === 'inactive') {
+      setErrorMessage('Tu cuenta institucional se encuentra inactiva. Contacta a Dirección General.');
+      return;
+    }
+
+    // Trigger the 3-second animated login welcome transition
+    setWelcomeUser(foundUser);
+  };
+
+  const handleWelcomeComplete = () => {
+    login(identifier, password);
   };
 
   const handleQuickFill = (roleKey) => {
@@ -568,6 +591,14 @@ export default function LoginScreen() {
 
           </div>
         </div>
+      )}
+
+      {/* 3-Second Precision Animated Login Welcome Transition */}
+      {welcomeUser && (
+        <LoginWelcomeScreen 
+          user={welcomeUser} 
+          onComplete={handleWelcomeComplete} 
+        />
       )}
 
       {/* Modern Institutional Footer Bar */}
