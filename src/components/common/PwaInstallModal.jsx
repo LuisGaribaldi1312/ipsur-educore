@@ -62,8 +62,8 @@ export default function PwaInstallModal({ isOpen, onClose, deferredPrompt, isIns
         {/* Header App Showcase Banner */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#070D1B] via-[#141C42] to-[#70003E] p-5 text-white border border-white/10 shadow-lg">
           <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-            <div className="w-16 h-16 rounded-2xl bg-white/10 p-2 shadow-md border border-white/20 flex-shrink-0 flex items-center justify-center backdrop-blur-md">
-              <img src="/ipsur-logo.png" alt="IPSUR Logo" className="w-full h-full object-contain" />
+            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border border-white/30 flex-shrink-0 flex items-center justify-center bg-[#070B1E]">
+              <img src="/icon-192.png" alt="IPSUR App Icon" className="w-full h-full object-cover rounded-2xl" />
             </div>
 
             <div className="flex-1 min-w-0">

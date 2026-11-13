@@ -1,5 +1,5 @@
 /* IPSUR EDUCORE Progressive Web App (PWA) Service Worker */
-const CACHE_NAME = 'ipsur-educore-pwa-v1';
+const CACHE_NAME = 'ipsur-educore-pwa-v2';
 
 const STATIC_ASSETS = [
   '/',
@@ -9,7 +9,8 @@ const STATIC_ASSETS = [
   '/icon-192.png',
   '/icon-512.png',
   '/icon-maskable-512.png',
-  '/apple-touch-icon.png'
+  '/apple-touch-icon.png',
+  '/favicon.png'
 ];
 
 // Install: Cache critical app shell assets
