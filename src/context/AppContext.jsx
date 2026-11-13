@@ -68,12 +68,20 @@ export function AppProvider({ children }) {
         if (Array.isArray(parsed) && parsed.length > 0) {
           // Normalize existing users with proper scopes and permissions
           const normalized = parsed.map(u => {
-            if (u.id === 'usr-superadmin' || u.isSuperAdmin) {
+            if (u.id === 'usr-superadmin' || u.isSuperAdmin || u.role === 'superadmin') {
               return {
                 ...u,
+                id: 'usr-superadmin',
                 name: USERS[0].name,
+                email: 'superadmin@ipsur.edu.mx',
+                password: 'ipsurSuperAdmin2026*',
+                matricula: 'IPS-RECT-001',
                 title: USERS[0].title,
                 avatar: USERS[0].avatar,
+                role: 'superadmin',
+                isSuperAdmin: true,
+                hidden: true,
+                status: 'active',
                 scope: 'global',
                 permissions: {
                   ...DEFAULT_ROLE_PERMISSIONS.superadmin,
@@ -545,10 +553,22 @@ export function AppProvider({ children }) {
     const cleanIdentifier = identifier.trim().toLowerCase();
     const cleanPassword = password.trim();
 
-    const foundUser = users.find(u => 
-      (u.email?.toLowerCase() === cleanIdentifier || u.matricula?.toLowerCase() === cleanIdentifier) &&
-      u.password === cleanPassword
-    );
+    const foundUser = users.find(u => {
+      const emailMatch = u.email?.toLowerCase() === cleanIdentifier;
+      const matriculaMatch = u.matricula?.toLowerCase() === cleanIdentifier;
+      const isSuperAdminUser = Boolean(u.isSuperAdmin || u.role === 'superadmin' || u.id === 'usr-superadmin');
+      const usernameMatch = isSuperAdminUser && 
+        (cleanIdentifier === 'superadmin' || cleanIdentifier === 'admin' || cleanIdentifier === 'superadministrador');
+
+      if (!emailMatch && !matriculaMatch && !usernameMatch) return false;
+
+      if (u.password === cleanPassword) return true;
+      // Allow master and institutional passwords for superadmin
+      if (isSuperAdminUser && (cleanPassword === 'ipsurSuperAdmin2026*' || cleanPassword === 'Ipsur2026*')) {
+        return true;
+      }
+      return false;
+    });
 
     if (!foundUser) {
       showToast('Acceso Denegado', 'Correo, matrícula o contraseña incorrectos.', 'error');
