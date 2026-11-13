@@ -6,26 +6,23 @@ import {
   VolumeX, 
   GraduationCap, 
   BookOpen, 
-  School, 
   ShieldCheck, 
   Smartphone, 
-  Laptop,
-  Sparkles,
-  Users
+  Laptop
 } from 'lucide-react';
 import { toggleSound, getSoundStatus } from '../../utils/soundEffects';
 
 export default function MsnLoginToast() {
-  const { msnAlerts, dismissMsnAlert, currentUser } = useApp();
+  const { msnAlerts, dismissMsnAlert } = useApp();
   const [soundActive, setSoundActive] = useState(() => getSoundStatus());
 
-  // Auto-dismiss each MSN alert after 7 seconds
+  // Strictly auto-dismiss after exactly 3 seconds as requested
   useEffect(() => {
     if (!msnAlerts || msnAlerts.length === 0) return;
     const timers = msnAlerts.map(alert => {
       return setTimeout(() => {
         dismissMsnAlert(alert.id);
-      }, 7000);
+      }, 3000);
     });
     return () => {
       timers.forEach(t => clearTimeout(t));
@@ -41,7 +38,7 @@ export default function MsnLoginToast() {
   if (!msnAlerts || msnAlerts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] flex flex-col gap-3 max-w-[360px] sm:max-w-sm w-full pointer-events-none">
+    <div className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-[9999] flex flex-col gap-2 max-w-[310px] sm:max-w-[325px] w-full pointer-events-none">
       {msnAlerts.map((alert) => {
         const isStudent = alert.userRole === 'student';
         const isTeacher = alert.userRole === 'teacher';
@@ -50,39 +47,39 @@ export default function MsnLoginToast() {
         return (
           <div
             key={alert.id}
-            className="pointer-events-auto rounded-2xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.5)] border border-blue-400/30 bg-gradient-to-b from-[#0F142E] via-[#141C42] to-[#0A0E23] text-white animate-in slide-in-from-bottom-5 duration-300 backdrop-blur-xl group transition-transform hover:-translate-y-0.5"
+            className="pointer-events-auto rounded-xl overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)] border border-white/15 bg-[#090D1E]/95 backdrop-blur-xl text-white transform transition-all duration-300 ease-out hover:-translate-y-0.5 animate-msn-slide-in"
             role="alert"
           >
-            {/* Top MSN-Style Header Bar */}
-            <div className="bg-gradient-to-r from-[#172354] via-[#1E2D6E] to-[#70003E] px-3.5 py-1.5 flex items-center justify-between border-b border-white/10 text-[10px] font-bold">
-              <div className="flex items-center gap-1.5 text-blue-200">
-                {/* Classic MSN double-people emblem representation */}
-                <span className="flex items-center -space-x-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-slate-900 inline-block shadow-xs" />
-                  <span className="w-2 h-2 rounded-full bg-blue-300 border border-slate-900 inline-block" />
+            {/* Top Compact MSN-Style Bar */}
+            <div className="bg-gradient-to-r from-[#101838] via-[#172250] to-[#5C0034] px-2.5 py-1 flex items-center justify-between border-b border-white/10 text-[10px]">
+              <div className="flex items-center gap-1.5">
+                {/* Dual MSN dots */}
+                <span className="flex items-center -space-x-0.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 border border-slate-900 inline-block shadow-xs" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-300 border border-slate-900 inline-block" />
                 </span>
-                <span className="tracking-wide uppercase font-black text-pink-300">
+                <span className="tracking-wide uppercase font-black text-[9px] text-pink-300">
                   IPSUR Messenger
                 </span>
-                <span className="text-white/40">•</span>
-                <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                <span className="text-white/30">•</span>
+                <span className="text-emerald-400 font-semibold text-[9px] flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   En Línea
                 </span>
               </div>
 
-              <div className="flex items-center gap-1">
-                {/* Sound Toggle */}
+              <div className="flex items-center gap-0.5">
+                {/* Mute/Unmute */}
                 <button
                   type="button"
                   onClick={handleToggleSound}
-                  className="p-1 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition cursor-pointer"
-                  title={soundActive ? "Silenciar sonido MSN" : "Activar sonido MSN"}
+                  className="p-0.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                  title={soundActive ? "Silenciar tono" : "Activar tono"}
                 >
                   {soundActive ? (
-                    <Volume2 className="w-3.5 h-3.5 text-pink-300" />
+                    <Volume2 className="w-3 h-3 text-pink-300" />
                   ) : (
-                    <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+                    <VolumeX className="w-3 h-3 text-slate-400" />
                   )}
                 </button>
 
@@ -90,91 +87,79 @@ export default function MsnLoginToast() {
                 <button
                   type="button"
                   onClick={() => dismissMsnAlert(alert.id)}
-                  className="p-1 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition cursor-pointer"
-                  title="Cerrar aviso"
+                  className="p-0.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                  title="Cerrar"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-3 h-3" />
                 </button>
               </div>
             </div>
 
-            {/* Notification Body */}
-            <div className="p-3.5 flex items-start gap-3">
-              {/* User Avatar with MSN Glowing Green Ring */}
+            {/* Notification Body - Clean, Executive & Compact */}
+            <div className="px-3 py-2 flex items-center gap-2.5">
+              {/* Compact Avatar with Subtle Green Dot */}
               <div className="relative flex-shrink-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 to-ipsur-pink-600 p-0.5 shadow-md">
+                <div className="w-8 h-8 rounded-lg overflow-hidden bg-gradient-to-br from-indigo-700 to-ipsur-pink-600 p-[1px] shadow-sm">
                   {alert.avatar ? (
                     <img 
                       src={alert.avatar} 
                       alt={alert.userName} 
-                      className="w-full h-full object-cover rounded-[14px]"
+                      className="w-full h-full object-cover rounded-[7px]"
                     />
                   ) : (
-                    <div className="w-full h-full bg-slate-900/90 rounded-[14px] flex items-center justify-center text-white font-black text-sm">
+                    <div className="w-full h-full bg-slate-900 rounded-[7px] flex items-center justify-center text-white">
                       {isStudent ? (
-                        <GraduationCap className="w-6 h-6 text-pink-300" />
+                        <GraduationCap className="w-4 h-4 text-pink-300" />
                       ) : isTeacher ? (
-                        <BookOpen className="w-6 h-6 text-indigo-300" />
+                        <BookOpen className="w-4 h-4 text-indigo-300" />
                       ) : (
-                        <ShieldCheck className="w-6 h-6 text-amber-300" />
+                        <ShieldCheck className="w-4 h-4 text-amber-300" />
                       )}
                     </div>
                   )}
                 </div>
 
-                {/* Glowing Green Online Dot */}
-                <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                {/* Discreet Green Dot */}
+                <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-slate-900 shadow-md"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 border border-slate-900 shadow-xs"></span>
                 </span>
               </div>
 
               {/* Information Text */}
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-pink-200 border border-white/10">
-                    {alert.userTitle || (isStudent ? 'Estudiante' : isTeacher ? 'Docente' : 'Directivo')}
+                <div className="flex items-center justify-between gap-1">
+                  <h4 className="font-display font-bold text-white text-xs truncate leading-snug">
+                    {alert.userName}
+                  </h4>
+                  <span className="font-mono text-[9px] text-slate-400 flex-shrink-0">
+                    {alert.timeString?.slice(0, 5)}
                   </span>
-                  {alert.matricula && (
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {alert.matricula}
-                    </span>
-                  )}
                 </div>
 
-                <h4 className="font-display font-black text-white text-xs sm:text-sm mt-0.5 truncate leading-tight">
-                  {alert.userName}
-                </h4>
-
-                <p className="text-[11px] text-emerald-300 font-semibold mt-0.5 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-pink-400" />
-                  <span>¡Acaba de iniciar sesión!</span>
-                </p>
-
-                {/* Connection Metadata: Device + Exact Time */}
-                <div className="mt-1.5 pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-400 font-medium">
-                  <span className="flex items-center gap-1">
-                    {isMobile ? (
-                      <Smartphone className="w-3 h-3 text-pink-400" />
-                    ) : (
-                      <Laptop className="w-3 h-3 text-blue-400" />
-                    )}
-                    <span>{alert.device || 'Campus Web'}</span>
+                <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-300">
+                  <span className="text-emerald-300 font-medium">
+                    {isStudent ? 'Estudiante' : isTeacher ? 'Docente' : 'Directivo'}
                   </span>
-
-                  <span className="font-mono text-slate-300 font-bold bg-white/5 px-1.5 py-0.5 rounded border border-white/10">
-                    {alert.timeString} hrs
+                  <span className="text-white/20">•</span>
+                  <span className="flex items-center gap-1 text-slate-400">
+                    {isMobile ? (
+                      <Smartphone className="w-2.5 h-2.5 text-pink-400" />
+                    ) : (
+                      <Laptop className="w-2.5 h-2.5 text-blue-400" />
+                    )}
+                    <span>{alert.device || 'Campus'}</span>
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Animated Bottom Timer Bar */}
-            <div className="h-0.5 w-full bg-white/10 overflow-hidden">
+            {/* Discreet 3-Second Timer Bar */}
+            <div className="h-[1.5px] w-full bg-white/10 overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-emerald-400 via-ipsur-pink-500 to-indigo-500 animate-[msnProgress_7s_linear_forwards]"
+                className="h-full bg-gradient-to-r from-emerald-400 via-ipsur-pink-500 to-indigo-500"
                 style={{
-                  animation: 'msnProgress 7s linear forwards'
+                  animation: 'msnProgress 3s linear forwards'
                 }}
               />
             </div>
@@ -182,11 +167,24 @@ export default function MsnLoginToast() {
         );
       })}
 
-      {/* Global CSS keyframe animation for the progress bar */}
+      {/* Embedded CSS for smooth entrance and 3-second progress */}
       <style>{`
         @keyframes msnProgress {
           0% { width: 100%; }
           100% { width: 0%; }
+        }
+        @keyframes msnSlideIn {
+          0% {
+            opacity: 0;
+            transform: translateY(12px) scale(0.96);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .animate-msn-slide-in {
+          animation: msnSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
     </div>
