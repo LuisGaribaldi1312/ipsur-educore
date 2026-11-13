@@ -11,6 +11,7 @@ import MsnLoginToast from './components/common/MsnLoginToast';
 import PwaInstallModal from './components/common/PwaInstallModal';
 import AppSplashScreen from './components/common/AppSplashScreen';
 import DoubleBackExitToast from './components/common/DoubleBackExitToast';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import { INSTITUTIONAL_INFO } from './data/initialData';
 
 function MainLayout() {
@@ -33,18 +34,20 @@ function MainLayout() {
 
         {/* Main Central Container: Full responsive workspace */}
         <main className="flex-1 min-w-0 px-3.5 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-14 py-4 sm:py-6">
-          {activeClassroomId ? (
-            <ClassroomDetail
-              classroomId={activeClassroomId}
-              onBack={() => setActiveClassroomId(null)}
-            />
-          ) : (currentUser.role === 'coordinator' || currentUser.role === 'director' || currentUser.role === 'superadmin') ? (
-            <CoordinatorDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
-          ) : currentUser.role === 'teacher' ? (
-            <TeacherDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
-          ) : (
-            <StudentDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
-          )}
+          <ErrorBoundary onReset={() => setActiveClassroomId(null)} onBack={() => setActiveClassroomId(null)}>
+            {activeClassroomId ? (
+              <ClassroomDetail
+                classroomId={activeClassroomId}
+                onBack={() => setActiveClassroomId(null)}
+              />
+            ) : (currentUser.role === 'coordinator' || currentUser.role === 'director' || currentUser.role === 'superadmin') ? (
+              <CoordinatorDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
+            ) : currentUser.role === 'teacher' ? (
+              <TeacherDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
+            ) : (
+              <StudentDashboard onSelectClassroom={id => setActiveClassroomId(id)} />
+            )}
+          </ErrorBoundary>
         </main>
       </div>
 

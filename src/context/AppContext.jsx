@@ -126,7 +126,17 @@ export function AppProvider({ children }) {
   const [classrooms, setClassrooms] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_CLASSROOMS);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.map(c => ({
+            ...c,
+            materials: Array.isArray(c.materials) ? c.materials : [],
+            activities: Array.isArray(c.activities) ? c.activities : [],
+            submissions: Array.isArray(c.submissions) ? c.submissions : []
+          }));
+        }
+      }
     } catch (e) {
       console.error('Error loading classrooms from localStorage', e);
     }
@@ -1107,7 +1117,7 @@ export function AppProvider({ children }) {
       if (cls.id !== classroomId) return cls;
       const updated = {
         ...cls,
-        materials: [newMaterial, ...cls.materials]
+        materials: [newMaterial, ...(Array.isArray(cls.materials) ? cls.materials : [])]
       };
       broadcastMutation('CLASSROOM_UPDATED', updated);
       syncClassroomToCloud(updated);

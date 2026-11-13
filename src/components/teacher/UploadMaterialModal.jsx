@@ -18,14 +18,14 @@ export default function UploadMaterialModal({ isOpen, onClose, classroom }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || !classroom?.id) return;
 
     const selectedTopic = rubricTopics.find(t => t.id === unitId);
 
     addMaterial(classroom.id, {
       title: title.trim(),
-      unitId,
-      unitTitle: selectedTopic ? `${selectedTopic.unit}` : 'Unidad',
+      unitId: unitId || 'top-general',
+      unitTitle: selectedTopic ? `${selectedTopic.unit}` : 'Material General',
       description: description.trim(),
       type,
       fileName: fileName.trim() || `${title.replace(/\s+/g, '_')}.${type === 'video' ? 'mp4' : type === 'presentation' ? 'pptx' : 'pdf'}`,
@@ -57,11 +57,15 @@ export default function UploadMaterialModal({ isOpen, onClose, classroom }) {
             onChange={e => setUnitId(e.target.value)}
             className="w-full text-xs font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-ipsur-navy-500 outline-none"
           >
-            {rubricTopics.map(topic => (
-              <option key={topic.id} value={topic.id}>
-                {topic.unit}: {topic.title}
-              </option>
-            ))}
+            {rubricTopics.length === 0 ? (
+              <option value="top-general">Material General de la Asignatura</option>
+            ) : (
+              rubricTopics.map(topic => (
+                <option key={topic.id} value={topic.id}>
+                  {topic.unit}: {topic.title}
+                </option>
+              ))
+            )}
           </select>
         </div>
 
@@ -74,7 +78,7 @@ export default function UploadMaterialModal({ isOpen, onClose, classroom }) {
             {[
               { id: 'pdf', label: 'PDF / Lectura', icon: FileText },
               { id: 'video', label: 'Video Clase', icon: Video },
-              { id: 'presentation', label: 'Diapositivas', icon: Presentation },
+              { id: 'presentation', label: 'Diapositivas', icon: Presentation || FileText },
               { id: 'document', label: 'Enlace Web', icon: Link }
             ].map(item => {
               const Icon = item.icon;
