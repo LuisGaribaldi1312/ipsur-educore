@@ -7,6 +7,7 @@ import TeacherDashboard from './components/teacher/TeacherDashboard';
 import StudentDashboard from './components/student/StudentDashboard';
 import ClassroomDetail from './components/classroom/ClassroomDetail';
 import LoginScreen from './components/auth/LoginScreen';
+import MsnLoginToast from './components/common/MsnLoginToast';
 import { INSTITUTIONAL_INFO } from './data/initialData';
 
 function MainLayout() {
@@ -43,6 +44,9 @@ function MainLayout() {
           )}
         </main>
       </div>
+
+      {/* MSN Messenger Style Real-Time Login Notification Toast */}
+      <MsnLoginToast />
 
       {/* Institutional Executive Footer Bar matching Screenshot */}
       <footer className="bg-[#070D1B] text-slate-400 text-[11px] py-3.5 px-4 sm:px-8 border-t border-slate-800 shadow-md">

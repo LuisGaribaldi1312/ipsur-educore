@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getDatabase, ref, set, get, onValue, update, remove } from 'firebase/database';
+import { getDatabase, ref, set, get, onValue, update, remove, onChildAdded, query, limitToLast } from 'firebase/database';
 import { mergeEntities, mergeClassrooms } from './p2pSync';
 
 export const firebaseConfig = {
@@ -30,7 +30,8 @@ export const DB_PATHS = {
   ACTIVITIES: 'ipsur/activities',
   NOTIFICATIONS: 'ipsur/notifications',
   PROCEDURES: 'ipsur/procedures',
-  PAYMENTS: 'ipsur/payments'
+  PAYMENTS: 'ipsur/payments',
+  LOGINS: 'ipsur/recent_logins'
 };
 
 export const ensureArray = (val) => {
@@ -191,5 +192,65 @@ export async function syncItemToCloud(path, item) {
     await set(ref(db, path), list);
   } catch (error) {
     console.warn(`[IPSUR Firebase] Error sincronizando item en ${path}:`, error.message);
+  }
+}
+
+/**
+ * Records a real-time login event to Firebase and alerts staff
+ */
+export async function recordUserLogin(user) {
+  if (!db || !user?.id) return null;
+  try {
+    const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    const now = new Date();
+    const loginEvent = {
+      id: `login-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      userId: user.id,
+      userName: user.name,
+      userRole: user.role,
+      userTitle: user.title || (user.role === 'student' ? 'Estudiante' : user.role === 'teacher' ? 'Docente Titular' : 'Directivo'),
+      avatar: user.avatar || '',
+      matricula: user.matricula || '',
+      email: user.email || '',
+      timestamp: now.toISOString(),
+      timeString: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      dateString: now.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' }),
+      device: isMobile ? 'Teléfono Móvil' : 'Computadora / Laptop'
+    };
+
+    // Store under recent_logins
+    await set(ref(db, `${DB_PATHS.LOGINS}/${loginEvent.id}`), loginEvent);
+    return loginEvent;
+  } catch (error) {
+    console.warn('[IPSUR Firebase] Error registrando evento de login:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Subscribes to real-time login events to trigger MSN style notification
+ */
+export function subscribeToLoginEvents(onLoginDetected) {
+  if (!db) return () => {};
+  try {
+    // Only capture events occurring after this client subscribed (within last 15 seconds)
+    const subscriptionTime = Date.now() - 15000;
+    const loginsRef = ref(db, DB_PATHS.LOGINS);
+    const loginsQuery = query(loginsRef, limitToLast(25));
+
+    const unsubscribe = onChildAdded(loginsQuery, (snapshot) => {
+      const event = snapshot.val();
+      if (event && event.timestamp) {
+        const eventTime = new Date(event.timestamp).getTime();
+        if (eventTime >= subscriptionTime && onLoginDetected) {
+          onLoginDetected(event);
+        }
+      }
+    });
+
+    return unsubscribe;
+  } catch (error) {
+    console.warn('[IPSUR Firebase] Error suscribiendo a eventos de inicio de sesión:', error.message);
+    return () => {};
   }
 }

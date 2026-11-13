@@ -21,6 +21,7 @@ import {
   triggerManualSync,
   getPeerId
 } from '../services/p2pSync';
+import { playMsnNotificationSound } from '../utils/soundEffects';
 import {
   uploadAllLocalDataToCloud,
   subscribeToCloudData,
@@ -29,6 +30,8 @@ import {
   syncUserToCloud,
   deleteUserFromCloud,
   syncItemToCloud,
+  recordUserLogin,
+  subscribeToLoginEvents,
   DB_PATHS
 } from '../services/firebaseSync';
 
@@ -129,6 +132,64 @@ export function AppProvider({ children }) {
   const [p2pModalOpen, setP2PModalOpen] = useState(false);
   const [p2pPeersCount, setP2PPeersCount] = useState(0);
   const [p2pSelfId, setP2PSelfId] = useState('');
+
+  // MSN Messenger Style Real-Time Login Alerts State
+  const [msnAlerts, setMsnAlerts] = useState([]);
+
+  const dismissMsnAlert = (id) => {
+    setMsnAlerts(prev => prev.filter(a => a.id !== id));
+  };
+
+  // Keep fresh references for async listeners (Firebase RTDB & P2P)
+  const currentUserIdRef = useRef(currentUserId);
+  useEffect(() => {
+    currentUserIdRef.current = currentUserId;
+  }, [currentUserId]);
+
+  const usersRef = useRef(users);
+  useEffect(() => {
+    usersRef.current = users;
+  }, [users]);
+
+  // Central incoming login event dispatcher
+  const handleIncomingLoginEvent = (event) => {
+    if (!event || !event.userId) return;
+
+    // Do not notify about self
+    if (event.userId === currentUserIdRef.current) return;
+
+    // Determine current user
+    const loggedInUser = usersRef.current.find(u => u.id === currentUserIdRef.current);
+    if (!loggedInUser) return;
+
+    // Allowed notification recipients: Super Admin, Rector, Director, Coordinator, Teacher
+    const isAllowedRecipient = 
+      loggedInUser.isSuperAdmin || 
+      loggedInUser.role === 'superadmin' || 
+      ['rector', 'director', 'coordinator', 'teacher'].includes(loggedInUser.role);
+
+    if (!isAllowedRecipient) return;
+
+    // Play synthesized MSN Messenger sound
+    playMsnNotificationSound();
+
+    // Show floating MSN toast notification
+    setMsnAlerts(prev => {
+      if (prev.some(a => a.id === event.id)) return prev;
+      return [event, ...prev.slice(0, 2)];
+    });
+
+    // Also register in system notifications list (accessible via top bell icon)
+    const notifItem = {
+      id: `notif-msn-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      title: `¡${event.userName} acaba de conectarse!`,
+      message: `${event.userTitle || 'Usuario'} inició sesión desde ${event.device || 'dispositivo'}.`,
+      time: 'Hace un momento',
+      read: false,
+      type: 'connection'
+    };
+    setNotificationsList(prev => [notifItem, ...(prev || [])]);
+  };
 
   // IPSUR EDUCORE live services datasets (Zero demo data)
   const [activities, setActivities] = useState(() => {
@@ -253,6 +314,22 @@ export function AppProvider({ children }) {
     }
   }, [currentUserId]);
 
+  // Announce connection if already authenticated on initial page load
+  const announcedInitialRef = useRef(false);
+  useEffect(() => {
+    if (currentUserId && !announcedInitialRef.current && users && users.length > 0) {
+      const activeUser = users.find(u => u.id === currentUserId);
+      if (activeUser) {
+        announcedInitialRef.current = true;
+        recordUserLogin(activeUser).then(loginEvent => {
+          if (loginEvent) {
+            broadcastMutation('USER_LOGGED_IN', loginEvent);
+          }
+        });
+      }
+    }
+  }, [currentUserId, users]);
+
   // Real-time Decentralized P2P Mesh Sync between devices (PC <-> Phone <-> Tablet)
   useEffect(() => {
     initP2PMesh({
@@ -283,6 +360,8 @@ export function AppProvider({ children }) {
             setActivities(prev => mergeEntities(prev, [data]));
           } else if (type === 'PROCEDURE_UPDATED') {
             setProcedures(prev => mergeEntities(prev, [data]));
+          } else if (type === 'USER_LOGGED_IN' && data) {
+            handleIncomingLoginEvent(data);
           }
         } else {
           // Full gossip synchronization with connected peer
@@ -357,6 +436,16 @@ export function AppProvider({ children }) {
     };
   }, []);
 
+  // Real-time listener for MSN login notifications across all devices
+  useEffect(() => {
+    const unsubscribe = subscribeToLoginEvents((loginEvt) => {
+      handleIncomingLoginEvent(loginEvt);
+    });
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, []);
+
   // Clean up timer on unmount
   useEffect(() => {
     return () => {
@@ -421,6 +510,13 @@ export function AppProvider({ children }) {
     setCurrentUserId(foundUser.id);
     setLoginModalOpen(false);
 
+    // Broadcast login in real-time to Firebase Realtime Database and P2P mesh
+    recordUserLogin(foundUser).then(loginEvent => {
+      if (loginEvent) {
+        broadcastMutation('USER_LOGGED_IN', loginEvent);
+      }
+    });
+
     showToast(
       'Acceso Autorizado',
       `Bienvenido(a) a IPSUR EDUCORE, ${foundUser.name}`,
@@ -450,6 +546,14 @@ export function AppProvider({ children }) {
 
     setCurrentUserId(userId);
     setActiveClassroomId(null);
+
+    // Broadcast switch event as login
+    recordUserLogin(targetUser).then(loginEvent => {
+      if (loginEvent) {
+        broadcastMutation('USER_LOGGED_IN', loginEvent);
+      }
+    });
+
     showToast(
       `Perfil Activo: ${targetUser.name}`,
       `Rol: ${targetUser.title || targetUser.role}`,
@@ -1143,7 +1247,9 @@ export function AppProvider({ children }) {
         setP2PModalOpen,
         p2pPeersCount,
         p2pSelfId,
-        syncP2PManually
+        syncP2PManually,
+        msnAlerts,
+        dismissMsnAlert
       }}
     >
       {children}
