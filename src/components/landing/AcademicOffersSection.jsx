@@ -9,413 +9,558 @@ import {
   CheckCircle2, 
   ArrowRight, 
   Laptop, 
-  Award,
-  FileText,
-  Sparkles,
-  Layers,
-  ChevronRight,
-  Code,
-  Briefcase,
-  HeartPulse,
-  Share2,
-  Scale,
-  BrainCircuit,
-  Compass
+  Award, 
+  FileText, 
+  Sparkles, 
+  Layers, 
+  ChevronRight, 
+  Code, 
+  Briefcase, 
+  HeartPulse, 
+  Share2, 
+  Scale, 
+  BrainCircuit, 
+  Compass,
+  Building2,
+  Wrench,
+  Zap,
+  Activity,
+  Palette,
+  Eye,
+  Check,
+  MessageCircle
 } from 'lucide-react';
+import { PREPA_DATA, IUPS_DATA } from '../../data/institutionalLandingData';
 
 export default function AcademicOffersSection() {
   const { goToPortalApp } = useApp();
   const [activeTab, setActiveTab] = useState('prepa'); // 'prepa' | 'universidad'
+  const [univSubTab, setUnivSubTab] = useState('licenciaturas'); // 'licenciaturas' | 'ingenierias' | 'maestrias'
 
-  const prepaSpecialties = [
-    {
-      title: 'Informática y Programación Web',
-      desc: 'Desarrollo de software, mantenimiento de equipos, bases de datos y creación de sitios web modernos.',
-      duration: 'Modular Cuatrimestral',
-      badge: 'Tecnología',
-      icon: Code,
-      topics: ['Algoritmos', 'Diseño Web', 'Bases de Datos', 'Ofimática Avanzada']
-    },
-    {
-      title: 'Administración y Emprendimiento de Negocios',
-      desc: 'Fundamentos de finanzas personales, mercadotecnia, constitución legal de empresas y gestión de proyectos.',
-      duration: 'Modular Cuatrimestral',
-      badge: 'Negocios',
-      icon: Briefcase,
-      topics: ['Contabilidad Básica', 'Modelos de Negocio', 'Ventas Digitales', 'Liderazgo']
-    },
-    {
-      title: 'Auxiliar en Salud Comunitaria y Primeros Auxilios',
-      desc: 'Introducción a la anatomía, nutrición, prevención de enfermedades y primeros auxilios asistenciales.',
-      duration: 'Modular Cuatrimestral',
-      badge: 'Salud',
-      icon: HeartPulse,
-      topics: ['Anatomía', 'Primeros Auxilios', 'Nutrición', 'Salud Preventiva']
-    },
-    {
-      title: 'Comunicación, Medios Digitales y Publicidad',
-      desc: 'Redacción publicitaria, producción multimedia para redes sociales y creación de contenido estratégico.',
-      duration: 'Modular Cuatrimestral',
-      badge: 'Creatividad',
-      icon: Share2,
-      topics: ['Contenido Digital', 'Diseño Gráfico', 'Redes Sociales', 'Expresión Oral']
+  // Icon mapping helper
+  const getPrepaIcon = (id) => {
+    switch (id) {
+      case 'prepa-comunicacion': return Share2;
+      case 'prepa-administracion': return Briefcase;
+      case 'prepa-dibujo': return Building2;
+      default: return BookOpen;
     }
-  ];
+  };
 
-  const universityDegrees = [
-    {
-      title: 'Licenciatura en Administración y Negocios Digitales',
-      level: 'Licenciatura',
-      duration: '3 Años · Cuatrimestral',
-      mode: '100% en Línea',
-      icon: Briefcase,
-      desc: 'Lidera organizaciones con visión estratégica, gestión de recursos humanos, finanzas modernas y marketing digital.',
-      topics: ['Dirección Estratégica', 'Finanzas Corporativas', 'E-commerce', 'Gestión de Talento']
-    },
-    {
-      title: 'Ingeniería en Tecnologías de la Información y Software',
-      level: 'Ingeniería',
-      duration: '3 Años · Cuatrimestral',
-      mode: '100% en Línea',
-      icon: Code,
-      desc: 'Diseño y arquitectura de aplicaciones web, cloud computing, ciberseguridad, bases de datos y gestión de proyectos de software.',
-      topics: ['Arquitectura Cloud', 'Desarrollo Full Stack', 'Ciberseguridad', 'DevOps & Git']
-    },
-    {
-      title: 'Licenciatura en Pedagogía y Tecnologías Educativas',
-      level: 'Licenciatura',
-      duration: '3 Años · Cuatrimestral',
-      mode: '100% en Línea',
-      icon: BrainCircuit,
-      desc: 'Formación de docentes y directivos expertos en diseño curricular, pedagogía contemporánea y entornos virtuales de aprendizaje.',
-      topics: ['Diseño Instruccional', 'E-learning', 'Evaluación Curricular', 'Psicología Educativa']
-    },
-    {
-      title: 'Licenciatura en Mercadotecnia y Comercio Electrónico',
-      level: 'Licenciatura',
-      duration: '3 Años · Cuatrimestral',
-      mode: '100% en Línea',
-      icon: Compass,
-      desc: 'Estrategias de marca, ventas en línea, analítica digital, gestión de redes sociales y modelos de negocio en internet.',
-      topics: ['Growth Marketing', 'SEO & Analytics', 'Social Media Ads', 'Logística E-commerce']
-    },
-    {
-      title: 'Licenciatura en Derecho y Gestión Corporativa',
-      level: 'Licenciatura',
-      duration: '3 Años · Cuatrimestral',
-      mode: '100% en Línea',
-      icon: Scale,
-      desc: 'Marco jurídico nacional e internacional, derecho civil, laboral, mercantil y resolución de controversias en la era digital.',
-      topics: ['Derecho Mercantil', 'Contratos Digitales', 'Juicios Orales', 'Derecho Laboral']
-    },
-    {
-      title: 'Maestría en Innovación Educativa y Cátedra Digital',
-      level: 'Posgrado',
-      duration: '1.5 Años · Cuatrimestral',
-      mode: '100% en Línea',
-      icon: Award,
-      desc: 'Especialización para profesionistas que lideran la transformación digital de escuelas, universidades y centros de capacitación.',
-      topics: ['Liderazgo Directivo', 'Inteligencia Artificial Educativa', 'Políticas Públicas', 'Investigación']
-    }
-  ];
+  const getUnivIcon = (id) => {
+    if (id.includes('derecho') || id.includes('amparo') || id.includes('juicios')) return Scale;
+    if (id.includes('administracion') || id.includes('mba') || id.includes('gobierno')) return Briefcase;
+    if (id.includes('pedagogia') || id.includes('educacion') || id.includes('calidad')) return BrainCircuit;
+    if (id.includes('civil') || id.includes('interiorismo') || id.includes('inmobiliaria')) return Building2;
+    if (id.includes('electrica')) return Zap;
+    if (id.includes('mecanica')) return Wrench;
+    if (id.includes('diseno')) return Palette;
+    if (id.includes('deporte')) return Activity;
+    if (id.includes('psicologia')) return HeartPulse;
+    return GraduationCap;
+  };
 
   return (
-    <section id="oferta" className="py-16 sm:py-24 bg-white border-b border-slate-200 select-none">
-      {/* FULL-WIDTH WIDESCREEN CONTAINER */}
+    <section id="oferta" className="py-16 sm:py-24 bg-white select-none">
       <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         
-        {/* Section Heading */}
+        {/* Section Header */}
         <div className="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold mb-3 shadow-2xs">
-            <Layers className="w-3.5 h-3.5 text-ipsur-pink-600" />
-            <span>Catálogo Curricular Nacional con Validez SEP</span>
+            <Sparkles className="w-3.5 h-3.5 text-ipsur-pink-600" />
+            <span>Oferta Académica Oficial con RVOE SEP</span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight font-display">
-            Planes de Estudio Diseñados para Crecer
+            Programas Educativos con Validez Nacional
           </h2>
 
-          <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto">
-            Descubre nuestra oferta académica integral. Ambos niveles cuentan con acreditación oficial y están integrados al portal virtual para tu comodidad.
+          <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto">
+            Descubre los 4 bachilleratos de <strong className="text-ipsur-pink-600">Prepa IPSUR</strong> y las 19 carreras y posgrados de <strong className="text-sky-600">IUPS Universidad</strong> diseñados para impulsar tu éxito laboral:
           </p>
 
-          {/* Academic Tabs Toggle */}
-          <div className="mt-8 flex items-center justify-center p-1.5 bg-slate-100 rounded-2xl border border-slate-200 max-w-md mx-auto shadow-inner">
+          {/* Level Segmented Pill Selector */}
+          <div className="mt-8 inline-flex p-1.5 bg-slate-100 rounded-2xl border border-slate-200 shadow-inner max-w-md w-full">
             <button
+              type="button"
               onClick={() => setActiveTab('prepa')}
-              className={`flex-1 py-3 px-5 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-2 cursor-pointer ${
+              className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
                 activeTab === 'prepa'
-                  ? 'bg-ipsur-pink-600 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-ipsur-pink-600 to-rose-600 text-white shadow-md'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <BookOpen className="w-4 h-4" />
-              <span>Prepa en Línea IPSUR</span>
+              <span>Prepa IPSUR (4 Bachilleratos)</span>
             </button>
 
             <button
+              type="button"
               onClick={() => setActiveTab('universidad')}
-              className={`flex-1 py-3 px-5 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-2 cursor-pointer ${
+              className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
                 activeTab === 'universidad'
-                  ? 'bg-ipsur-navy-700 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-ipsur-navy-700 via-blue-600 to-sky-500 text-white shadow-md'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <GraduationCap className="w-4 h-4" />
-              <span>Universidad en Línea</span>
+              <span>IUPS Universidad (19 Programas)</span>
             </button>
           </div>
         </div>
 
-        {/* TAB CONTENT 1: PREPA EN LÍNEA IPSUR */}
+        {/* ======================================================== */}
+        {/* PREPA IPSUR TAB CONTENT                                  */}
+        {/* ======================================================== */}
         {activeTab === 'prepa' && (
-          <div id="prepa" className="space-y-12 animate-in fade-in duration-300">
+          <div className="space-y-12 animate-fadeIn">
             
-            {/* Main Overview Bento Box */}
-            <div className="bg-gradient-to-br from-pink-50/70 via-white to-slate-50 border-2 border-pink-100 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <div className="lg:col-span-8 space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-pink-100 text-ipsur-pink-800 text-xs font-black uppercase tracking-wider">
-                    Bachillerato General Acreditado · SEP DGB
-                  </div>
-
-                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight font-display">
-                    Preparatoria en Línea IPSUR: Obtén tu Certificado en 2 Años
-                  </h3>
-
-                  <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed font-normal">
-                    La modalidad de <strong className="text-slate-900 font-bold">Prepa IPSUR</strong> te permite cursar tu bachillerato general con acompañamiento docente personalizado en el portal virtual. Avanza materia por materia, entrega actividades con fecha programada y cuenta con tutores que te respaldan en cada paso.
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2 text-xs text-slate-700 font-medium">
-                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 text-sm mb-0.5">Duración</div>
-                      <div className="text-slate-500">2 Años (6 Periodos Modulares)</div>
-                    </div>
-                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 text-sm mb-0.5">Validez SEP</div>
-                      <div className="text-slate-500">Certificado Digital Oficial</div>
-                    </div>
-                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 text-sm mb-0.5">Metodología</div>
-                      <div className="text-slate-500">100% en Línea con Horarios Libres</div>
-                    </div>
-                  </div>
+            {/* Prepa Header Banner */}
+            <div className="bg-gradient-to-r from-pink-50 via-rose-50/50 to-white rounded-3xl p-6 sm:p-8 border border-pink-100 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="space-y-2 max-w-3xl">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-ipsur-pink-700 bg-pink-100/80 px-2.5 py-1 rounded-full">
+                    {PREPA_DATA.badge}
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+                    {PREPA_DATA.rvoe}
+                  </span>
                 </div>
-
-                <div className="lg:col-span-4 bg-white p-6 sm:p-8 rounded-3xl border border-pink-200 shadow-lg text-center space-y-4">
-                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-ipsur-pink-600 to-rose-500 text-white flex items-center justify-center shadow-md">
-                    <BookOpen className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-black text-slate-900 font-display">¿Listo para comenzar?</h4>
-                    <p className="text-xs text-slate-500 mt-1">Inscripciones abiertas todo el año sin examen de admisión.</p>
-                  </div>
-                  <button
-                    onClick={() => goToPortalApp('prepa')}
-                    className="w-full py-3.5 px-5 rounded-2xl bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <span>Entrar al Portal Prepa IPSUR</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Specialties Bento Grid */}
-            <div>
-              <div className="mb-6">
-                <span className="text-[11px] font-bold text-ipsur-pink-600 uppercase tracking-wider block">
-                  Capacitación para el Trabajo Integrada
-                </span>
-                <h4 className="text-xl sm:text-2xl font-black text-slate-900 font-display">
-                  Especializaciones del Bachillerato IPSUR
-                </h4>
-                <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  Desarrolla habilidades laborales prácticas certificadas que te abren puertas profesionales:
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 font-display">
+                  {PREPA_DATA.name} · {PREPA_DATA.institution}
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  {PREPA_DATA.description}
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {prepaSpecialties.map((item, index) => {
-                  const Icon = item.icon;
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                <button
+                  onClick={() => goToPortalApp('prepa')}
+                  className="px-5 py-3 rounded-xl bg-gradient-to-r from-ipsur-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>Entrar al Portal Prepa IPSUR</span>
+                </button>
+                <a
+                  href={`https://wa.me/${PREPA_DATA.whatsapp}?text=${encodeURIComponent('Hola, me interesa inscribirme en Prepa IPSUR.')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Pedir Beca</span>
+                </a>
+              </div>
+            </div>
+
+            {/* 3 Modalidades de Prepa */}
+            <div>
+              <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">
+                3 Modalidades de Estudio para Tu Vida:
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {PREPA_DATA.modalities.map((mod) => (
+                  <div key={mod.id} className="bg-slate-50/70 hover:bg-white rounded-3xl p-6 border border-slate-200 transition-all hover:shadow-lg flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-ipsur-pink-600 bg-pink-50 border border-pink-200 px-2.5 py-1 rounded-full">
+                          {mod.duration}
+                        </span>
+                        <Clock className="w-4 h-4 text-slate-400" />
+                      </div>
+                      <h5 className="text-base font-bold text-slate-900 mb-1">{mod.title}</h5>
+                      <span className="text-xs font-semibold text-slate-500 block mb-3">{mod.subtitle}</span>
+                      <p className="text-xs text-slate-600 leading-relaxed mb-4">{mod.desc}</p>
+                      
+                      <div className="space-y-2 border-t border-slate-200/60 pt-3">
+                        {mod.highlights.map((h, i) => (
+                          <div key={i} className="flex items-start gap-2 text-[11px] text-slate-600">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-ipsur-pink-500 flex-shrink-0 mt-0.5" />
+                            <span>{h}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 4 Programas de Bachillerato */}
+            <div>
+              <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">
+                Los 4 Bachilleratos Oficiales de IPSUR:
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                {PREPA_DATA.programs.map((prog) => {
+                  const Icon = getPrepaIcon(prog.id);
                   return (
                     <div 
-                      key={index}
-                      className="bg-slate-50 hover:bg-white rounded-3xl p-6 border border-slate-200 hover:border-pink-300 hover:shadow-xl transition-all flex flex-col justify-between space-y-4 group"
+                      key={prog.id}
+                      className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-100 hover:border-ipsur-pink-400 transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between group"
                     >
                       <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-ipsur-pink-600 bg-pink-50 border border-pink-100 px-2.5 py-0.5 rounded-full">
-                            {item.badge}
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-ipsur-pink-700 bg-pink-50 border border-pink-200 px-3 py-1 rounded-full">
+                            {prog.badge}
                           </span>
-                          <div className="w-8 h-8 rounded-lg bg-pink-100 text-ipsur-pink-600 flex items-center justify-center">
-                            <Icon className="w-4 h-4" />
+                          <span className="text-xs font-mono font-bold text-slate-400">
+                            {prog.duration}
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-ipsur-pink-600 to-rose-500 text-white flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                            <Icon className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">
+                              {prog.type}
+                            </span>
+                            <h4 className="text-lg font-bold text-slate-900 group-hover:text-ipsur-pink-600 transition-colors">
+                              {prog.name}
+                            </h4>
                           </div>
                         </div>
 
-                        <h5 className="text-base font-bold text-slate-900 leading-snug group-hover:text-ipsur-pink-600 transition-colors">
-                          {item.title}
-                        </h5>
-                        <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                          {item.desc}
+                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-5">
+                          {prog.desc}
                         </p>
 
-                        <div className="mt-4 flex flex-wrap gap-1.5">
-                          {item.topics.map((t, i) => (
-                            <span key={i} className="text-[10px] font-semibold text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-200">
-                              {t}
-                            </span>
-                          ))}
+                        <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-4 space-y-2">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                            Competencias y Habilidades Clave:
+                          </span>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {prog.skills.map((skill, sIdx) => (
+                              <div key={sIdx} className="flex items-center gap-2 text-xs text-slate-700 font-medium">
+                                <Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                                <span className="line-clamp-1">{skill}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="text-xs text-slate-500">
+                          <strong className="text-slate-700 font-bold">Continuidad Universitaria:</strong> {prog.careerPath}
                         </div>
                       </div>
 
-                      <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500 font-medium">
-                        <span>{item.duration}</span>
-                        <span className="text-emerald-600 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Oficial
-                        </span>
+                      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-xs font-mono text-emerald-600 font-bold">RVOE SEP Oficial</span>
+                        <button
+                          onClick={() => goToPortalApp('prepa')}
+                          className="text-xs font-bold text-ipsur-pink-600 hover:text-ipsur-pink-700 flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <span>Ver Materias en el Portal</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* Prepa Mission / Vision / Principles */}
+            <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 border border-slate-800 shadow-xl">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-ipsur-pink-400 block mb-2">Nuestra Esencia</span>
+                  <h4 className="text-lg font-bold text-white mb-2">Misión Institucional</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">{PREPA_DATA.mision}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-sky-400 block mb-2">Hacia Dónde Vamos</span>
+                  <h4 className="text-lg font-bold text-white mb-2">Visión 2030</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">{PREPA_DATA.vision}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 block mb-2">Principio Fundamental</span>
+                  <h4 className="text-lg font-bold text-white mb-2">Centrado en la Persona</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">{PREPA_DATA.principle}</p>
+                </div>
               </div>
             </div>
 
           </div>
         )}
 
-        {/* TAB CONTENT 2: UNIVERSIDAD EN LÍNEA */}
+        {/* ======================================================== */}
+        {/* IUPS UNIVERSIDAD TAB CONTENT                             */}
+        {/* ======================================================== */}
         {activeTab === 'universidad' && (
-          <div id="universidad" className="space-y-12 animate-in fade-in duration-300">
+          <div className="space-y-12 animate-fadeIn">
             
-            {/* Main Overview Bento Box */}
-            <div className="bg-gradient-to-br from-sky-50/70 via-white to-slate-50 border-2 border-sky-100 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <div className="lg:col-span-8 space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-black uppercase tracking-wider">
-                    Nivel Superior · Licenciaturas, Ingenierías y Maestrías
-                  </div>
-
-                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight font-display">
-                    Universidad en Línea: Carreras Profesionales con Alta Empleabilidad
-                  </h3>
-
-                  <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed font-normal">
-                    Diseñada para personas que desean titularse con un modelo cuatrimestral dinámico. Cursa materias con docentes con grado de maestría y doctorado, desarrolla proyectos de valor y titúlate por promedio o diplomado.
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2 text-xs text-slate-700 font-medium">
-                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 text-sm mb-0.5">Duración Licenciaturas</div>
-                      <div className="text-slate-500">3 Años (9 Cuatrimestres)</div>
-                    </div>
-                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 text-sm mb-0.5">Titulación Ágil</div>
-                      <div className="text-slate-500">Por Promedio o Diplomado</div>
-                    </div>
-                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 text-sm mb-0.5">Cátedra Virtual</div>
-                      <div className="text-slate-500">Sesiones en Vivo y Grabadas</div>
-                    </div>
-                  </div>
+            {/* IUPS Header Banner */}
+            <div className="bg-gradient-to-r from-sky-50 via-blue-50/50 to-white rounded-3xl p-6 sm:p-8 border border-sky-100 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="space-y-2 max-w-3xl">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-sky-800 bg-sky-100/80 px-2.5 py-1 rounded-full">
+                    {IUPS_DATA.badge}
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+                    {IUPS_DATA.rvoe}
+                  </span>
                 </div>
-
-                <div className="lg:col-span-4 bg-white p-6 sm:p-8 rounded-3xl border border-sky-200 shadow-lg text-center space-y-4">
-                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-ipsur-navy-700 to-sky-500 text-white flex items-center justify-center shadow-md">
-                    <GraduationCap className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-black text-slate-900 font-display">Portal Universitario</h4>
-                    <p className="text-xs text-slate-500 mt-1">Accede a tus cátedras, biblioteca y expediente académico.</p>
-                  </div>
-                  <button
-                    onClick={() => goToPortalApp('universidad')}
-                    className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-ipsur-navy-700 to-sky-600 hover:from-ipsur-navy-800 hover:to-sky-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <span>Entrar al Portal Universidad</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* University Careers Bento Grid */}
-            <div>
-              <div className="mb-6">
-                <span className="text-[11px] font-bold text-sky-600 uppercase tracking-wider block">
-                  Catálogo de Educación Superior
-                </span>
-                <h4 className="text-xl sm:text-2xl font-black text-slate-900 font-display">
-                  Licenciaturas, Ingenierías y Posgrados
-                </h4>
-                <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  Programas universitarios actualizados con validez oficial SEP nacional:
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 font-display">
+                  {IUPS_DATA.name} · {IUPS_DATA.institution}
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  {IUPS_DATA.description}
+                </p>
+                <p className="text-xs font-bold text-sky-700">
+                  {IUPS_DATA.subSlogan}
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {universityDegrees.map((deg, index) => {
-                  const Icon = deg.icon;
-                  return (
-                    <div 
-                      key={index}
-                      className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 hover:border-sky-400 hover:shadow-xl transition-all flex flex-col justify-between space-y-4 group"
-                    >
-                      <div className="space-y-3.5">
-                        <div className="flex items-center justify-between">
-                          <span className={`text-[10px] font-extrabold uppercase px-3 py-1 rounded-full ${
-                            deg.level === 'Posgrado'
-                              ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                              : 'bg-sky-100 text-sky-800 border border-sky-200'
-                          }`}>
-                            {deg.level}
-                          </span>
-                          <span className="text-xs font-mono text-slate-400 flex items-center gap-1 font-semibold">
-                            <Clock className="w-3.5 h-3.5" />
-                            {deg.duration}
-                          </span>
-                        </div>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                <button
+                  onClick={() => goToPortalApp('universidad')}
+                  className="px-5 py-3 rounded-xl bg-gradient-to-r from-ipsur-navy-700 via-blue-600 to-sky-500 hover:from-ipsur-navy-800 hover:to-sky-600 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Entrar al Portal IUPS</span>
+                </button>
+                <a
+                  href={`https://wa.me/${IUPS_DATA.whatsapp}?text=${encodeURIComponent('Hola, me interesa solicitar informes para las carreras de IUPS Universidad.')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Pedir Informes</span>
+                </a>
+              </div>
+            </div>
 
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0 mt-0.5 border border-sky-100">
+            {/* IUPS 4 Ventajas Competitivas */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {IUPS_DATA.advantages.map((adv, i) => (
+                <div key={i} className="bg-slate-50/80 rounded-2xl p-5 border border-slate-200 flex flex-col justify-between">
+                  <div>
+                    <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center mb-3">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                    <h5 className="text-sm font-bold text-slate-900 mb-1">{adv.title}</h5>
+                    <p className="text-xs text-slate-600 leading-relaxed">{adv.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Sub-Filters for IUPS Offer: Licenciaturas (8) | Ingenierías (3) | Maestrías (8) */}
+            <div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">
+                    Catálogo de Programas Universitarios Oficiales:
+                  </h4>
+                  <span className="text-sm font-bold text-slate-700">
+                    {univSubTab === 'licenciaturas' && '8 Licenciaturas con Alta Demanda Laboral'}
+                    {univSubTab === 'ingenierias' && '3 Ingenierías con Formación Tecnológica Avanzada'}
+                    {univSubTab === 'maestrias' && '8 Maestrías para Especialización y Alta Dirección'}
+                  </span>
+                </div>
+
+                <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setUnivSubTab('licenciaturas')}
+                    className={`py-2 px-3.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      univSubTab === 'licenciaturas'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Licenciaturas (8)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setUnivSubTab('ingenierias')}
+                    className={`py-2 px-3.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      univSubTab === 'ingenierias'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Ingenierías (3)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setUnivSubTab('maestrias')}
+                    className={`py-2 px-3.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      univSubTab === 'maestrias'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Maestrías (8)
+                  </button>
+                </div>
+              </div>
+
+              {/* Subtab 1: 8 Licenciaturas */}
+              {univSubTab === 'licenciaturas' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {IUPS_DATA.academicOffer.licenciaturas.map((carrera) => {
+                    const Icon = getUnivIcon(carrera.id);
+                    return (
+                      <div 
+                        key={carrera.id}
+                        className="bg-white rounded-3xl p-6 border-2 border-slate-100 hover:border-sky-400 transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between group"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full">
+                              {carrera.area}
+                            </span>
+                            <span className="text-[11px] font-mono text-slate-400 font-semibold">{carrera.duration}</span>
+                          </div>
+
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-ipsur-navy-700 to-sky-500 text-white flex items-center justify-center mb-3 shadow-md group-hover:scale-105 transition-transform">
                             <Icon className="w-5 h-5" />
                           </div>
-                          <h5 className="text-base font-bold text-slate-900 leading-snug group-hover:text-sky-600 transition-colors">
-                            {deg.title}
+
+                          <h5 className="text-base font-bold text-slate-900 group-hover:text-sky-600 transition-colors mb-2">
+                            {carrera.name}
                           </h5>
+
+                          <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                            {carrera.desc}
+                          </p>
+
+                          <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100 mb-2">
+                            <strong className="text-slate-700 block">Campo de Aplicación:</strong>
+                            {carrera.field}
+                          </div>
                         </div>
 
-                        <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                          {deg.desc}
-                        </p>
+                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                          <span className="font-mono text-emerald-600 font-bold">RVOE SEP</span>
+                          <span className="text-sky-600 font-semibold group-hover:translate-x-1 transition-transform">Info →</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
-                        <div className="flex flex-wrap gap-1.5 pt-1">
-                          {deg.topics.map((t, i) => (
-                            <span key={i} className="text-[10px] font-semibold text-slate-600 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
-                              {t}
+              {/* Subtab 2: 3 Ingenierías */}
+              {univSubTab === 'ingenierias' && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {IUPS_DATA.academicOffer.ingenierias.map((ing) => {
+                    const Icon = getUnivIcon(ing.id);
+                    return (
+                      <div 
+                        key={ing.id}
+                        className="bg-white rounded-3xl p-6 border-2 border-slate-100 hover:border-sky-400 transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between group"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full">
+                              {ing.area}
                             </span>
-                          ))}
+                            <span className="text-[11px] font-mono text-slate-400 font-semibold">{ing.duration}</span>
+                          </div>
+
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-slate-900 to-sky-600 text-white flex items-center justify-center mb-4 shadow-md group-hover:scale-105 transition-transform">
+                            <Icon className="w-6 h-6" />
+                          </div>
+
+                          <h5 className="text-lg font-bold text-slate-900 group-hover:text-sky-600 transition-colors mb-2">
+                            {ing.name}
+                          </h5>
+
+                          <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                            {ing.desc}
+                          </p>
+
+                          <div className="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100 mb-2">
+                            <strong className="text-slate-700 block mb-0.5">Especialización de la Carrera:</strong>
+                            {ing.field}
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                          <span className="font-mono text-emerald-600 font-bold">RVOE SEP Federal</span>
+                          <span className="text-sky-600 font-semibold">Modalidad Ejecutiva</span>
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
+              )}
 
-                      <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <span className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          RVOE SEP Oficial
-                        </span>
+              {/* Subtab 3: 8 Maestrías */}
+              {univSubTab === 'maestrias' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {IUPS_DATA.academicOffer.maestrias.map((posgrado) => {
+                    const Icon = getUnivIcon(posgrado.id);
+                    return (
+                      <div 
+                        key={posgrado.id}
+                        className="bg-white rounded-3xl p-6 border-2 border-slate-100 hover:border-sky-400 transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between group"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 border border-purple-200 px-2.5 py-0.5 rounded-full">
+                              Posgrado Oficial
+                            </span>
+                            <span className="text-[11px] font-mono text-slate-400 font-semibold">{posgrado.duration}</span>
+                          </div>
 
-                        <button
-                          onClick={() => goToPortalApp('universidad')}
-                          className="font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1 text-xs cursor-pointer group-hover:translate-x-0.5 transition-transform"
-                        >
-                          <span>Ver en Portal</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-800 to-sky-500 text-white flex items-center justify-center mb-3 shadow-md group-hover:scale-105 transition-transform">
+                            <Icon className="w-5 h-5" />
+                          </div>
+
+                          <h5 className="text-base font-bold text-slate-900 group-hover:text-sky-600 transition-colors mb-2">
+                            {posgrado.name}
+                          </h5>
+
+                          <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                            {posgrado.desc}
+                          </p>
+
+                          <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100 mb-2">
+                            <strong className="text-slate-700 block">Dirigido a:</strong>
+                            {posgrado.target}
+                          </div>
+                        </div>
+
+                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                          <span className="font-mono text-emerald-600 font-bold">RVOE Grado Maestría</span>
+                          <span className="text-sky-600 font-semibold group-hover:translate-x-1 transition-transform">Ver →</span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+              )}
+
+            </div>
+
+            {/* Mensaje de Rectoría / Filosofía IUPS */}
+            <div className="bg-gradient-to-br from-[#070D1B] via-[#0D1530] to-[#081024] text-white rounded-3xl p-8 sm:p-12 border border-slate-800 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-sky-500/10 rounded-full blur-[100px] pointer-events-none" />
+              
+              <div className="relative z-10 max-w-4xl">
+                <span className="text-xs font-mono font-bold text-sky-400 uppercase tracking-widest block mb-2">
+                  {IUPS_DATA.welcomeDirector.title}
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-black text-white font-display mb-4">
+                  "{IUPS_DATA.welcomeDirector.quote}"
+                </h3>
+                <p className="text-sm text-slate-300 leading-relaxed font-normal mb-6">
+                  {IUPS_DATA.welcomeDirector.body}
+                </p>
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-800 text-xs text-slate-400">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Rectoría y Dirección General · Instituto Universitario Peninsular del Sur (IUPS)</span>
+                </div>
               </div>
             </div>
 

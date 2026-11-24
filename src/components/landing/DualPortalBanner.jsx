@@ -12,8 +12,11 @@ import {
   LogIn,
   CheckCircle2,
   Lock,
-  Layers
+  Layers,
+  MapPin,
+  Clock
 } from 'lucide-react';
+import { PREPA_DATA, IUPS_DATA } from '../../data/institutionalLandingData';
 
 export default function DualPortalBanner() {
   const { goToPortalApp, goToPortalSelector } = useApp();
@@ -69,21 +72,21 @@ export default function DualPortalBanner() {
               </div>
 
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6 font-normal">
-                Espacio virtual exclusivo para alumnos de bachillerato, docentes y directivos. Accede a tus materias por periodo, guías didácticas oficiales, entregas con fecha límite, boletas cuatrimestrales y exámenes en línea.
+                Espacio virtual exclusivo para alumnos de preparatoria, docentes y directivos del <strong className="text-slate-800">Instituto Peninsular del Sur</strong>. Accede a tus materias por cuatrimestre, guías didácticas oficiales, entregas de actividades, boletas y exámenes en línea.
               </p>
 
               <div className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 mb-8 font-medium">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-ipsur-pink-500 flex-shrink-0" />
-                  <span>Salas Virtuales y repositorios didácticos 24/7</span>
+                  <span>4 Bachilleratos: Comunicación, Administración, Dibujo y General</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-ipsur-pink-500 flex-shrink-0" />
-                  <span>Entrega de tareas escolares con rúbricas de evaluación al 100%</span>
+                  <span>Modalidad Modular Intensiva (1 día/semana), Mixta y 100% en Línea</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-ipsur-pink-500 flex-shrink-0" />
-                  <span>Boleta oficial de calificaciones y trámites de control escolar</span>
+                  <span>Certificado oficial SEP con validez nacional para cualquier universidad</span>
                 </div>
               </div>
             </div>
@@ -97,7 +100,7 @@ export default function DualPortalBanner() {
             </button>
           </div>
 
-          {/* CARD 2: UNIVERSIDAD EN LÍNEA */}
+          {/* CARD 2: IUPS UNIVERSIDAD */}
           <div className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-slate-200 hover:border-sky-500 transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col justify-between group transform hover:-translate-y-1 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-48 h-48 bg-sky-100/50 rounded-full blur-[60px] pointer-events-none" />
 
@@ -119,27 +122,27 @@ export default function DualPortalBanner() {
                     Educación Superior
                   </span>
                   <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 group-hover:text-sky-600 transition-colors font-display">
-                    Universidad en Línea
+                    IUPS Universidad en Línea
                   </h3>
                 </div>
               </div>
 
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6 font-normal">
-                Campus virtual universitario para licenciaturas, ingenierías y maestrías. Acceso a cátedras con docentes especializados, biblioteca digital, seguimiento de créditos y proyectos de titulación profesional.
+                Campus virtual del <strong className="text-slate-800">Instituto Universitario Peninsular del Sur (IUPS)</strong>. Creado para estudiar sin dejar de trabajar. Acceso a cátedras con docentes especializados, biblioteca digital, materias cuatrimestrales y titulación ágil.
               </p>
 
               <div className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 mb-8 font-medium">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-500 flex-shrink-0" />
-                  <span>Cátedra virtual con docentes de maestría y doctorado</span>
+                  <span>8 Licenciaturas: Derecho, Administración, Contaduría, Pedagogía y más</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-500 flex-shrink-0" />
-                  <span>Gestión de proyectos aplicativos, prácticas y servicio social</span>
+                  <span>3 Ingenierías (Civil, Eléctrica, Mecánica) y 8 Maestrías de Posgrado</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-500 flex-shrink-0" />
-                  <span>Expediente de créditos acumulados y trámites de titulación ágil</span>
+                  <span>Modalidad Ejecutiva & RVOE SEP Incorporado para cédula profesional</span>
                 </div>
               </div>
             </div>
@@ -148,7 +151,7 @@ export default function DualPortalBanner() {
               onClick={() => goToPortalApp('universidad')}
               className="relative z-10 w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-ipsur-navy-700 via-blue-600 to-sky-500 hover:from-ipsur-navy-800 hover:to-sky-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-sky-600/25 transition cursor-pointer group-hover:gap-3"
             >
-              <span>Ingresar a Universidad en Línea</span>
+              <span>Ingresar a IUPS Universidad en Línea</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

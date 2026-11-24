@@ -12,8 +12,11 @@ import {
   GraduationCap,
   CheckCircle2,
   ArrowRight,
-  Bell
+  Bell,
+  MapPin,
+  CalendarCheck
 } from 'lucide-react';
+import { INSTITUTIONAL_CAMPUS } from '../../data/institutionalLandingData';
 
 export default function EducationalModelSection() {
   const { goToPortalSelector, installPwa, isPwaInstalled } = useApp();
@@ -22,37 +25,37 @@ export default function EducationalModelSection() {
     {
       icon: Laptop,
       title: 'Plataforma Virtual EDUCORE 24/7',
-      desc: 'Salas virtuales interactivas, repositorios didácticos, videoconferencias integradas y seguimiento de tareas en tiempo real.',
+      desc: 'Salas virtuales interactivas, repositorios didácticos oficiales, videoconferencias integradas y seguimiento de tareas en tiempo real desde cualquier dispositivo.',
       color: 'pink'
     },
     {
       icon: Users,
-      title: 'Docentes Titulados y Asesoría Continua',
-      desc: 'Profesores especializados que resuelven tus dudas académicas, califican tus actividades con rúbricas oficiales y te acompañan paso a paso.',
+      title: 'Docentes Titulados y Asesoría Personalizada',
+      desc: 'Profesores y catedráticos con nivel posgrado que resuelven dudas académicas, evalúan con rúbricas claras y brindan retroalimentación continua.',
       color: 'blue'
     },
     {
       icon: Clock,
-      title: 'Flexibilidad Total de Horarios',
-      desc: 'Estudia a tu propio ritmo. Ideal para estudiantes que trabajan o tienen responsabilidades familiares sin sacrificar la calidad educativa.',
+      title: 'Modalidad Modular & Ejecutiva',
+      desc: '¡Estudia sin tener que dejar de trabajar! Modalidad Modular de 1 día a la semana en Prepa y esquemas ejecutivos cuatrimestrales en Universidad IUPS.',
       color: 'pink'
     },
     {
       icon: ShieldCheck,
       title: 'Validez Oficial SEP Garantizada',
-      desc: 'Planes con reconocimiento oficial de validez de estudios (RVOE). Tu certificado de prepa o título universitario tiene valor en todo México y el extranjero.',
+      desc: 'Todos nuestros planes cuentan con RVOE oficial SEP federal y estatal. Tu certificado de prepa, título y cédula profesional universitaria tienen validez nacional.',
       color: 'blue'
+    },
+    {
+      icon: MapPin,
+      title: 'Campus Físico en Playa del Carmen',
+      desc: 'Instalaciones ubicadas en Calle 6 Norte entre Av. 20 y 25, Centro. Acceso a biblioteca, asesorías presenciales, laboratorios y trámites de control escolar.',
+      color: 'pink'
     },
     {
       icon: Smartphone,
       title: 'App Móvil PWA Instalable',
-      desc: 'Instala la aplicación en tu celular Android o iPhone. Accede a tus clases, recibe alertas cuando tus compañeros o docentes se conectan y consulta tus calificaciones.',
-      color: 'pink'
-    },
-    {
-      icon: Award,
-      title: 'Becas y Colegiaturas Congeladas',
-      desc: 'Precios justos, sin costos ocultos, sin examen de admisión y con opciones de becas académicas de hasta 40% durante toda tu trayectoria.',
+      desc: 'Descarga directa en tu teléfono Android o iPhone. Acceso inmediato a tus clases con un solo toque, notificaciones en vivo y consumo de datos optimizado.',
       color: 'blue'
     }
   ];
@@ -69,15 +72,15 @@ export default function EducationalModelSection() {
         <div className="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-slate-200 text-xs font-bold mb-3 shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-ipsur-pink-400" />
-            <span>Innovación en Educación a Distancia</span>
+            <span>Modelo Pedagógico Integral Peninsular</span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight font-display">
-            ¿Por qué estudiar en IPSUR EDUCORE?
+            ¿Por qué estudiar en IPSUR e IUPS?
           </h2>
 
           <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto">
-            Hemos transformado la experiencia de estudiar en línea combinando tecnología intuitiva, calidad pedagógica y un entorno seguro para tu crecimiento:
+            Combinamos tecnología educativa de vanguardia, flexibilidad de horarios para trabajadores y el respaldo institucional de la Secretaría de Educación Pública:
           </p>
         </div>
 
@@ -101,7 +104,7 @@ export default function EducationalModelSection() {
                     <Icon className="w-6 h-6" />
                   </div>
 
-                  <h3 className="text-base sm:text-lg font-bold text-white mb-2 leading-snug">
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2 group-hover:text-pink-300 transition-colors">
                     {item.title}
                   </h3>
 
@@ -110,50 +113,30 @@ export default function EducationalModelSection() {
                   </p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs">
-                  <span className={`font-mono text-[11px] font-bold ${isPink ? 'text-ipsur-pink-400' : 'text-sky-400'}`}>
-                    IPSUR · Garantía Oficial
-                  </span>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <div className="mt-6 pt-4 border-t border-slate-700/50 flex items-center justify-between text-xs text-slate-400">
+                  <span className="font-mono text-[11px]">Garantía Institucional</span>
+                  <CheckCircle2 className={`w-4 h-4 ${isPink ? 'text-ipsur-pink-400' : 'text-sky-400'}`} />
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Interactive Experience Banner */}
-        <div className="mt-12 sm:mt-16 bg-gradient-to-r from-ipsur-navy-900 via-slate-900 to-ipsur-pink-950 border border-slate-700/90 rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
-          <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] font-black uppercase tracking-wider text-ipsur-pink-400 bg-pink-950/80 px-2.5 py-1 rounded-full border border-pink-800/80">
-              Acceso a la Plataforma
-            </span>
-            <h3 className="text-xl sm:text-2xl font-black text-white">
-              ¿Ya eres alumno o docente de Prepa o Universidad?
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-              Ingresa con tu matrícula y contraseña al Portal Educativo para revisar tus salas virtuales y calificaciones.
+        {/* Bottom CTA within section */}
+        <div className="mt-12 sm:mt-16 bg-gradient-to-r from-slate-800/90 via-slate-800/60 to-slate-800/90 border border-slate-700 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 max-w-5xl mx-auto shadow-xl">
+          <div className="space-y-1 text-center sm:text-left">
+            <h4 className="text-base sm:text-lg font-bold text-white">¿Listo para iniciar tus estudios?</h4>
+            <p className="text-xs sm:text-sm text-slate-300">
+              Inscripciones abiertas con becas institucionales de hasta 40% durante todo tu programa.
             </p>
           </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <button
-              onClick={() => goToPortalSelector()}
-              className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-ipsur-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-extrabold text-xs sm:text-sm shadow-xl flex items-center gap-2 cursor-pointer transition-all"
-            >
-              <span>Ingresar al Portal</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-
-            {!isPwaInstalled && (
-              <button
-                onClick={installPwa}
-                className="px-4 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs flex items-center gap-2 border border-white/20 transition cursor-pointer"
-              >
-                <Smartphone className="w-4 h-4 text-sky-400" />
-                <span>Instalar en Celular</span>
-              </button>
-            )}
-          </div>
+          <button
+            onClick={() => goToPortalSelector()}
+            className="flex-shrink-0 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-ipsur-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-ipsur-pink-600/30 flex items-center gap-2 cursor-pointer transition transform hover:-translate-y-0.5"
+          >
+            <span>Seleccionar Mi Portal</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
 
       </div>

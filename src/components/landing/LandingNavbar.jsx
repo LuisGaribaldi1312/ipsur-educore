@@ -31,10 +31,10 @@ export default function LandingNavbar() {
   const navLinks = [
     { label: 'Inicio', href: '#inicio' },
     { label: 'Prepa IPSUR', href: '#prepa', badge: 'Bachillerato' },
-    { label: 'Universidad en Línea', href: '#universidad', badge: 'Superior' },
+    { label: 'IUPS Universidad', href: '#universidad', badge: 'Superior' },
     { label: 'Modelo Educativo', href: '#modelo' },
     { label: 'Admisiones & Becas', href: '#admisiones' },
-    { label: 'Contacto', href: '#contacto' }
+    { label: 'Campus & Contacto', href: '#contacto' }
   ];
 
   const handleLinkClick = (e, href) => {
@@ -58,7 +58,7 @@ export default function LandingNavbar() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-ipsur-pink-500"></span>
             </span>
             <span className="tracking-wide">
-              Ciclo Escolar 2026-2027 · Inscripciones Abiertas con Becas de hasta 40% en <strong className="text-pink-300 font-bold">Prepa IPSUR</strong> y <strong className="text-sky-300 font-bold">Universidad en Línea</strong>
+              Playa del Carmen, Q. Roo · Inscripciones Abiertas con Becas en <strong className="text-pink-300 font-bold">Prepa IPSUR</strong> e <strong className="text-sky-300 font-bold">IUPS Universidad</strong>
             </span>
           </div>
 
@@ -69,13 +69,13 @@ export default function LandingNavbar() {
             </span>
             <span className="hidden md:inline text-white/20">|</span>
             <a 
-              href="https://wa.me/529988452100" 
+              href="https://wa.me/529843623473" 
               target="_blank" 
               rel="noreferrer"
               className="hover:text-white flex items-center gap-1.5 text-slate-200 font-bold transition group"
             >
               <MessageCircle className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
-              <span>WhatsApp Admisiones: (998) 845-2100</span>
+              <span>WhatsApp Admisiones: (984) 362-3473</span>
             </a>
           </div>
         </div>
@@ -100,14 +100,14 @@ export default function LandingNavbar() {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-lg sm:text-xl font-black text-ipsur-navy-900 tracking-tight leading-none font-display">
-                IPSUR
+                IPSUR <span className="text-ipsur-pink-600">·</span> IUPS
               </span>
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-ipsur-pink-600 bg-pink-50 px-2 py-0.5 rounded-md border border-pink-200 shadow-2xs">
                 EDUCORE
               </span>
             </div>
             <span className="text-[11px] sm:text-xs font-semibold text-slate-500 block leading-tight mt-0.5">
-              Prepa en Línea IPSUR & Universidad en Línea
+              Prepa IPSUR & IUPS Instituto Universitario Peninsular del Sur
             </span>
           </div>
         </a>

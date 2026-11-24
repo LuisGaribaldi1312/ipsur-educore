@@ -11,8 +11,12 @@ import {
   ArrowRight,
   ShieldCheck,
   GraduationCap,
-  BookOpen
+  BookOpen,
+  MapPin,
+  Clock,
+  Check
 } from 'lucide-react';
+import { PREPA_DATA, IUPS_DATA, INSTITUTIONAL_CAMPUS } from '../../data/institutionalLandingData';
 
 export default function AdmissionSection() {
   const { showToast } = useApp();
@@ -22,7 +26,7 @@ export default function AdmissionSection() {
     name: '',
     phone: '',
     email: '',
-    city: '',
+    program: '',
     message: ''
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -37,16 +41,17 @@ export default function AdmissionSection() {
     setIsSubmitted(true);
     showToast(
       '¡Solicitud Recibida!', 
-      `Gracias ${formData.name}. Un asesor académico de ${selectedLevel === 'prepa' ? 'Prepa IPSUR' : 'Universidad en Línea'} se comunicará contigo vía WhatsApp.`,
+      `Gracias ${formData.name}. Un asesor académico de ${selectedLevel === 'prepa' ? 'Prepa IPSUR' : 'IUPS Universidad'} se comunicará contigo vía WhatsApp a la brevedad.`,
       'success'
     );
   };
 
   const openWhatsApp = () => {
+    const targetData = selectedLevel === 'prepa' ? PREPA_DATA : IUPS_DATA;
     const text = encodeURIComponent(
-      `Hola, me gustaría solicitar informes para ingresar a ${selectedLevel === 'prepa' ? 'Prepa en Línea IPSUR' : 'la Universidad en Línea'}. Mi nombre es ${formData.name || 'un aspirante interesado'}.`
+      `Hola, me gustaría solicitar informes para ingresar a ${targetData.name} (${targetData.institution}). Mi nombre es ${formData.name || 'un aspirante interesado'}. Programa de interés: ${formData.program || 'general'}.`
     );
-    window.open(`https://wa.me/529988452100?text=${text}`, '_blank');
+    window.open(`https://wa.me/${targetData.whatsapp}?text=${text}`, '_blank');
   };
 
   return (
@@ -65,7 +70,7 @@ export default function AdmissionSection() {
           </h2>
 
           <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto">
-            Sin examen de admisión y con inicio de clases continuo. Comienza tu preparación académica hoy mismo:
+            Sin examen de admisión y con inicio de clases continuo. Comienza tu preparación en Prepa IPSUR o IUPS Universidad hoy mismo:
           </p>
         </div>
 
@@ -75,215 +80,293 @@ export default function AdmissionSection() {
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs relative flex flex-col justify-between">
             <div className="space-y-3">
               <span className="text-3xl font-black font-mono text-ipsur-pink-600">01</span>
-              <h3 className="text-base font-bold text-slate-900">Registro y Solicitud</h3>
+              <h3 className="text-base font-bold text-slate-900">Registro y Asesoría Vocacional</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Completa tus datos en el formulario o contáctanos por WhatsApp. Un asesor te guiará con las materias y tu beca aplicable.
+                Completa tus datos en el formulario o comunícate vía WhatsApp oficial. Un asesor académico te explicará el plan de estudios, las modalidades y tu beca disponible.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>Respuesta inmediata</span>
+              <span>Respuesta inmediata en minutos</span>
             </div>
           </div>
 
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs relative flex flex-col justify-between">
             <div className="space-y-3">
               <span className="text-3xl font-black font-mono text-ipsur-navy-700">02</span>
-              <h3 className="text-base font-bold text-slate-900">Envío de Documentos Digitales</h3>
+              <h3 className="text-base font-bold text-slate-900">Envío Digital de Documentos</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Envía fotografía o escaneo de tu certificado previo (secundaria para prepa, o bachillerato para universidad), acta y CURP.
+                Envía fotografía o escaneo legible de tu certificado previo (secundaria para prepa, o bachillerato/título para universidad), acta de nacimiento y CURP.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>Trámite 100% digital</span>
+              <span>Trámite 100% digital o presencial</span>
             </div>
           </div>
 
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs relative flex flex-col justify-between">
             <div className="space-y-3">
-              <span className="text-3xl font-black font-mono text-sky-600">03</span>
-              <h3 className="text-base font-bold text-slate-900">Acceso Inmediato al Portal</h3>
+              <span className="text-3xl font-black font-mono text-emerald-600">03</span>
+              <h3 className="text-base font-bold text-slate-900">Inscripción y Acceso al Portal</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Recibe tu matrícula de estudiante y contraseña para ingresar a tus salas virtuales de Prepa IPSUR o Universidad en Línea.
+                Realiza tu aportación inicial con opciones de pago en línea o en banco y recibe de inmediato tu matrícula y clave para entrar a las salas virtuales EDUCORE.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>Alta de materias en EDUCORE</span>
+              <span>Inicio de clases continuo</span>
             </div>
           </div>
 
         </div>
 
-        {/* Contact and Request Info Form */}
-        <div id="contacto" className="max-w-4xl mx-auto bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-12">
+        {/* Dual Layout: Requirements Checklist & Official Application Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 max-w-6xl mx-auto items-start">
           
-          {/* Left Info Panel */}
-          <div className="md:col-span-5 bg-gradient-to-br from-ipsur-navy-900 via-ipsur-navy-800 to-slate-900 text-white p-6 sm:p-8 flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-wider text-ipsur-pink-400 bg-pink-950/80 px-2.5 py-1 rounded-full border border-pink-800/80 inline-block">
-                Atención a Aspirantes
+          {/* Left Column: Requirements & Campus Info */}
+          <div className="lg:col-span-5 space-y-6">
+            
+            {/* Level Selector Pills */}
+            <div className="bg-white p-2 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedLevel('prepa')}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-2 ${
+                  selectedLevel === 'prepa'
+                    ? 'bg-ipsur-pink-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Prepa IPSUR</span>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => setSelectedLevel('universidad')}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-2 ${
+                  selectedLevel === 'universidad'
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <GraduationCap className="w-3.5 h-3.5" />
+                <span>IUPS Universidad</span>
+              </button>
+            </div>
+
+            {/* Requirements Card */}
+            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs">
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white ${
+                  selectedLevel === 'prepa' ? 'bg-ipsur-pink-600' : 'bg-sky-600'
+                }`}>
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">
+                    Requisitos Oficiales de Admisión
+                  </h4>
+                  <span className="text-[11px] text-slate-500">
+                    {selectedLevel === 'prepa' ? 'Para ingresar a Prepa IPSUR' : 'Para ingresar a IUPS Universidad'}
+                  </span>
+                </div>
+              </div>
+
+              <ul className="space-y-2.5 text-xs text-slate-600">
+                {(selectedLevel === 'prepa' ? PREPA_DATA.requirements : IUPS_DATA.requirements).map((req, rIdx) => (
+                  <li key={rIdx} className="flex items-start gap-2.5">
+                    <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
+                      selectedLevel === 'prepa' ? 'text-ipsur-pink-500' : 'text-sky-500'
+                    }`} />
+                    <span>{req}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Campus Physical Address Card */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3">
+              <div className="flex items-center gap-2.5 text-xs font-bold text-slate-900">
+                <MapPin className="w-4 h-4 text-ipsur-pink-600" />
+                <span>Plantel Oficial Playa del Carmen</span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {INSTITUTIONAL_CAMPUS.address}
+              </p>
+              <div className="flex items-center gap-2 text-[11px] text-slate-500 pt-2 border-t border-slate-100">
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <span>{INSTITUTIONAL_CAMPUS.schedule}</span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Right Column: Admission Application Form */}
+          <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-lg">
+            <div className="mb-6">
+              <span className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
+                selectedLevel === 'prepa' 
+                  ? 'bg-pink-50 text-ipsur-pink-700 border border-pink-200' 
+                  : 'bg-sky-50 text-sky-700 border border-sky-200'
+              }`}>
+                Solicitud de Inscripción o Beca
               </span>
-              <h3 className="text-xl sm:text-2xl font-black text-white leading-snug">
-                ¿Tienes dudas sobre los costos, planes o revalidaciones?
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-2 font-display">
+                Comunícate con Admisiones
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Nuestro equipo de admisiones te atenderá con gusto para resolver todas tus preguntas y asignar tu descuento institucional.
+              <p className="text-xs text-slate-500 mt-1">
+                Llena el formulario para que un orientador educativo te brinde atención personalizada:
               </p>
             </div>
 
-            <div className="space-y-3 text-xs text-slate-200">
-              <div className="flex items-center gap-2.5">
-                <MessageCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>WhatsApp: +52 (998) 845-2100</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                <span>Teléfono directo: (998) 845-2100</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-ipsur-pink-400 flex-shrink-0" />
-                <span>admisiones@ipsur.edu.mx</span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={openWhatsApp}
-              className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-md"
-            >
-              <MessageCircle className="w-4 h-4" />
-              <span>Chatear por WhatsApp Directo</span>
-            </button>
-          </div>
-
-          {/* Right Form Panel */}
-          <div className="md:col-span-7 p-6 sm:p-8">
             {isSubmitted ? (
-              <div className="py-12 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
-                  <CheckCircle2 className="w-8 h-8" />
+              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center space-y-4">
+                <div className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto shadow-md">
+                  <Check className="w-6 h-6" />
                 </div>
-                <h4 className="text-lg font-bold text-slate-900">¡Información enviada exitosamente!</h4>
-                <p className="text-xs text-slate-600 max-w-sm mx-auto">
-                  Hemos registrado tus datos. En breve un coordinador de admisiones se pondrá en contacto contigo.
+                <h4 className="text-base font-bold text-emerald-900">¡Información Enviada con Éxito!</h4>
+                <p className="text-xs text-emerald-800 leading-relaxed max-w-md mx-auto">
+                  Hemos registrado tus datos. Si deseas acelerar tu trámite, también puedes iniciar una conversación directa en WhatsApp con nuestro departamento de admisiones.
                 </p>
                 <button
-                  onClick={() => setIsSubmitted(false)}
-                  className="px-4 py-2 text-xs font-bold text-ipsur-navy-700 bg-slate-100 rounded-xl hover:bg-slate-200 transition"
+                  type="button"
+                  onClick={openWhatsApp}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
                 >
-                  Enviar otra consulta
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Abrir WhatsApp Ahora</span>
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <h4 className="text-base font-bold text-slate-900">
-                  Solicita Informes y Aplica para Beca
-                </h4>
-
-                {/* Level Selection */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Nivel Educativo de Interés *
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedLevel('prepa')}
-                      className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition cursor-pointer ${
-                        selectedLevel === 'prepa'
-                          ? 'bg-pink-50 border-ipsur-pink-500 text-ipsur-pink-700 shadow-2xs'
-                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                      }`}
-                    >
-                      <BookOpen className="w-3.5 h-3.5" />
-                      <span>Prepa en Línea IPSUR</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setSelectedLevel('universidad')}
-                      className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition cursor-pointer ${
-                        selectedLevel === 'universidad'
-                          ? 'bg-sky-50 border-sky-500 text-sky-800 shadow-2xs'
-                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                      }`}
-                    >
-                      <GraduationCap className="w-3.5 h-3.5" />
-                      <span>Universidad en Línea</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Name */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Nombre Completo *
+                    Nombre Completo del Aspirante *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="Ej. Carlos Mendoza López"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-800 focus:ring-2 focus:ring-ipsur-pink-500 outline-none"
+                    placeholder="Ej. Juan Carlos Pérez Morales"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-ipsur-pink-500 transition"
                   />
                 </div>
 
-                {/* Phone & Email */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
                       Teléfono / WhatsApp *
                     </label>
                     <input
                       type="tel"
                       required
-                      placeholder="10 dígitos (ej. 998 123 4567)"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-800 focus:ring-2 focus:ring-ipsur-pink-500 outline-none"
+                      placeholder="Ej. (984) 123-4567"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-ipsur-pink-500 transition"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
                       Correo Electrónico
                     </label>
                     <input
                       type="email"
-                      placeholder="tu@correo.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-800 focus:ring-2 focus:ring-ipsur-pink-500 outline-none"
+                      placeholder="correo@ejemplo.com"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-ipsur-pink-500 transition"
                     />
                   </div>
                 </div>
 
-                {/* Message */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    ¿Tienes alguna duda específica? (Opcional)
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Programa de Interés
+                  </label>
+                  <select
+                    value={formData.program}
+                    onChange={(e) => setFormData({ ...formData, program: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-ipsur-pink-500 transition bg-white"
+                  >
+                    <option value="">Selecciona una opción...</option>
+                    {selectedLevel === 'prepa' ? (
+                      <>
+                        <option value="Bachillerato en Comunicación">Bachillerato en Comunicación</option>
+                        <option value="Bachillerato en Administración">Bachillerato en Administración</option>
+                        <option value="Bachillerato en Dibujo Arquitectónico">Bachillerato en Dibujo Arquitectónico y Construcción</option>
+                        <option value="Bachillerato General">Bachillerato General</option>
+                      </>
+                    ) : (
+                      <>
+                        <optgroup label="Licenciaturas (3 Años)">
+                          <option value="Licenciatura en Administración">Licenciatura en Administración</option>
+                          <option value="Licenciatura en Derecho">Licenciatura en Derecho</option>
+                          <option value="Licenciatura en Contaduría">Licenciatura en Contaduría</option>
+                          <option value="Licenciatura en Pedagogía">Licenciatura en Pedagogía</option>
+                          <option value="Licenciatura en Seguridad Pública">Licenciatura en Seguridad Pública</option>
+                          <option value="Licenciatura en Diseño y Comunicación Digital">Diseño y Comunicación Digital</option>
+                          <option value="Licenciatura en Ciencias del Deporte">Ciencias del Deporte</option>
+                          <option value="Licenciatura en Psicología">Psicología</option>
+                        </optgroup>
+                        <optgroup label="Ingenierías (3 Años)">
+                          <option value="Ingeniería Civil">Ingeniería Civil</option>
+                          <option value="Ingeniería Eléctrica">Ingeniería Eléctrica</option>
+                          <option value="Ingeniería Mecánica Automotriz">Ingeniería Mecánica Automotriz</option>
+                        </optgroup>
+                        <optgroup label="Maestrías (Posgrados)">
+                          <option value="Maestría en Administración y Alta Dirección MBA">MBA Administración y Alta Dirección</option>
+                          <option value="Maestría en Juicios Orales">Maestría en Juicios Orales</option>
+                          <option value="Maestría en Amparo">Maestría en Amparo</option>
+                          <option value="Maestría en Educación">Maestría en Educación</option>
+                          <option value="Maestría en Calidad Educativa">Maestría en Calidad Educativa</option>
+                          <option value="Maestría en Comercialización Inmobiliaria">Comercialización Inmobiliaria</option>
+                          <option value="Maestría en Interiorismo y Decoración">Interiorismo y Decoración</option>
+                          <option value="Maestría en Gobierno y Administración Pública">Gobierno y Administración Pública</option>
+                        </optgroup>
+                      </>
+                    )}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Comentarios o Dudas Adicionales
                   </label>
                   <textarea
-                    rows={2}
-                    placeholder="Escribe tu consulta sobre fechas, materias o revalidaciones..."
+                    rows={3}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:ring-2 focus:ring-ipsur-pink-500 outline-none"
+                    placeholder="Escribe aquí si necesitas información de costos, becas o revalidación de materias..."
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-ipsur-pink-500 transition resize-none"
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-3 px-4 rounded-xl bg-ipsur-navy-700 hover:bg-ipsur-navy-800 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Send className="w-4 h-4 text-ipsur-pink-400" />
-                  <span>Enviar Solicitud de Informes</span>
-                </button>
+                <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+                  <button
+                    type="submit"
+                    className="w-full sm:flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-ipsur-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Enviar Solicitud</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={openWhatsApp}
+                    className="w-full sm:w-auto py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>WhatsApp Directo</span>
+                  </button>
+                </div>
               </form>
             )}
+
           </div>
 
         </div>

@@ -12,12 +12,14 @@ import {
   Laptop, 
   Smartphone, 
   Download, 
-  Lock,
-  ExternalLink,
-  Users,
-  Award,
-  Phone
+  Lock, 
+  ExternalLink, 
+  Users, 
+  Award, 
+  Phone,
+  MapPin
 } from 'lucide-react';
+import { PREPA_DATA, IUPS_DATA, INSTITUTIONAL_CAMPUS } from '../../data/institutionalLandingData';
 
 export default function PortalSelectorScreen() {
   const { 
@@ -64,7 +66,7 @@ export default function PortalSelectorScreen() {
           </div>
           <div className="hidden sm:block text-left">
             <span className="text-xs font-black text-white tracking-wide block leading-none">
-              IPSUR EDUCORE
+              IPSUR · IUPS EDUCORE
             </span>
             <span className="text-[10px] text-slate-400 font-medium tracking-wider uppercase">
               Portal Alumnos y Docentes
@@ -90,7 +92,7 @@ export default function PortalSelectorScreen() {
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 shadow-inner mb-4">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34D399]" />
           <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-slate-300">
-            Campus Virtual Activo · Ciclo Lectivo 2026-2027
+            Campus Virtual Peninsular · Ciclo Activo 2026-2027
           </span>
         </div>
 
@@ -98,6 +100,7 @@ export default function PortalSelectorScreen() {
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl font-display">
           Selecciona tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-ipsur-pink-500 via-pink-400 to-sky-400">Portal Institucional</span>
         </h1>
+
         <p className="text-xs sm:text-sm md:text-base text-slate-400 max-w-2xl mt-3 mb-10 sm:mb-14 leading-relaxed">
           Bienvenido al centro de acceso de <strong className="text-slate-200">IPSUR EDUCORE</strong>. Elige el nivel educativo al que perteneces para ingresar a tus salas virtuales, tareas, boletas y servicios académicos:
         </p>
@@ -126,7 +129,7 @@ export default function PortalSelectorScreen() {
 
               <div>
                 <span className="text-[11px] font-bold text-ipsur-pink-400 uppercase tracking-widest block">
-                  Bachillerato Virtual
+                  Instituto Peninsular del Sur
                 </span>
                 <h2 className="text-xl sm:text-2xl font-black text-white group-hover:text-ipsur-pink-300 transition-colors">
                   Prepa en Línea IPSUR
@@ -136,22 +139,22 @@ export default function PortalSelectorScreen() {
 
             {/* Description */}
             <p className="text-xs text-slate-300 leading-relaxed mb-6 font-normal">
-              Acceso a la plataforma de Preparatoria para alumnos, docentes y tutores. Consulta materias, entrega actividades escolares, revisa tu boleta de calificaciones y comunícate con tus profesores en vivo.
+              Acceso a la plataforma de Preparatoria para alumnos, docentes y coordinadores de IPSUR. Consulta tus 4 opciones de bachillerato, material didáctico, entregas y boleta oficial SEP.
             </p>
 
             {/* Highlights List */}
             <div className="space-y-2.5 border-t border-slate-800/90 pt-4 mb-6 text-xs text-slate-300">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-ipsur-pink-400 flex-shrink-0" />
-                <span>Salas Virtuales y Material de Estudio 24/7</span>
+                <span>Salas Virtuales y Material Didáctico 24/7</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-ipsur-pink-400 flex-shrink-0" />
-                <span>Entrega de Tareas y Rúbricas Oficiales</span>
+                <span>Modalidad Modular Intensiva, Mixta y Virtual</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-ipsur-pink-400 flex-shrink-0" />
-                <span>Boleta de Calificaciones y Control Escolar</span>
+                <span>Boleta Oficial SEP y Control Escolar Centralizado</span>
               </div>
             </div>
 
@@ -165,7 +168,7 @@ export default function PortalSelectorScreen() {
             </button>
           </div>
 
-          {/* ICON / CARD 2: UNIVERSIDAD EN LÍNEA */}
+          {/* ICON / CARD 2: UNIVERSIDAD EN LÍNEA (IUPS) */}
           <div 
             onClick={() => goToPortalApp('universidad')}
             className="group relative bg-gradient-to-b from-slate-900/95 via-slate-900/85 to-[#0b1428] rounded-3xl p-6 sm:p-8 border-2 border-slate-800 hover:border-sky-400/80 transition-all duration-300 shadow-xl hover:shadow-[0_20px_50px_rgba(56,189,248,0.22)] cursor-pointer flex flex-col justify-between text-left transform hover:-translate-y-1.5"
@@ -186,32 +189,32 @@ export default function PortalSelectorScreen() {
 
               <div>
                 <span className="text-[11px] font-bold text-sky-400 uppercase tracking-widest block">
-                  Educación Superior
+                  Instituto Universitario Peninsular del Sur
                 </span>
                 <h2 className="text-xl sm:text-2xl font-black text-white group-hover:text-sky-300 transition-colors">
-                  Universidad en Línea
+                  IUPS Universidad en Línea
                 </h2>
               </div>
             </div>
 
             {/* Description */}
             <p className="text-xs text-slate-300 leading-relaxed mb-6 font-normal">
-              Campus virtual universitario para licenciaturas, ingenierías y posgrados. Accede a tus asignaturas superiores, bibliotecas digitales, proyectos de titulación y cátedras con docentes especializados.
+              Campus virtual universitario del IUPS. Diseñado para estudiar y avanzar profesionalmente sin dejar de trabajar. 8 Licenciaturas, 3 Ingenierías y 8 Maestrías con RVOE SEP.
             </p>
 
             {/* Highlights List */}
             <div className="space-y-2.5 border-t border-slate-800/90 pt-4 mb-6 text-xs text-slate-300">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                <span>Licenciaturas e Ingenierías 100% en Línea</span>
+                <span>Modalidad Ejecutiva & Semipresencial Sabatina</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                <span>Cátedras Universitarias y Proyectos Profesionales</span>
+                <span>Cátedras con Profesores de Nivel Posgrado</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                <span>Historial Académico, Créditos y Titulación</span>
+                <span>Titulación Ágil y Validez Oficial SEP Nacional</span>
               </div>
             </div>
 
@@ -220,7 +223,7 @@ export default function PortalSelectorScreen() {
               type="button"
               className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-ipsur-navy-600 via-blue-600 to-sky-500 hover:from-ipsur-navy-500 hover:to-sky-400 text-white font-bold text-xs sm:text-sm tracking-wide shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer group-hover:gap-3"
             >
-              <span>Entrar a Universidad en Línea</span>
+              <span>Entrar a IUPS Universidad en Línea</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -233,8 +236,8 @@ export default function PortalSelectorScreen() {
             <ShieldCheck className="w-5 h-5 text-emerald-400" />
           </div>
           <div className="text-xs text-slate-400 leading-relaxed">
-            <span className="font-bold text-slate-200 block mb-0.5">Acceso Institucional Seguro</span>
-            Alumnos, docentes, directores y administradores ingresan con su matrícula o usuario único. Todos los datos están sincronizados en tiempo real.
+            <span className="font-bold text-slate-200 block mb-0.5">Acceso Institucional Segmentado</span>
+            Los alumnos de preparatoria ingresan exclusivamente a su portal de bachillerato, y los de universidad a su campus superior. Directores y coordinadores tienen acceso a ambos portales.
           </div>
         </div>
 
@@ -243,8 +246,8 @@ export default function PortalSelectorScreen() {
       {/* Bottom Sub-Footer Bar */}
       <footer className="relative z-10 w-full border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>{institutionalInfo.name} · {institutionalInfo.schoolName}</span>
-          <span className="text-[11px] text-slate-400">Prepa en Línea IPSUR & Universidad en Línea · RVOE SEP</span>
+          <span>{PREPA_DATA.institution} & {IUPS_DATA.institution}</span>
+          <span className="text-[11px] text-slate-400">Playa del Carmen, Quintana Roo · RVOE SEP Oficial</span>
           <button
             onClick={() => goToLanding()}
             className="text-ipsur-pink-400 hover:text-ipsur-pink-300 underline font-semibold cursor-pointer"
