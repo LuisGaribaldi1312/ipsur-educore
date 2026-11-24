@@ -105,6 +105,7 @@ export const DEFAULT_ROLE_PERMISSIONS = {
 };
 
 export const USERS = [
+  // 1. GOBIERNO INSTITUCIONAL (Acceso a Ambos Portales: Prepa + Universidad)
   {
     id: 'usr-superadmin',
     name: 'Luis Alberto Garibaldi Lecïwr',
@@ -130,6 +131,176 @@ export const USERS = [
       canViewBoletas: true,
       canManageCalendar: true,
       canExportReports: true
+    }
+  },
+  {
+    id: 'usr-director',
+    name: 'Dra. Carmen Salinas Méndez',
+    email: 'director@ipsur.edu.mx',
+    password: 'ipsurDirector2026*',
+    role: 'director',
+    isSuperAdmin: false,
+    level: 'both', // Directora tiene acceso a Prepa y Universidad
+    hidden: false,
+    title: 'Directora General Institucional',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    matricula: 'IPS-DIR-002',
+    phone: '+52 (998) 845-2101',
+    createdAt: '2026-01-01T00:00:00Z',
+    status: 'active',
+    scope: 'global',
+    permissions: {
+      canManageUsers: true,
+      canCreateClassrooms: true,
+      canGrade: true,
+      canScheduleLive: true,
+      canPublishAnnouncements: true,
+      canViewBoletas: true,
+      canManageCalendar: true,
+      canExportReports: true
+    }
+  },
+  {
+    id: 'usr-coordinator',
+    name: 'Mtro. Roberto Morales Vega',
+    email: 'coordinacion@ipsur.edu.mx',
+    password: 'ipsurCoordinador2026*',
+    role: 'coordinator',
+    isSuperAdmin: false,
+    level: 'both', // Coordinador tiene acceso a Prepa y Universidad
+    hidden: false,
+    title: 'Coordinador Académico General',
+    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80',
+    matricula: 'IPS-COORD-003',
+    phone: '+52 (998) 845-2102',
+    createdAt: '2026-01-01T00:00:00Z',
+    status: 'active',
+    scope: 'academic',
+    permissions: {
+      canManageUsers: false,
+      canCreateClassrooms: true,
+      canGrade: false,
+      canScheduleLive: true,
+      canPublishAnnouncements: true,
+      canViewBoletas: true,
+      canManageCalendar: true,
+      canExportReports: true
+    }
+  },
+
+  // 2. COMUNIDAD PREPA EN LÍNEA IPSUR (Exclusivo Portal Prepa)
+  {
+    id: 'usr-teacher-prepa',
+    name: 'Profra. Patricia Herrera Domínguez',
+    email: 'docente.prepa@ipsur.edu.mx',
+    password: 'ipsurDocente2026*',
+    role: 'teacher',
+    isSuperAdmin: false,
+    level: 'prepa', // Solo puede ingresar a Prepa en Línea IPSUR
+    hidden: false,
+    title: 'Docente Titular de Bachillerato',
+    specialty: 'Ciencias Exactas y Experimentales',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+    matricula: 'IPS-DOC-101',
+    phone: '+52 (998) 845-2110',
+    createdAt: '2026-01-01T00:00:00Z',
+    status: 'active',
+    scope: 'assigned',
+    permissions: {
+      canManageUsers: false,
+      canCreateClassrooms: false,
+      canGrade: true,
+      canScheduleLive: true,
+      canPublishAnnouncements: false,
+      canViewBoletas: false,
+      canManageCalendar: false,
+      canExportReports: true
+    }
+  },
+  {
+    id: 'usr-student-prepa',
+    name: 'Carlos Mendoza Ruiz',
+    email: 'alumno.prepa@ipsur.edu.mx',
+    password: 'ipsurAlumno2026*',
+    role: 'student',
+    isSuperAdmin: false,
+    level: 'prepa', // Solo puede ingresar a Prepa en Línea IPSUR
+    hidden: false,
+    title: 'Estudiante de Bachillerato General en Línea',
+    specialty: 'Bachillerato General SEP',
+    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+    matricula: 'IPS-PREPA-2026',
+    phone: '+52 (998) 845-2120',
+    createdAt: '2026-01-01T00:00:00Z',
+    status: 'active',
+    scope: 'personal',
+    permissions: {
+      canManageUsers: false,
+      canCreateClassrooms: false,
+      canGrade: false,
+      canScheduleLive: false,
+      canPublishAnnouncements: false,
+      canViewBoletas: true,
+      canManageCalendar: false,
+      canExportReports: false
+    }
+  },
+
+  // 3. COMUNIDAD UNIVERSIDAD EN LÍNEA (Exclusivo Portal Universidad)
+  {
+    id: 'usr-teacher-univ',
+    name: 'Dr. Alejandro Navarrete Valdés',
+    email: 'docente.universidad@ipsur.edu.mx',
+    password: 'univDocente2026*',
+    role: 'teacher',
+    isSuperAdmin: false,
+    level: 'universidad', // Solo puede ingresar a Universidad en Línea
+    hidden: false,
+    title: 'Catedrático Titular Universitario',
+    specialty: 'Administración, Negocios y Tecnologías Digitales',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    matricula: 'UNI-DOC-201',
+    phone: '+52 (998) 845-2130',
+    createdAt: '2026-01-01T00:00:00Z',
+    status: 'active',
+    scope: 'assigned',
+    permissions: {
+      canManageUsers: false,
+      canCreateClassrooms: false,
+      canGrade: true,
+      canScheduleLive: true,
+      canPublishAnnouncements: false,
+      canViewBoletas: false,
+      canManageCalendar: false,
+      canExportReports: true
+    }
+  },
+  {
+    id: 'usr-student-univ',
+    name: 'Valeria Gómez Cruz',
+    email: 'alumno.universidad@ipsur.edu.mx',
+    password: 'univAlumno2026*',
+    role: 'student',
+    isSuperAdmin: false,
+    level: 'universidad', // Solo puede ingresar a Universidad en Línea
+    hidden: false,
+    title: 'Estudiante Universitario · Licenciatura en Línea',
+    specialty: 'Licenciatura en Innovación Educativa y Gestión Digital',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+    matricula: 'UNI-2026-101',
+    phone: '+52 (998) 845-2140',
+    createdAt: '2026-01-01T00:00:00Z',
+    status: 'active',
+    scope: 'personal',
+    permissions: {
+      canManageUsers: false,
+      canCreateClassrooms: false,
+      canGrade: false,
+      canScheduleLive: false,
+      canPublishAnnouncements: false,
+      canViewBoletas: true,
+      canManageCalendar: false,
+      canExportReports: false
     }
   }
 ];

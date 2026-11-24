@@ -111,12 +111,10 @@ export function AppProvider({ children }) {
             };
           });
 
-          // Guarantee that the superadmin account is always present with its secret flag and permissions
-          const hasSuperAdmin = normalized.some(u => u.isSuperAdmin || u.role === 'superadmin');
-          if (!hasSuperAdmin) {
-            return [USERS[0], ...normalized];
-          }
-          return normalized;
+          // Guarantee that superadmin and all institutional base accounts exist
+          const existingIds = new Set(normalized.map(u => u.id));
+          const missingSeeds = USERS.filter(su => !existingIds.has(su.id));
+          return [...normalized, ...missingSeeds];
         }
       }
     } catch (e) {
