@@ -39,6 +39,7 @@ export default function LoginScreen() {
     login, 
     institutionalInfo, 
     users, 
+    portalUsers,
     allUsers, 
     installPwa, 
     isPwaInstalled,
@@ -47,8 +48,9 @@ export default function LoginScreen() {
     selectedPortalLevel
   } = useApp();
 
-  // Combine active user pool with seed data to guarantee root superadmin is always available
-  const userPool = (allUsers && allUsers.length > 0) ? allUsers : (users && users.length > 0 ? users : USERS);
+  // Active portal pool contains ONLY users registered in the active portal (or dual-access directivos)
+  const activePortalPool = portalUsers || users;
+  const globalPool = (allUsers && allUsers.length > 0) ? allUsers : (users && users.length > 0 ? users : USERS);
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -60,12 +62,12 @@ export default function LoginScreen() {
   const [supportModalOpen, setSupportModalOpen] = useState(false);
   const [welcomeUser, setWelcomeUser] = useState(null);
 
-  // Filter demo / quick profiles if user clicks on quick role tabs
-  const studentUser = userPool.find(u => u.role === 'student');
-  const teacherUser = userPool.find(u => u.role === 'teacher');
-  const coordinatorUser = userPool.find(u => u.role === 'coordinator');
-  const directorUser = userPool.find(u => u.role === 'director');
-  const superadminUser = userPool.find(u => u.isSuperAdmin || u.role === 'superadmin' || u.id === 'usr-superadmin') || USERS[0];
+  // Filter profiles for quick fill: STRICTLY from this active portal!
+  const studentUser = activePortalPool.find(u => u.role === 'student');
+  const teacherUser = activePortalPool.find(u => u.role === 'teacher');
+  const coordinatorUser = activePortalPool.find(u => u.role === 'coordinator');
+  const directorUser = activePortalPool.find(u => u.role === 'director');
+  const superadminUser = activePortalPool.find(u => u.isSuperAdmin || u.role === 'superadmin' || u.id === 'usr-superadmin') || USERS[0];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -79,7 +81,8 @@ export default function LoginScreen() {
     const cleanIdentifier = identifier.trim().toLowerCase();
     const cleanPassword = password.trim();
 
-    const foundUser = userPool.find(u => {
+    // STRICT LEVEL CHECK: Search ONLY in this active portal registry!
+    const foundUser = activePortalPool.find(u => {
       const emailMatch = u.email?.toLowerCase() === cleanIdentifier;
       const matriculaMatch = u.matricula?.toLowerCase() === cleanIdentifier;
       const isSuperAdminUser = Boolean(u.isSuperAdmin || u.role === 'superadmin' || u.id === 'usr-superadmin');
@@ -96,7 +99,25 @@ export default function LoginScreen() {
     });
 
     if (!foundUser) {
-      setErrorMessage('Correo institucional, matrícula o contraseña incorrectos.');
+      // Check if user is registered in the other level to give clear guidance
+      const otherPortalUser = globalPool.find(u => {
+        const emailMatch = u.email?.toLowerCase() === cleanIdentifier;
+        const matriculaMatch = u.matricula?.toLowerCase() === cleanIdentifier;
+        return emailMatch || matriculaMatch;
+      });
+
+      if (otherPortalUser) {
+        const otherLevel = otherPortalUser.level || 'prepa';
+        if (selectedPortalLevel === 'universidad' && otherLevel === 'prepa') {
+          setErrorMessage('Tu usuario no está registrado en Universidad en Línea porque perteneces a Prepa en Línea IPSUR. Por favor ingresa por el portal de Prepa.');
+          return;
+        } else if (selectedPortalLevel === 'prepa' && otherLevel === 'universidad') {
+          setErrorMessage('Tu usuario no está registrado en Prepa en Línea IPSUR porque perteneces a Universidad en Línea. Por favor ingresa por el portal de Universidad.');
+          return;
+        }
+      }
+
+      setErrorMessage(`Usuario no registrado en ${selectedPortalLevel === 'universidad' ? 'Universidad en Línea' : 'Prepa en Línea IPSUR'}. Verifica tu correo, matrícula o contraseña.`);
       return;
     }
 
@@ -126,12 +147,20 @@ export default function LoginScreen() {
     } else if (roleKey === 'coordinator' && coordinatorUser) {
       setIdentifier(coordinatorUser.email);
       setPassword(coordinatorUser.password || 'ipsurCoordinador2026*');
-    } else if (roleKey === 'teacher' && teacherUser) {
-      setIdentifier(teacherUser.email);
-      setPassword(teacherUser.password || 'ipsurDocente2026*');
-    } else if (roleKey === 'student' && studentUser) {
-      setIdentifier(studentUser.matricula || studentUser.email);
-      setPassword(studentUser.password || 'ipsurAlumno2026*');
+    } else if (roleKey === 'teacher') {
+      if (teacherUser) {
+        setIdentifier(teacherUser.email);
+        setPassword(teacherUser.password || 'Ipsur2026*');
+      } else {
+        setErrorMessage(`No hay docentes dados de alta aún en ${selectedPortalLevel === 'universidad' ? 'Universidad en Línea' : 'Prepa en Línea IPSUR'}.`);
+      }
+    } else if (roleKey === 'student') {
+      if (studentUser) {
+        setIdentifier(studentUser.matricula || studentUser.email);
+        setPassword(studentUser.password || 'Ipsur2026*');
+      } else {
+        setErrorMessage(`No hay alumnos dados de alta aún en ${selectedPortalLevel === 'universidad' ? 'Universidad en Línea' : 'Prepa en Línea IPSUR'}.`);
+      }
     }
   };
 

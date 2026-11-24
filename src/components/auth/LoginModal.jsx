@@ -64,12 +64,20 @@ export default function LoginModal({ isOpen, onClose }) {
     } else if (roleKey === 'coordinator' && coordinatorUser) {
       setIdentifier(coordinatorUser.email);
       setPassword(coordinatorUser.password || 'ipsurCoordinador2026*');
-    } else if (roleKey === 'teacher' && teacherUser) {
-      setIdentifier(teacherUser.email);
-      setPassword(teacherUser.password || 'ipsurDocente2026*');
-    } else if (roleKey === 'student' && studentUser) {
-      setIdentifier(studentUser.matricula || studentUser.email);
-      setPassword(studentUser.password || 'ipsurAlumno2026*');
+    } else if (roleKey === 'teacher') {
+      if (teacherUser) {
+        setIdentifier(teacherUser.email);
+        setPassword(teacherUser.password || 'Ipsur2026*');
+      } else {
+        setErrorMessage(`No hay docentes registrados en ${selectedPortalLevel === 'universidad' ? 'Universidad en Línea' : 'Prepa en Línea IPSUR'}.`);
+      }
+    } else if (roleKey === 'student') {
+      if (studentUser) {
+        setIdentifier(studentUser.matricula || studentUser.email);
+        setPassword(studentUser.password || 'Ipsur2026*');
+      } else {
+        setErrorMessage(`No hay alumnos registrados en ${selectedPortalLevel === 'universidad' ? 'Universidad en Línea' : 'Prepa en Línea IPSUR'}.`);
+      }
     }
   };
 

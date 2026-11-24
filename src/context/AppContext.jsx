@@ -651,14 +651,11 @@ export function AppProvider({ children }) {
     return cLevel === selectedPortalLevel;
   });
 
-  // STRICT HIDDEN USER & LEVEL PARTITION FILTER:
-  // 1. Non-superadmin users CANNOT see the Super Usuario in any list, table, or directory
-  // 2. Prepa portal only lists Prepa students and teachers (plus cross-access directivos)
-  // 3. Universidad portal only lists Universidad students and teachers (plus cross-access directivos)
-  const visibleUsers = users.filter(u => {
-    if (u.hidden || u.isSuperAdmin || u.role === 'superadmin') {
-      return isSuperAdmin && currentUser?.id === u.id;
-    }
+  // STRICT PORTAL REGISTRY:
+  // A student or teacher from Prepa is logically NOT in Universidad registry,
+  // and a student or teacher from Universidad is logically NOT in Prepa registry.
+  // Directivos (Rector, Director, Coordinador, Super Admin) have dual access in both registries.
+  const portalUsers = users.filter(u => {
     const isManager = Boolean(
       u.isSuperAdmin || 
       u.role === 'superadmin' || 
@@ -673,6 +670,15 @@ export function AppProvider({ children }) {
     return uLevel === selectedPortalLevel || uLevel === 'both';
   });
 
+  // STRICT HIDDEN USER FILTER FOR DIRECTORIES:
+  // Non-superadmin users CANNOT see the Super Usuario in any list, table, or directory
+  const visibleUsers = portalUsers.filter(u => {
+    if (u.hidden || u.isSuperAdmin || u.role === 'superadmin') {
+      return isSuperAdmin && currentUser?.id === u.id;
+    }
+    return true;
+  });
+
   // Authentication: Login with Email or Matrícula + Password
   const login = (identifier, password) => {
     if (!identifier || !password) {
@@ -683,7 +689,8 @@ export function AppProvider({ children }) {
     const cleanIdentifier = identifier.trim().toLowerCase();
     const cleanPassword = password.trim();
 
-    const foundUser = users.find(u => {
+    // STRICT PORTAL LOOKUP: Search exclusively in the active portal registry!
+    const foundUser = portalUsers.find(u => {
       const emailMatch = u.email?.toLowerCase() === cleanIdentifier;
       const matriculaMatch = u.matricula?.toLowerCase() === cleanIdentifier;
       const isSuperAdminUser = Boolean(u.isSuperAdmin || u.role === 'superadmin' || u.id === 'usr-superadmin');
@@ -701,52 +708,52 @@ export function AppProvider({ children }) {
     });
 
     if (!foundUser) {
-      showToast('Acceso Denegado', 'Correo, matrícula o contraseña incorrectos.', 'error');
-      return { success: false, message: 'Credenciales inválidas' };
+      // Check if this user exists in the other portal database to provide exact explanation
+      const otherPortalUser = users.find(u => {
+        const emailMatch = u.email?.toLowerCase() === cleanIdentifier;
+        const matriculaMatch = u.matricula?.toLowerCase() === cleanIdentifier;
+        return emailMatch || matriculaMatch;
+      });
+
+      if (otherPortalUser) {
+        const otherLevel = otherPortalUser.level || 'prepa';
+        if (selectedPortalLevel === 'universidad' && otherLevel === 'prepa') {
+          showToast(
+            'Usuario no Registrado en Universidad',
+            'Tu usuario no está registrado en Universidad porque perteneces a Prepa en Línea IPSUR. Ingresa al portal de Prepa.',
+            'error'
+          );
+          return {
+            success: false,
+            message: 'Tu usuario no está registrado en Universidad en Línea porque perteneces a Prepa en Línea IPSUR. Por favor ingresa por el portal de Prepa.'
+          };
+        } else if (selectedPortalLevel === 'prepa' && otherLevel === 'universidad') {
+          showToast(
+            'Usuario no Registrado en Prepa',
+            'Tu usuario no está registrado en Prepa porque perteneces a Universidad en Línea. Ingresa al portal de Universidad.',
+            'error'
+          );
+          return {
+            success: false,
+            message: 'Tu usuario no está registrado en Prepa en Línea IPSUR porque perteneces a Universidad en Línea. Por favor ingresa por el portal de Universidad.'
+          };
+        }
+      }
+
+      showToast(
+        'Acceso Denegado', 
+        `Usuario no registrado en ${selectedPortalLevel === 'universidad' ? 'Universidad en Línea' : 'Prepa en Línea IPSUR'}.`, 
+        'error'
+      );
+      return { 
+        success: false, 
+        message: `Usuario no registrado en ${selectedPortalLevel === 'universidad' ? 'Universidad en Línea' : 'Prepa en Línea IPSUR'}. Verifica tu matrícula o correo.` 
+      };
     }
 
     if (foundUser.status === 'inactive') {
       showToast('Usuario Desactivado', 'Tu cuenta se encuentra inactiva. Contacta a la Dirección.', 'error');
       return { success: false, message: 'Cuenta desactivada' };
-    }
-
-    // STRICT LEVEL SEGREGATION CHECK:
-    // Directivos (Rector, Director, Coordinador, Super Admin) have access to both portals.
-    // Students and Teachers are strictly restricted to their designated educational level.
-    const isManager = Boolean(
-      foundUser.isSuperAdmin ||
-      foundUser.role === 'superadmin' ||
-      foundUser.role === 'rector' ||
-      foundUser.role === 'director' ||
-      foundUser.role === 'coordinator' ||
-      foundUser.level === 'both'
-    );
-
-    if (!isManager) {
-      const userLevel = foundUser.level || 'prepa';
-      if (userLevel !== selectedPortalLevel && userLevel !== 'both') {
-        if (selectedPortalLevel === 'prepa') {
-          showToast(
-            'Portal Incorrecto', 
-            'Esta cuenta pertenece al Portal Universidad en Línea. Por favor ingresa a través del acceso a Universidad.', 
-            'warning'
-          );
-          return { 
-            success: false, 
-            message: 'Esta cuenta está registrada en el Portal Universidad en Línea. Ingresa a través de Universidad.' 
-          };
-        } else {
-          showToast(
-            'Portal Incorrecto', 
-            'Esta cuenta pertenece a Prepa en Línea IPSUR. Por favor ingresa a través del acceso a Prepa.', 
-            'warning'
-          );
-          return { 
-            success: false, 
-            message: 'Esta cuenta está registrada en Prepa en Línea IPSUR. Ingresa a través de Prepa en Línea.' 
-          };
-        }
-      }
     }
 
     setCurrentUserId(foundUser.id);
@@ -1468,6 +1475,7 @@ export function AppProvider({ children }) {
         currentUser,
         currentUserId,
         users: visibleUsers,      // Strictly filtered: non-superadmin NEVER sees Super Admin
+        portalUsers,              // Portal active user registry (level-scoped)
         allUsers: users,          // Raw list for Super Admin only
         isSuperAdmin,
         periods: PERIODS,
