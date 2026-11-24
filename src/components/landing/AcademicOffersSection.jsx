@@ -13,7 +13,14 @@ import {
   FileText,
   Sparkles,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Code,
+  Briefcase,
+  HeartPulse,
+  Share2,
+  Scale,
+  BrainCircuit,
+  Compass
 } from 'lucide-react';
 
 export default function AcademicOffersSection() {
@@ -22,100 +29,121 @@ export default function AcademicOffersSection() {
 
   const prepaSpecialties = [
     {
-      title: 'Tecnologías de la Información y Programación',
-      desc: 'Desarrollo de habilidades en herramientas digitales, software, bases de datos y creación de contenido web.',
-      duration: 'Modular',
-      badge: 'Alta Demanda'
+      title: 'Informática y Programación Web',
+      desc: 'Desarrollo de software, mantenimiento de equipos, bases de datos y creación de sitios web modernos.',
+      duration: 'Modular Cuatrimestral',
+      badge: 'Tecnología',
+      icon: Code,
+      topics: ['Algoritmos', 'Diseño Web', 'Bases de Datos', 'Ofimática Avanzada']
     },
     {
-      title: 'Administración y Gestión de Pequeñas Empresas',
-      desc: 'Fundamentos de emprendimiento, contabilidad práctica, mercadeo y organización administrativa.',
-      duration: 'Modular',
-      badge: 'Práctico'
+      title: 'Administración y Emprendimiento de Negocios',
+      desc: 'Fundamentos de finanzas personales, mercadotecnia, constitución legal de empresas y gestión de proyectos.',
+      duration: 'Modular Cuatrimestral',
+      badge: 'Negocios',
+      icon: Briefcase,
+      topics: ['Contabilidad Básica', 'Modelos de Negocio', 'Ventas Digitales', 'Liderazgo']
     },
     {
-      title: 'Auxiliar en Salud y Bienestar Comunitario',
-      desc: 'Introducción a las ciencias biológicas, primeros auxilios, prevención de la salud y nutrición básica.',
-      duration: 'Modular',
-      badge: 'Vocacional'
+      title: 'Auxiliar en Salud Comunitaria y Primeros Auxilios',
+      desc: 'Introducción a la anatomía, nutrición, prevención de enfermedades y primeros auxilios asistenciales.',
+      duration: 'Modular Cuatrimestral',
+      badge: 'Salud',
+      icon: HeartPulse,
+      topics: ['Anatomía', 'Primeros Auxilios', 'Nutrición', 'Salud Preventiva']
     },
     {
-      title: 'Comunicación, Medios Digitales y Diseño',
-      desc: 'Redacción profesional, producción multimedia, diseño visual e interacción en entornos virtuales.',
-      duration: 'Modular',
-      badge: 'Creativo'
+      title: 'Comunicación, Medios Digitales y Publicidad',
+      desc: 'Redacción publicitaria, producción multimedia para redes sociales y creación de contenido estratégico.',
+      duration: 'Modular Cuatrimestral',
+      badge: 'Creatividad',
+      icon: Share2,
+      topics: ['Contenido Digital', 'Diseño Gráfico', 'Redes Sociales', 'Expresión Oral']
     }
   ];
 
   const universityDegrees = [
     {
-      title: 'Licenciatura en Administración de Empresas y Negocios',
+      title: 'Licenciatura en Administración y Negocios Digitales',
       level: 'Licenciatura',
       duration: '3 Años · Cuatrimestral',
       mode: '100% en Línea',
-      desc: 'Lidera organizaciones con visión estratégica, gestión de recursos humanos, finanzas modernas y marketing digital.'
+      icon: Briefcase,
+      desc: 'Lidera organizaciones con visión estratégica, gestión de recursos humanos, finanzas modernas y marketing digital.',
+      topics: ['Dirección Estratégica', 'Finanzas Corporativas', 'E-commerce', 'Gestión de Talento']
     },
     {
       title: 'Ingeniería en Tecnologías de la Información y Software',
       level: 'Ingeniería',
       duration: '3 Años · Cuatrimestral',
       mode: '100% en Línea',
-      desc: 'Diseño y arquitectura de aplicaciones web, cloud computing, ciberseguridad, bases de datos y gestión de proyectos de software.'
+      icon: Code,
+      desc: 'Diseño y arquitectura de aplicaciones web, cloud computing, ciberseguridad, bases de datos y gestión de proyectos de software.',
+      topics: ['Arquitectura Cloud', 'Desarrollo Full Stack', 'Ciberseguridad', 'DevOps & Git']
     },
     {
       title: 'Licenciatura en Pedagogía y Tecnologías Educativas',
       level: 'Licenciatura',
       duration: '3 Años · Cuatrimestral',
       mode: '100% en Línea',
-      desc: 'Formación de docentes y directivos expertos en diseño curricular, pedagogía contemporánea y entornos virtuales de aprendizaje.'
+      icon: BrainCircuit,
+      desc: 'Formación de docentes y directivos expertos en diseño curricular, pedagogía contemporánea y entornos virtuales de aprendizaje.',
+      topics: ['Diseño Instruccional', 'E-learning', 'Evaluación Curricular', 'Psicología Educativa']
     },
     {
       title: 'Licenciatura en Mercadotecnia y Comercio Electrónico',
       level: 'Licenciatura',
       duration: '3 Años · Cuatrimestral',
       mode: '100% en Línea',
-      desc: 'Estrategias de marca, ventas en línea, analítica digital, gestión de redes sociales y modelos de negocio en internet.'
+      icon: Compass,
+      desc: 'Estrategias de marca, ventas en línea, analítica digital, gestión de redes sociales y modelos de negocio en internet.',
+      topics: ['Growth Marketing', 'SEO & Analytics', 'Social Media Ads', 'Logística E-commerce']
     },
     {
       title: 'Licenciatura en Derecho y Gestión Corporativa',
       level: 'Licenciatura',
       duration: '3 Años · Cuatrimestral',
       mode: '100% en Línea',
-      desc: 'Marco jurídico nacional e internacional, derecho civil, laboral, mercantil y resolución de controversias en la era digital.'
+      icon: Scale,
+      desc: 'Marco jurídico nacional e internacional, derecho civil, laboral, mercantil y resolución de controversias en la era digital.',
+      topics: ['Derecho Mercantil', 'Contratos Digitales', 'Juicios Orales', 'Derecho Laboral']
     },
     {
       title: 'Maestría en Innovación Educativa y Cátedra Digital',
       level: 'Posgrado',
       duration: '1.5 Años · Cuatrimestral',
       mode: '100% en Línea',
-      desc: 'Especialización para profesionistas que lideran la transformación digital de escuelas, universidades y centros de capacitación.'
+      icon: Award,
+      desc: 'Especialización para profesionistas que lideran la transformación digital de escuelas, universidades y centros de capacitación.',
+      topics: ['Liderazgo Directivo', 'Inteligencia Artificial Educativa', 'Políticas Públicas', 'Investigación']
     }
   ];
 
   return (
-    <section id="oferta" className="py-16 sm:py-24 bg-white border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="oferta" className="py-16 sm:py-24 bg-white border-b border-slate-200 select-none">
+      {/* FULL-WIDTH WIDESCREEN CONTAINER */}
+      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         
         {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold mb-3">
+        <div className="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold mb-3 shadow-2xs">
             <Layers className="w-3.5 h-3.5 text-ipsur-pink-600" />
-            <span>Catálogo Curricular Oficial</span>
+            <span>Catálogo Curricular Nacional con Validez SEP</span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-            Nuestra Oferta Académica
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight font-display">
+            Planes de Estudio Diseñados para Crecer
           </h2>
 
-          <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed">
-            Planes de estudio flexibles avalados con <strong className="text-slate-800">Validez Oficial SEP</strong>. Elige entre preparatoria acelerada o formación universitaria de alto impacto.
+          <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto">
+            Descubre nuestra oferta académica integral. Ambos niveles cuentan con acreditación oficial y están integrados al portal virtual para tu comodidad.
           </p>
 
           {/* Academic Tabs Toggle */}
           <div className="mt-8 flex items-center justify-center p-1.5 bg-slate-100 rounded-2xl border border-slate-200 max-w-md mx-auto shadow-inner">
             <button
               onClick={() => setActiveTab('prepa')}
-              className={`flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+              className={`flex-1 py-3 px-5 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-2 cursor-pointer ${
                 activeTab === 'prepa'
                   ? 'bg-ipsur-pink-600 text-white shadow-md'
                   : 'text-slate-600 hover:text-slate-900'
@@ -127,7 +155,7 @@ export default function AcademicOffersSection() {
 
             <button
               onClick={() => setActiveTab('universidad')}
-              className={`flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+              className={`flex-1 py-3 px-5 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-2 cursor-pointer ${
                 activeTab === 'universidad'
                   ? 'bg-ipsur-navy-700 text-white shadow-md'
                   : 'text-slate-600 hover:text-slate-900'
@@ -141,51 +169,51 @@ export default function AcademicOffersSection() {
 
         {/* TAB CONTENT 1: PREPA EN LÍNEA IPSUR */}
         {activeTab === 'prepa' && (
-          <div id="prepa" className="space-y-12">
+          <div id="prepa" className="space-y-12 animate-in fade-in duration-300">
             
-            {/* Main Overview Banner */}
-            <div className="bg-gradient-to-br from-pink-50 via-white to-slate-50 border-2 border-pink-100 rounded-3xl p-6 sm:p-10 shadow-sm">
+            {/* Main Overview Bento Box */}
+            <div className="bg-gradient-to-br from-pink-50/70 via-white to-slate-50 border-2 border-pink-100 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 <div className="lg:col-span-8 space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-100 text-ipsur-pink-800 text-xs font-black uppercase tracking-wider">
-                    Bachillerato General con Acreditación SEP
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-pink-100 text-ipsur-pink-800 text-xs font-black uppercase tracking-wider">
+                    Bachillerato General Acreditado · SEP DGB
                   </div>
 
-                  <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-snug">
-                    Preparatoria en Línea IPSUR: Tu certificado oficial en solo 2 años
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight font-display">
+                    Preparatoria en Línea IPSUR: Obtén tu Certificado en 2 Años
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    La modalidad de <strong className="text-slate-800">Prepa IPSUR</strong> está diseñada para adaptarse a tu ritmo de vida laboral y personal. A través de nuestro portal virtual, avanzas por materias cuatrimestrales, cuentas con asesoría permanente de docentes y entregas actividades semanales sin presiones de horario.
+                  <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed font-normal">
+                    La modalidad de <strong className="text-slate-900 font-bold">Prepa IPSUR</strong> te permite cursar tu bachillerato general con acompañamiento docente personalizado en el portal virtual. Avanza materia por materia, entrega actividades con fecha programada y cuenta con tutores que te respaldan en cada paso.
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs text-slate-700 font-medium">
-                    <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 mb-0.5">Duración</div>
-                      <div className="text-slate-500">2 Años (6 Cuatrimestres)</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2 text-xs text-slate-700 font-medium">
+                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
+                      <div className="font-bold text-slate-900 text-sm mb-0.5">Duración</div>
+                      <div className="text-slate-500">2 Años (6 Periodos Modulares)</div>
                     </div>
-                    <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 mb-0.5">Validez</div>
-                      <div className="text-slate-500">Certificado SEP Oficial</div>
+                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
+                      <div className="font-bold text-slate-900 text-sm mb-0.5">Validez SEP</div>
+                      <div className="text-slate-500">Certificado Digital Oficial</div>
                     </div>
-                    <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 mb-0.5">Modalidad</div>
-                      <div className="text-slate-500">100% en Línea / Asíncrono</div>
+                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
+                      <div className="font-bold text-slate-900 text-sm mb-0.5">Metodología</div>
+                      <div className="text-slate-500">100% en Línea con Horarios Libres</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-pink-200 shadow-md text-center space-y-4">
-                  <div className="w-14 h-14 mx-auto rounded-2xl bg-pink-100 text-ipsur-pink-600 flex items-center justify-center">
-                    <BookOpen className="w-7 h-7" />
+                <div className="lg:col-span-4 bg-white p-6 sm:p-8 rounded-3xl border border-pink-200 shadow-lg text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-ipsur-pink-600 to-rose-500 text-white flex items-center justify-center shadow-md">
+                    <BookOpen className="w-8 h-8" />
                   </div>
                   <div>
-                    <h4 className="text-base font-bold text-slate-900">¿Listo para estudiar?</h4>
+                    <h4 className="text-lg font-black text-slate-900 font-display">¿Listo para comenzar?</h4>
                     <p className="text-xs text-slate-500 mt-1">Inscripciones abiertas todo el año sin examen de admisión.</p>
                   </div>
                   <button
                     onClick={() => goToPortalApp('prepa')}
-                    className="w-full py-3 px-4 rounded-xl bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-3.5 px-5 rounded-2xl bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>Entrar al Portal Prepa IPSUR</span>
                     <ArrowRight className="w-4 h-4" />
@@ -194,44 +222,63 @@ export default function AcademicOffersSection() {
               </div>
             </div>
 
-            {/* Specialties & Vocational Training */}
+            {/* Specialties Bento Grid */}
             <div>
               <div className="mb-6">
                 <span className="text-[11px] font-bold text-ipsur-pink-600 uppercase tracking-wider block">
-                  Capacitación para el Trabajo
+                  Capacitación para el Trabajo Integrada
                 </span>
-                <h4 className="text-xl sm:text-2xl font-black text-slate-900">
-                  Especializaciones Incluidas en el Bachillerato IPSUR
+                <h4 className="text-xl sm:text-2xl font-black text-slate-900 font-display">
+                  Especializaciones del Bachillerato IPSUR
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  Obtén competencias laborales certificadas que te preparan tanto para ingresar a la universidad como para el campo de trabajo:
+                  Desarrolla habilidades laborales prácticas certificadas que te abren puertas profesionales:
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {prepaSpecialties.map((item, index) => (
-                  <div 
-                    key={index}
-                    className="bg-slate-50 hover:bg-white rounded-2xl p-5 border border-slate-200 hover:border-pink-300 hover:shadow-md transition-all flex flex-col justify-between space-y-3"
-                  >
-                    <div>
-                      <span className="text-[10px] font-black uppercase tracking-wider text-ipsur-pink-600 bg-pink-50 border border-pink-100 px-2 py-0.5 rounded">
-                        {item.badge}
-                      </span>
-                      <h5 className="text-sm font-bold text-slate-900 mt-2.5 leading-snug">
-                        {item.title}
-                      </h5>
-                      <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
-                        {item.desc}
-                      </p>
-                    </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {prepaSpecialties.map((item, index) => {
+                  const Icon = item.icon;
+                  return (
+                    <div 
+                      key={index}
+                      className="bg-slate-50 hover:bg-white rounded-3xl p-6 border border-slate-200 hover:border-pink-300 hover:shadow-xl transition-all flex flex-col justify-between space-y-4 group"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-ipsur-pink-600 bg-pink-50 border border-pink-100 px-2.5 py-0.5 rounded-full">
+                            {item.badge}
+                          </span>
+                          <div className="w-8 h-8 rounded-lg bg-pink-100 text-ipsur-pink-600 flex items-center justify-center">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                        </div>
 
-                    <div className="pt-3 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500 font-medium">
-                      <span>Módulos prácticos</span>
-                      <span className="text-ipsur-pink-600 font-bold">Incluido</span>
+                        <h5 className="text-base font-bold text-slate-900 leading-snug group-hover:text-ipsur-pink-600 transition-colors">
+                          {item.title}
+                        </h5>
+                        <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                          {item.desc}
+                        </p>
+
+                        <div className="mt-4 flex flex-wrap gap-1.5">
+                          {item.topics.map((t, i) => (
+                            <span key={i} className="text-[10px] font-semibold text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-200">
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500 font-medium">
+                        <span>{item.duration}</span>
+                        <span className="text-emerald-600 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Oficial
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -240,51 +287,51 @@ export default function AcademicOffersSection() {
 
         {/* TAB CONTENT 2: UNIVERSIDAD EN LÍNEA */}
         {activeTab === 'universidad' && (
-          <div id="universidad" className="space-y-12">
+          <div id="universidad" className="space-y-12 animate-in fade-in duration-300">
             
-            {/* Main Overview Banner */}
-            <div className="bg-gradient-to-br from-sky-50 via-white to-slate-50 border-2 border-sky-100 rounded-3xl p-6 sm:p-10 shadow-sm">
+            {/* Main Overview Bento Box */}
+            <div className="bg-gradient-to-br from-sky-50/70 via-white to-slate-50 border-2 border-sky-100 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 <div className="lg:col-span-8 space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-black uppercase tracking-wider">
-                    Educación Superior · Licenciaturas, Ingenierías y Maestrías
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-black uppercase tracking-wider">
+                    Nivel Superior · Licenciaturas, Ingenierías y Maestrías
                   </div>
 
-                  <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-snug">
-                    Universidad en Línea: Carreras profesionales para el mundo global
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight font-display">
+                    Universidad en Línea: Carreras Profesionales con Alta Empleabilidad
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    Diseñada para personas que buscan titularse sin pausar su vida profesional. Nuestro modelo universitario cuatrimestral te permite cursar materias con catedráticos con posgrado, realizar proyectos aplicados reales y obtener tu título con validez oficial SEP.
+                  <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed font-normal">
+                    Diseñada para personas que desean titularse con un modelo cuatrimestral dinámico. Cursa materias con docentes con grado de maestría y doctorado, desarrolla proyectos de valor y titúlate por promedio o diplomado.
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs text-slate-700 font-medium">
-                    <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 mb-0.5">Duración Licenciaturas</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2 text-xs text-slate-700 font-medium">
+                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
+                      <div className="font-bold text-slate-900 text-sm mb-0.5">Duración Licenciaturas</div>
                       <div className="text-slate-500">3 Años (9 Cuatrimestres)</div>
                     </div>
-                    <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 mb-0.5">Titulación Ágil</div>
-                      <div className="text-slate-500">Por Promedio o Proyecto</div>
+                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
+                      <div className="font-bold text-slate-900 text-sm mb-0.5">Titulación Ágil</div>
+                      <div className="text-slate-500">Por Promedio o Diplomado</div>
                     </div>
-                    <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                      <div className="font-bold text-slate-900 mb-0.5">Acompañamiento</div>
-                      <div className="text-slate-500">Cátedra y Asesoría 24/7</div>
+                    <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs">
+                      <div className="font-bold text-slate-900 text-sm mb-0.5">Cátedra Virtual</div>
+                      <div className="text-slate-500">Sesiones en Vivo y Grabadas</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-sky-200 shadow-md text-center space-y-4">
-                  <div className="w-14 h-14 mx-auto rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center">
-                    <GraduationCap className="w-7 h-7" />
+                <div className="lg:col-span-4 bg-white p-6 sm:p-8 rounded-3xl border border-sky-200 shadow-lg text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-ipsur-navy-700 to-sky-500 text-white flex items-center justify-center shadow-md">
+                    <GraduationCap className="w-8 h-8" />
                   </div>
                   <div>
-                    <h4 className="text-base font-bold text-slate-900">Portal Universitario</h4>
-                    <p className="text-xs text-slate-500 mt-1">Ingresa a tus cátedras, biblioteca digital y expediente de créditos.</p>
+                    <h4 className="text-lg font-black text-slate-900 font-display">Portal Universitario</h4>
+                    <p className="text-xs text-slate-500 mt-1">Accede a tus cátedras, biblioteca y expediente académico.</p>
                   </div>
                   <button
                     onClick={() => goToPortalApp('universidad')}
-                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-ipsur-navy-700 to-sky-600 hover:from-ipsur-navy-800 hover:to-sky-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-ipsur-navy-700 to-sky-600 hover:from-ipsur-navy-800 hover:to-sky-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>Entrar al Portal Universidad</span>
                     <ArrowRight className="w-4 h-4" />
@@ -293,66 +340,82 @@ export default function AcademicOffersSection() {
               </div>
             </div>
 
-            {/* University Careers Grid */}
+            {/* University Careers Bento Grid */}
             <div>
               <div className="mb-6">
                 <span className="text-[11px] font-bold text-sky-600 uppercase tracking-wider block">
-                  Planes de Estudio de Nivel Superior
+                  Catálogo de Educación Superior
                 </span>
-                <h4 className="text-xl sm:text-2xl font-black text-slate-900">
-                  Carreras Profesionales y Posgrados en Línea
+                <h4 className="text-xl sm:text-2xl font-black text-slate-900 font-display">
+                  Licenciaturas, Ingenierías y Posgrados
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  Programas actualizados con alta empleabilidad y desarrollo de habilidades directivas:
+                  Programas universitarios actualizados con validez oficial SEP nacional:
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {universityDegrees.map((deg, index) => (
-                  <div 
-                    key={index}
-                    className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 hover:border-sky-400 hover:shadow-lg transition-all flex flex-col justify-between space-y-4"
-                  >
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className={`text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full ${
-                          deg.level === 'Posgrado'
-                            ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                            : 'bg-sky-100 text-sky-800 border border-sky-200'
-                        }`}>
-                          {deg.level}
-                        </span>
-                        <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {deg.duration}
-                        </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {universityDegrees.map((deg, index) => {
+                  const Icon = deg.icon;
+                  return (
+                    <div 
+                      key={index}
+                      className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 hover:border-sky-400 hover:shadow-xl transition-all flex flex-col justify-between space-y-4 group"
+                    >
+                      <div className="space-y-3.5">
+                        <div className="flex items-center justify-between">
+                          <span className={`text-[10px] font-extrabold uppercase px-3 py-1 rounded-full ${
+                            deg.level === 'Posgrado'
+                              ? 'bg-purple-100 text-purple-700 border border-purple-200'
+                              : 'bg-sky-100 text-sky-800 border border-sky-200'
+                          }`}>
+                            {deg.level}
+                          </span>
+                          <span className="text-xs font-mono text-slate-400 flex items-center gap-1 font-semibold">
+                            <Clock className="w-3.5 h-3.5" />
+                            {deg.duration}
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0 mt-0.5 border border-sky-100">
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <h5 className="text-base font-bold text-slate-900 leading-snug group-hover:text-sky-600 transition-colors">
+                            {deg.title}
+                          </h5>
+                        </div>
+
+                        <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                          {deg.desc}
+                        </p>
+
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {deg.topics.map((t, i) => (
+                            <span key={i} className="text-[10px] font-semibold text-slate-600 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                              {t}
+                            </span>
+                          ))}
+                        </div>
                       </div>
 
-                      <h5 className="text-base font-bold text-slate-900 leading-snug">
-                        {deg.title}
-                      </h5>
+                      <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          RVOE SEP Oficial
+                        </span>
 
-                      <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                        {deg.desc}
-                      </p>
+                        <button
+                          onClick={() => goToPortalApp('universidad')}
+                          className="font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1 text-xs cursor-pointer group-hover:translate-x-0.5 transition-transform"
+                        >
+                          <span>Ver en Portal</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                      <span className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        RVOE SEP Oficial
-                      </span>
-
-                      <button
-                        onClick={() => goToPortalApp('universidad')}
-                        className="font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1 text-[11px] cursor-pointer"
-                      >
-                        <span>Ver en Portal</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

@@ -50,27 +50,27 @@ export default function AdmissionSection() {
   };
 
   return (
-    <section id="admisiones" className="py-16 sm:py-24 bg-slate-50 border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="admisiones" className="py-16 sm:py-24 bg-slate-50 border-b border-slate-200 select-none">
+      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-ipsur-pink-700 text-xs font-bold mb-3">
+        <div className="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-ipsur-pink-700 text-xs font-bold mb-3 shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-ipsur-pink-600" />
             <span>Admisiones Ciclo 2026-2027</span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight font-display">
             Inscríbete en 3 Sencillos Pasos 100% en Línea
           </h2>
 
-          <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed">
+          <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto">
             Sin examen de admisión y con inicio de clases continuo. Comienza tu preparación académica hoy mismo:
           </p>
         </div>
 
         {/* 3 Step Process Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-16 max-w-6xl mx-auto">
           
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs relative flex flex-col justify-between">
             <div className="space-y-3">

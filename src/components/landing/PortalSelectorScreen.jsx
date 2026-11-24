@@ -45,7 +45,7 @@ export default function PortalSelectorScreen() {
       />
 
       {/* Top Header Bar */}
-      <header className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 py-5 flex items-center justify-between border-b border-slate-800/80">
+      <header className="relative z-10 w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-5 flex items-center justify-between border-b border-slate-800/80">
         <button
           onClick={() => goToLanding()}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition shadow-sm cursor-pointer group"
@@ -84,26 +84,26 @@ export default function PortalSelectorScreen() {
       </header>
 
       {/* Main Content: Central Hero and Two Primary Portal Icons */}
-      <main className="relative z-10 flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col items-center justify-center text-center">
+      <main className="relative z-10 flex-1 w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 sm:py-16 flex flex-col items-center justify-center text-center">
         
         {/* Institutional Pill Tag */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 shadow-inner mb-4">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[11px] font-bold tracking-wider uppercase text-slate-300">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 shadow-inner mb-4">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34D399]" />
+          <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-slate-300">
             Campus Virtual Activo · Ciclo Lectivo 2026-2027
           </span>
         </div>
 
         {/* Section Heading */}
-        <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight max-w-3xl">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl font-display">
           Selecciona tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-ipsur-pink-500 via-pink-400 to-sky-400">Portal Institucional</span>
         </h1>
-        <p className="text-xs sm:text-sm md:text-base text-slate-400 max-w-2xl mt-3 mb-8 sm:mb-12 leading-relaxed">
-          Bienvenido al centro de acceso de <strong className="text-slate-200">IPSUR EDUCORE</strong>. Elige el nivel educativo al que perteneces para ingresar a tus salas virtuales, tareas, boletas y servicios académicos.
+        <p className="text-xs sm:text-sm md:text-base text-slate-400 max-w-2xl mt-3 mb-10 sm:mb-14 leading-relaxed">
+          Bienvenido al centro de acceso de <strong className="text-slate-200">IPSUR EDUCORE</strong>. Elige el nivel educativo al que perteneces para ingresar a tus salas virtuales, tareas, boletas y servicios académicos:
         </p>
 
         {/* The Two Main Educational Portal Icons / Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 w-full max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 w-full max-w-5xl">
           
           {/* ICON / CARD 1: PREPA EN LÍNEA (IPSUR) */}
           <div 

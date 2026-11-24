@@ -16,8 +16,8 @@ export default function LandingFooter() {
   const { goToPortalSelector, goToPortalApp, institutionalInfo, installPwa } = useApp();
 
   return (
-    <footer className="bg-[#070D1B] text-slate-400 text-xs border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <footer className="bg-[#070D1B] text-slate-400 text-xs border-t border-slate-800 select-none">
+      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 mb-12">
           
           {/* Col 1: Brand & Identity */}

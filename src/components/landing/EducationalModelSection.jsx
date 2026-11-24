@@ -63,20 +63,20 @@ export default function EducationalModelSection() {
       <div className="absolute top-1/4 -left-48 w-96 h-96 bg-ipsur-pink-600/15 rounded-full blur-[130px] pointer-events-none" />
       <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-sky-500/15 rounded-full blur-[130px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-slate-200 text-xs font-bold mb-3">
+        <div className="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-slate-200 text-xs font-bold mb-3 shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-ipsur-pink-400" />
             <span>Innovación en Educación a Distancia</span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight font-display">
             ¿Por qué estudiar en IPSUR EDUCORE?
           </h2>
 
-          <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">
+          <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto">
             Hemos transformado la experiencia de estudiar en línea combinando tecnología intuitiva, calidad pedagógica y un entorno seguro para tu crecimiento:
           </p>
         </div>
