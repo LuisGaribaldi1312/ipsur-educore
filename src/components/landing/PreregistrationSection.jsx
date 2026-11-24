@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   FileText, 
   Upload, 
@@ -25,7 +25,9 @@ import {
   ArrowRight, 
   RotateCcw,
   MessageCircle,
-  FileCheck
+  FileCheck,
+  Eye,
+  Info
 } from 'lucide-react';
 import { PREPA_DATA, IUPS_DATA, INSTITUTIONAL_CAMPUS } from '../../data/institutionalLandingData';
 import { useApp } from '../../context/AppContext';
@@ -53,14 +55,14 @@ export default function PreregistrationSection() {
     postalCode: '',
     city: 'Playa del Carmen',
 
-    // Prepa Tutor fields (only for prepa)
+    // Prepa Tutor fields (for prepa)
     tutorName: '',
     tutorPhone: '',
     tutorEmail: '',
     tutorRelationship: 'Madre / Padre'
   });
 
-  // Uploaded and compressed documents state
+  // Uploaded and compressed documents state (100% Optional)
   // key: docId -> { name, originalSize, compressedSize, dataUrl, isCompressing }
   const [documents, setDocuments] = useState({});
   const [isCompressingAny, setIsCompressingAny] = useState(false);
@@ -68,20 +70,33 @@ export default function PreregistrationSection() {
   // Completed registration voucher state
   const [completedVoucher, setCompletedVoucher] = useState(null);
   const [copiedFolio, setCopiedFolio] = useState(false);
-  const printRef = useRef(null);
+  const [screenshotHighlight, setScreenshotHighlight] = useState(false);
+  const voucherTopRef = useRef(null);
 
-  // Document list configuration per level
+  // Check if there was a saved voucher in localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('ipsur_last_voucher'));
+      if (saved && saved.folio) {
+        // Can be re-opened by user if desired
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  // Document list configuration per level (All optional!)
   const docConfig = level === 'prepa' ? [
-    { id: 'comprobante_domicilio', label: 'Comprobante de Domicilio', desc: 'Recibo de luz, agua o predial reciente (máximo 3 meses)' },
-    { id: 'acta_nacimiento', label: 'Acta de Nacimiento del Alumno', desc: 'Legible y en buen estado (copia digital o foto clara)' },
-    { id: 'curp_alumno', label: 'CURP del Alumno', desc: 'Formato oficial actualizado de RENAPO' },
-    { id: 'ine_tutor', label: 'Credencial de Elector (INE) del Tutor', desc: 'Identificación oficial vigente del padre, madre o tutor' }
+    { id: 'comprobante_domicilio', label: 'Comprobante de Domicilio (Opcional)', desc: 'Recibo de luz, agua o predial reciente' },
+    { id: 'acta_nacimiento', label: 'Acta de Nacimiento (Opcional)', desc: 'Copia digital o fotografía clara' },
+    { id: 'curp_alumno', label: 'CURP del Alumno (Opcional)', desc: 'Formato oficial de RENAPO' },
+    { id: 'ine_tutor', label: 'INE del Tutor (Opcional)', desc: 'Identificación oficial del padre, madre o tutor' }
   ] : [
-    { id: 'comprobante_domicilio', label: 'Comprobante de Domicilio', desc: 'Recibo de luz, agua o predial vigente' },
-    { id: 'acta_nacimiento', label: 'Acta de Nacimiento', desc: 'Copia digital legible o fotografía clara' },
-    { id: 'curp_alumno', label: 'CURP Actualizada', desc: 'Formato oficial descargado de RENAPO' },
-    { id: 'ine_alumno', label: 'Credencial de Elector (INE)', desc: 'Identificación oficial vigente del aspirante' },
-    { id: 'certificado_previo', label: 'Certificado de Bachillerato o Título', desc: 'Certificado de bachillerato o título previo para posgrado' }
+    { id: 'comprobante_domicilio', label: 'Comprobante de Domicilio (Opcional)', desc: 'Recibo de luz, agua o predial reciente' },
+    { id: 'acta_nacimiento', label: 'Acta de Nacimiento (Opcional)', desc: 'Copia digital o fotografía legible' },
+    { id: 'curp_alumno', label: 'CURP Actualizada (Opcional)', desc: 'Formato oficial de RENAPO' },
+    { id: 'ine_alumno', label: 'INE del Aspirante (Opcional)', desc: 'Identificación oficial vigente' },
+    { id: 'certificado_previo', label: 'Certificado / Título Previo (Opcional)', desc: 'Certificado de bachillerato o título previo para posgrado' }
   ];
 
   // Client-Side Image/Document Compression Engine
@@ -89,7 +104,7 @@ export default function PreregistrationSection() {
     return new Promise((resolve) => {
       const originalSize = file.size;
 
-      // If it's a PDF, we can't resize through canvas, so we preserve it and store a compact base64
+      // If it's a PDF, we store dataUrl with metadata
       if (file.type === 'application/pdf') {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -105,7 +120,7 @@ export default function PreregistrationSection() {
         return;
       }
 
-      // For images (JPEG, PNG, WEBP, etc.)
+      // For images (JPEG, PNG, WEBP, HEIC, etc.)
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
@@ -168,7 +183,7 @@ export default function PreregistrationSection() {
           uploadedAt: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
         }
       }));
-      showToast('Documento Optimizado', `${file.name} fue comprimido y cargado con éxito.`, 'success');
+      showToast('Documento Optimizado', `${file.name} comprimido con éxito.`, 'success');
     } catch (err) {
       console.error('Error compressing file', err);
       showToast('Error', 'No se pudo procesar el archivo. Intenta con una imagen o PDF.', 'error');
@@ -183,24 +198,17 @@ export default function PreregistrationSection() {
     return (bytes / 1024).toFixed(0) + ' KB';
   };
 
-  // Submission handler
+  // Submission handler - Documentos 100% Opcionales
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.studentName.trim() || !formData.curp.trim() || !formData.studentPhone.trim()) {
-      showToast('Campos Incompletos', 'Por favor ingresa nombre, CURP y teléfono del aspirante.', 'error');
+    if (!formData.studentName.trim() || !formData.studentPhone.trim()) {
+      showToast('Datos Faltantes', 'Por favor ingresa al menos el nombre y teléfono del aspirante.', 'error');
       return;
     }
 
     if (level === 'prepa' && !formData.tutorName.trim()) {
-      showToast('Falta Tutor', 'Para nivel preparatoria es necesario el nombre del padre, madre o tutor.', 'error');
-      return;
-    }
-
-    // Check if at least one essential document is uploaded
-    const uploadedCount = Object.keys(documents).filter((k) => documents[k]?.dataUrl).length;
-    if (uploadedCount === 0) {
-      showToast('Carga de Documentos Requerida', 'Por favor carga al menos tu comprobante de domicilio o acta de nacimiento.', 'error');
+      showToast('Datos de Tutor Requeridos', 'Por favor ingresa el nombre del padre, madre o tutor para Prepa.', 'error');
       return;
     }
 
@@ -210,6 +218,18 @@ export default function PreregistrationSection() {
     const year = new Date().getFullYear();
     const folio = `${prefix}-${year}-${randomDigits}`;
 
+    // Collect whatever docs were uploaded (if none, array is empty, which is completely valid!)
+    const uploadedDocs = Object.keys(documents)
+      .filter((k) => documents[k]?.dataUrl)
+      .map((k) => ({
+        docId: k,
+        label: docConfig.find((d) => d.id === k)?.label?.replace(' (Opcional)', '') || k,
+        name: documents[k].name,
+        originalSize: documents[k].originalSize,
+        compressedSize: documents[k].compressedSize,
+        uploadedAt: documents[k].uploadedAt
+      }));
+
     const newVoucher = {
       folio,
       level,
@@ -218,16 +238,8 @@ export default function PreregistrationSection() {
       date: new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }),
       time: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
       formData: { ...formData },
-      uploadedDocs: Object.keys(documents)
-        .filter((k) => documents[k]?.dataUrl)
-        .map((k) => ({
-          docId: k,
-          label: docConfig.find((d) => d.id === k)?.label || k,
-          name: documents[k].name,
-          originalSize: documents[k].originalSize,
-          compressedSize: documents[k].compressedSize,
-          uploadedAt: documents[k].uploadedAt
-        }))
+      uploadedDocs,
+      hasUploadedDocs: uploadedDocs.length > 0
     };
 
     // Save to localStorage for administrative auditing
@@ -235,12 +247,25 @@ export default function PreregistrationSection() {
       const existing = JSON.parse(localStorage.getItem('ipsur_preregistrations') || '[]');
       existing.unshift(newVoucher);
       localStorage.setItem('ipsur_preregistrations', JSON.stringify(existing));
-    } catch (e) {
-      console.warn('Could not save to localStorage', e);
+      localStorage.setItem('ipsur_last_voucher', JSON.stringify(newVoucher));
+    } catch (err) {
+      console.warn('Could not save to localStorage', err);
     }
 
+    // Set completed voucher state
     setCompletedVoucher(newVoucher);
-    showToast('¡Prerregistro Exitoso!', `Tu folio asignado es ${folio}. Guarda tu comprobante.`, 'success');
+
+    // Scroll smoothly to the generated voucher so the user sees it immediately!
+    setTimeout(() => {
+      if (voucherTopRef.current) {
+        voucherTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        const elem = document.getElementById('preinscripcion');
+        if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 150);
+
+    showToast('¡Ficha Generada con Éxito!', `Folio asignado: ${folio}. Toma una captura o foto de tu ficha.`, 'success');
   };
 
   const copyFolioToClipboard = () => {
@@ -255,10 +280,22 @@ export default function PreregistrationSection() {
     window.print();
   };
 
+  const triggerScreenshotGuide = () => {
+    setScreenshotHighlight(true);
+    showToast('Modo Captura Activo', 'Toma una captura de pantalla (Screenshot) o fotografía con tu celular a este recuadro.', 'info');
+    setTimeout(() => setScreenshotHighlight(false), 4000);
+  };
+
   const shareWhatsApp = () => {
     if (!completedVoucher) return;
     const msg = encodeURIComponent(
-      `¡Hola! Realicé mi prerregistro en ${completedVoucher.levelTitle} con Folio: ${completedVoucher.folio}. Nombre: ${completedVoucher.formData.studentName}. Programa: ${completedVoucher.formData.program}. Presentaré esta ficha en las instalaciones de Playa del Carmen.`
+      `¡Hola! Realicé mi prerregistro en ${completedVoucher.levelTitle}.\n` +
+      `Folio Oficial: ${completedVoucher.folio}\n` +
+      `Aspirante: ${completedVoucher.formData.studentName}\n` +
+      `Programa: ${completedVoucher.formData.program}\n` +
+      `Modalidad: ${completedVoucher.formData.modality}\n` +
+      `Documentación precargada: ${completedVoucher.hasUploadedDocs ? 'Sí (adjuntada en línea)' : 'Pendiente de entrega en físico en el plantel'}\n` +
+      `Presentaré esta ficha en las instalaciones de Playa del Carmen.`
     );
     const phone = completedVoucher.level === 'prepa' ? PREPA_DATA.whatsapp : IUPS_DATA.whatsapp;
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
@@ -289,13 +326,18 @@ export default function PreregistrationSection() {
   return (
     <section id="preinscripcion" className="py-16 sm:py-24 bg-slate-900 text-white relative overflow-hidden select-none">
       
+      {/* Scroll anchor target */}
+      <div ref={voucherTopRef} className="absolute -top-20" />
+
       {/* Background Decorative Glows */}
       <div className="absolute top-1/4 -right-40 w-96 h-96 bg-ipsur-pink-600/15 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-1/4 -left-40 w-96 h-96 bg-sky-500/15 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         
-        {/* If no voucher generated yet, show the pre-registration form */}
+        {/* ======================================================== */}
+        {/* CASE 1: PRE-REGISTRATION FORM VIEW                        */}
+        {/* ======================================================== */}
         {!completedVoucher ? (
           <div>
             {/* Section Header */}
@@ -310,7 +352,7 @@ export default function PreregistrationSection() {
               </h2>
 
               <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto">
-                Realiza tu prerregistro, sube tus documentos oficiales (el sistema reducirá y optimizará su tamaño automáticamente) y obtén tu <strong className="text-white font-bold">Ficha Oficial con Código QR y Folio</strong> para asegurar tu lugar:
+                Completa tus datos para generar al instante tu <strong className="text-white font-bold">Ficha Oficial con Código QR y Folio</strong>. La carga de documentos es totalmente <strong className="text-pink-300 font-bold">opcional</strong> (puedes subirlos ahora para que el sistema los comprima automáticamente o llevarlos en físico el día de tu visita):
               </p>
 
               {/* Segmented Level Selector */}
@@ -393,11 +435,10 @@ export default function PreregistrationSection() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                      CURP del Alumno *
+                      CURP del Alumno (Opcional si aún no la tienes)
                     </label>
                     <input
                       type="text"
-                      required
                       maxLength={18}
                       value={formData.curp}
                       onChange={(e) => setFormData({ ...formData, curp: e.target.value.toUpperCase() })}
@@ -408,7 +449,7 @@ export default function PreregistrationSection() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                      Teléfono / WhatsApp *
+                      Teléfono / WhatsApp de Contacto *
                     </label>
                     <input
                       type="tel"
@@ -422,7 +463,7 @@ export default function PreregistrationSection() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                      Correo Electrónico
+                      Correo Electrónico (Opcional)
                     </label>
                     <input
                       type="email"
@@ -435,7 +476,7 @@ export default function PreregistrationSection() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                      Fecha de Nacimiento
+                      Fecha de Nacimiento (Opcional)
                     </label>
                     <input
                       type="date"
@@ -555,11 +596,10 @@ export default function PreregistrationSection() {
 
                     <div>
                       <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                        Teléfono del Tutor *
+                        Teléfono del Tutor (Opcional)
                       </label>
                       <input
                         type="tel"
-                        required={level === 'prepa'}
                         value={formData.tutorPhone}
                         onChange={(e) => setFormData({ ...formData, tutorPhone: e.target.value })}
                         placeholder="(984) 000-0000"
@@ -608,7 +648,7 @@ export default function PreregistrationSection() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                   <div className="lg:col-span-2">
                     <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                      Calle, Número Exterior e Interior
+                      Calle, Número Exterior e Interior (Opcional)
                     </label>
                     <input
                       type="text"
@@ -647,7 +687,7 @@ export default function PreregistrationSection() {
                 </div>
               </div>
 
-              {/* STEP 4: CARGA Y COMPRESIÓN DE DOCUMENTOS */}
+              {/* STEP 4: CARGA Y COMPRESIÓN DE DOCUMENTOS (100% OPCIONAL) */}
               <div className="bg-slate-800/80 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-700/80">
                   <div className="flex items-center gap-3">
@@ -655,24 +695,32 @@ export default function PreregistrationSection() {
                       <Upload className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                        {level === 'prepa' ? 'Paso 04' : 'Paso 03'}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                          {level === 'prepa' ? 'Paso 04' : 'Paso 03'}
+                        </span>
+                        <span className="text-[10px] font-black uppercase text-pink-300 bg-pink-950/80 border border-pink-800/80 px-2 py-0.5 rounded-full">
+                          Paso Opcional
+                        </span>
+                      </div>
                       <h3 className="text-base sm:text-lg font-bold text-white">
-                        Carga y Compresión Automática de Documentos Oficiales
+                        Carga y Compresión de Documentos (Puedes subirlos ahora o entregarlos en ventanilla)
                       </h3>
                     </div>
                   </div>
 
                   <span className="text-[11px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800/80 px-3 py-1 rounded-full flex items-center gap-1.5">
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>Compresión Inteligente en el Navegador</span>
+                    <span>Compresión Automática Activa</span>
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Sube tus documentos vigentes (fotografía clara tomada con tu celular o escaneo en JPG, PNG o PDF). <strong className="text-emerald-300">El portal reducirá y optimizará su tamaño automáticamente</strong> sin perder legibilidad, facilitando su almacenamiento y validación.
-                </p>
+                <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 flex items-start gap-2.5">
+                  <Info className="w-4 h-4 text-sky-400 flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong>¿No tienes tus documentos a la mano?</strong> No te preocupes. Puedes generar tu ficha de preinscripción de inmediato sin subir archivos y llevarlos en físico cuando asistas a la escuela para finalizar tu proceso. Si decides subirlos, el sistema reducirá su peso automáticamente para agilizar tu trámite.
+                  </span>
+                </div>
 
                 {/* Document Upload Cards Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -743,7 +791,7 @@ export default function PreregistrationSection() {
                                 ? 'Comprimiendo archivo...' 
                                 : uploaded?.dataUrl 
                                 ? 'Cambiar archivo' 
-                                : 'Seleccionar o Tomar Foto'}
+                                : 'Subir o Tomar Foto (Opcional)'}
                             </span>
                             <input
                               type="file"
@@ -765,7 +813,7 @@ export default function PreregistrationSection() {
                 <div className="space-y-1 text-center sm:text-left">
                   <h4 className="text-base sm:text-lg font-bold text-white">¿Listo para generar tu Ficha Oficial?</h4>
                   <p className="text-xs text-slate-400">
-                    Al dar clic en Enviar, se generará tu comprobante oficial con Folio y Código QR listo para captura o impresión.
+                    Tu ficha se generará de inmediato con Folio y Código QR listo para captura o impresión, aun si no subiste documentos.
                   </p>
                 </div>
 
@@ -775,7 +823,7 @@ export default function PreregistrationSection() {
                   className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-ipsur-pink-600 via-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-black text-xs sm:text-sm tracking-wide shadow-xl shadow-ipsur-pink-600/30 flex items-center justify-center gap-2.5 transition transform hover:-translate-y-0.5 cursor-pointer disabled:opacity-50"
                 >
                   <FileCheck className="w-4 h-4 text-pink-200" />
-                  <span>Generar Ficha de Preinscripción</span>
+                  <span>Generar Ficha de Preinscripción Ahora</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -784,27 +832,49 @@ export default function PreregistrationSection() {
           </div>
         ) : (
           /* ======================================================== */
-          /* THE OFFICIAL FICHA DE PREINSCRIPCIÓN (VOUCHER) VIEW       */
+          /* CASE 2: THE OFFICIAL FICHA DE PREINSCRIPCIÓN (VOUCHER)    */
           /* ======================================================== */
           <div className="max-w-4xl mx-auto space-y-6 animate-fadeIn">
             
-            {/* Top Success Banner */}
-            <div className="bg-emerald-950/80 border border-emerald-700/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3 text-emerald-300">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />
-                <div className="text-left">
-                  <h4 className="text-sm font-bold text-white">¡Prerregistro Exitoso en el Sistema!</h4>
-                  <p className="text-xs text-emerald-300">
-                    Tu documentación ha sido precargada y optimizada. Toma una captura de pantalla a la ficha inferior.
+            {/* Top Success Banner with Visual Instructions */}
+            <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/80 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5 text-left">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/30 animate-pulse">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">
+                      Ficha Generada con Éxito
+                    </span>
+                    <span className="text-[10px] bg-emerald-900/80 text-emerald-200 border border-emerald-700 px-2 py-0.5 rounded font-mono font-bold">
+                      Folio: {completedVoucher.folio}
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white">
+                    ¡Toma una foto o captura a la ficha de abajo!
+                  </h3>
+                  <p className="text-xs text-slate-300">
+                    Preséntala en la escuela junto con tus documentos para concluir tu inscripción en minutos.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* Action Buttons Toolbar */}
+              <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={triggerScreenshotGuide}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-ipsur-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Camera className="w-4 h-4" />
+                  <span>Tomar Foto / Captura</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="px-4 py-2 rounded-xl bg-white text-slate-900 font-bold text-xs hover:bg-slate-100 transition shadow-md flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-white text-slate-900 font-bold text-xs hover:bg-slate-100 transition shadow-md flex items-center gap-1.5 cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Imprimir / PDF</span>
@@ -813,7 +883,7 @@ export default function PreregistrationSection() {
                 <button
                   type="button"
                   onClick={shareWhatsApp}
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
                   <span>Enviar a WhatsApp</span>
@@ -821,13 +891,27 @@ export default function PreregistrationSection() {
               </div>
             </div>
 
-            {/* THE PRINTABLE / SCREENSHOTABLE FICHA CARD */}
+            {/* ======================================================== */}
+            {/* THE PRINTABLE / SCREENSHOTABLE FICHA CARD                */}
+            {/* ======================================================== */}
             <div 
-              ref={printRef}
-              className="bg-white text-slate-900 rounded-3xl p-6 sm:p-10 border-4 border-slate-300 shadow-2xl relative overflow-hidden font-sans"
+              id="ficha-credencial"
+              className={`bg-white text-slate-900 rounded-3xl p-6 sm:p-10 border-4 transition-all duration-300 shadow-2xl relative overflow-hidden font-sans ${
+                screenshotHighlight 
+                  ? 'border-ipsur-pink-500 ring-8 ring-pink-500/20 scale-[1.01]' 
+                  : 'border-slate-300'
+              }`}
             >
+              {/* Screenshot Frame Guide Banner (Only shows when clicking Tomar Captura) */}
+              {screenshotHighlight && (
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-ipsur-pink-600 text-white text-[11px] font-bold px-4 py-1 rounded-full shadow-lg z-20 flex items-center gap-1.5 animate-bounce">
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>📸 ¡Listo! Toma tu captura de pantalla o foto a este recuadro ahora</span>
+                </div>
+              )}
+
               {/* Institutional Watermark background */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+              <div className="absolute inset-0 flex items-center justify-center opacity-[0.035] pointer-events-none">
                 <img src="/ipsur-logo.png" alt="Watermark" className="w-96 h-96 object-contain" />
               </div>
 
@@ -839,37 +923,37 @@ export default function PreregistrationSection() {
                   </div>
                   <div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-ipsur-pink-600 block">
-                      {completedVoucher.institution}
+                      FICHA INSTITUCIONAL DE PREINSCRIPCIÓN
                     </span>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight font-display">
-                      {completedVoucher.levelTitle}
+                      {completedVoucher.institution}
                     </h3>
                     <span className="text-xs text-slate-500 block">
-                      Campus Playa del Carmen · Ciclo Escolar 2026-2027
+                      {completedVoucher.levelTitle} · Campus Playa del Carmen
                     </span>
                   </div>
                 </div>
 
                 {/* Unique Folio Stamp */}
-                <div className="bg-slate-900 text-white p-3.5 sm:p-4 rounded-2xl text-center shadow-lg border border-slate-800">
+                <div className="bg-slate-900 text-white p-4 rounded-2xl text-center shadow-lg border border-slate-800 flex-shrink-0">
                   <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 block mb-1">
-                    Folio de Preinscripción
+                    FOLIO ASIGNADO
                   </span>
                   <div className="flex items-center justify-center gap-2">
-                    <span className="text-lg sm:text-xl font-mono font-black text-ipsur-pink-400">
+                    <span className="text-xl sm:text-2xl font-mono font-black text-ipsur-pink-400">
                       {completedVoucher.folio}
                     </span>
                     <button
                       type="button"
                       onClick={copyFolioToClipboard}
-                      className="text-slate-400 hover:text-white transition cursor-pointer"
+                      className="text-slate-400 hover:text-white transition cursor-pointer p-1"
                       title="Copiar Folio"
                     >
                       <Copy className="w-4 h-4" />
                     </button>
                   </div>
                   <span className="text-[10px] text-slate-400 block mt-1">
-                    {completedVoucher.date} · {completedVoucher.time}
+                    Emisión: {completedVoucher.date} · {completedVoucher.time}
                   </span>
                 </div>
               </div>
@@ -889,9 +973,9 @@ export default function PreregistrationSection() {
                     />
                   </div>
                   <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider mt-2.5">
-                    Validación Digital
+                    CÓDIGO QR INSTITUCIONAL
                   </span>
-                  <span className="text-[11px] font-bold text-slate-700">
+                  <span className="text-[11px] font-bold text-slate-800">
                     Escanear en Ventanilla
                   </span>
                 </div>
@@ -907,14 +991,14 @@ export default function PreregistrationSection() {
                     </div>
 
                     <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                      <span className="text-[10px] text-slate-500 font-bold uppercase block">CURP Registrada</span>
+                      <span className="text-[10px] text-slate-500 font-bold uppercase block">CURP del Aspirante</span>
                       <strong className="text-xs font-mono font-bold text-slate-900 block mt-0.5">
-                        {completedVoucher.formData.curp}
+                        {completedVoucher.formData.curp || 'Pendiente de cotejo'}
                       </strong>
                     </div>
 
                     <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                      <span className="text-[10px] text-slate-500 font-bold uppercase block">Programa Solicitado</span>
+                      <span className="text-[10px] text-slate-500 font-bold uppercase block">Programa Seleccionado</span>
                       <strong className="text-xs font-bold text-ipsur-pink-600 block mt-0.5">
                         {completedVoucher.formData.program}
                       </strong>
@@ -935,9 +1019,9 @@ export default function PreregistrationSection() {
                     </div>
 
                     <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                      <span className="text-[10px] text-slate-500 font-bold uppercase block">Domicilio Declarado</span>
+                      <span className="text-[10px] text-slate-500 font-bold uppercase block">Domicilio Registrado</span>
                       <strong className="text-xs font-semibold text-slate-800 block mt-0.5 truncate">
-                        {completedVoucher.formData.street || 'Domicilio Registrado'}, {completedVoucher.formData.city}
+                        {completedVoucher.formData.street || 'Domicilio no especificado'}, {completedVoucher.formData.city}
                       </strong>
                     </div>
                   </div>
@@ -951,47 +1035,57 @@ export default function PreregistrationSection() {
                         </span>
                         <span className="font-bold text-slate-900">{completedVoucher.formData.tutorName}</span>
                       </div>
-                      <span className="text-[11px] font-mono text-slate-600">{completedVoucher.formData.tutorPhone}</span>
+                      <span className="text-[11px] font-mono text-slate-600">{completedVoucher.formData.tutorPhone || 'Sin teléfono extra'}</span>
                     </div>
                   )}
                 </div>
 
               </div>
 
-              {/* Uploaded Documents List */}
+              {/* Uploaded Documents List or In-Person Pending Notice */}
               <div className="border-t-2 border-slate-200 pt-4 text-left">
                 <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 block mb-2">
-                  Documentación Digital Pre-validada en el Sistema:
+                  Estado de Documentación Digital:
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
-                  {completedVoucher.uploadedDocs.map((doc, dIdx) => (
-                    <div key={dIdx} className="bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                      <div className="overflow-hidden">
-                        <span className="text-[11px] font-bold text-emerald-950 block truncate">{doc.label}</span>
-                        <span className="text-[9px] font-mono text-emerald-700">Comprimido: {formatSize(doc.compressedSize)}</span>
+                
+                {completedVoucher.hasUploadedDocs ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+                    {completedVoucher.uploadedDocs.map((doc, dIdx) => (
+                      <div key={dIdx} className="bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl flex items-center gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                        <div className="overflow-hidden">
+                          <span className="text-[11px] font-bold text-emerald-950 block truncate">{doc.label}</span>
+                          <span className="text-[9px] font-mono text-emerald-700">Comprimido: {formatSize(doc.compressedSize)}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-amber-50 border border-amber-200 p-3 rounded-2xl flex items-center gap-2.5 text-xs text-amber-900">
+                    <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                    <span>
+                      <strong>Documentación en línea opcional:</strong> No adjuntaste archivos digitales en este paso. Tu prerregistro y folio ya están confirmados en el sistema; solo deberás presentar tus documentos en físico al momento de acudir a las instalaciones de la escuela para concluir tu inscripción.
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Instructions Box for Student */}
               <div className="mt-6 bg-slate-900 text-white rounded-2xl p-4 sm:p-5 text-left text-xs space-y-2 border border-slate-800">
                 <div className="flex items-center gap-2 font-bold text-pink-300">
                   <Camera className="w-4 h-4" />
-                  <span>Pasos para Concluir tu Inscripción Oficial:</span>
+                  <span>Pasos para Concluir tu Inscripción Oficial con esta Ficha:</span>
                 </div>
-                <ol className="list-decimal list-inside space-y-1 text-slate-300 text-[11px] leading-relaxed">
-                  <li>Toma una foto o captura de pantalla a esta ficha con tu celular o imprímela.</li>
-                  <li>Preséntate en nuestras instalaciones: <strong className="text-white">{INSTITUTIONAL_CAMPUS.address}</strong> (Lunes a Viernes 8:00 a 19:00 hrs, Sábados 8:00 a 15:00 hrs).</li>
-                  <li>Muestra este Código QR y Folio en ventanilla junto con tus originales para cotejo rápido. Tus documentos ya están precargados en el sistema EDUCORE.</li>
+                <ol className="list-decimal list-inside space-y-1.5 text-slate-300 text-[11px] leading-relaxed">
+                  <li><strong>Toma una foto o captura de pantalla a esta ficha</strong> con tu teléfono celular o descárgala en PDF.</li>
+                  <li>Preséntate en nuestras instalaciones: <strong className="text-white">{INSTITUTIONAL_CAMPUS.address}</strong> (Horario: Lunes a Viernes 8:00 a 19:00 hrs, Sábados 8:00 a 15:00 hrs).</li>
+                  <li>Muestra este <strong>Código QR y Folio</strong> en ventanilla junto con tus documentos originales para cotejo y asignación de matrícula definitiva.</li>
                 </ol>
               </div>
 
               {/* Bottom Stamp Bar */}
               <div className="mt-6 pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-slate-500">
-                <span>RVOE SEP Acreditado · {completedVoucher.institution}</span>
+                <span>RVOE SEP Oficial · {completedVoucher.institution}</span>
                 <span>Ficha generada por el Sistema Integral EDUCORE</span>
               </div>
             </div>
@@ -1009,11 +1103,20 @@ export default function PreregistrationSection() {
 
               <button
                 type="button"
+                onClick={triggerScreenshotGuide}
+                className="px-5 py-2.5 rounded-xl bg-ipsur-pink-600 hover:bg-ipsur-pink-500 text-white font-bold text-xs transition flex items-center gap-2 cursor-pointer shadow-md"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>Tomar Foto / Captura a la Ficha</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={shareWhatsApp}
                 className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-2 cursor-pointer shadow-md"
               >
                 <MessageCircle className="w-3.5 h-3.5" />
-                <span>Confirmar por WhatsApp con Admisiones</span>
+                <span>Confirmar Folio por WhatsApp con Admisiones</span>
               </button>
             </div>
 
