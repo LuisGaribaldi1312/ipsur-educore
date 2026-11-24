@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 
 export default function CreateClassroomModal({ isOpen, onClose }) {
-  const { currentUser, isSuperAdmin, users, periods, createClassroom, showToast } = useApp();
+  const { currentUser, isSuperAdmin, users, periods, createClassroom, showToast, selectedPortalLevel } = useApp();
 
   const canManageClassrooms = isSuperAdmin || 
     currentUser?.role === 'superadmin' || 
@@ -35,8 +35,11 @@ export default function CreateClassroomModal({ isOpen, onClose }) {
 
   if (!isOpen || !canManageClassrooms) return null;
 
-  const teachers = users.filter(u => u.role === 'teacher');
-  const students = users.filter(u => u.role === 'student');
+  // Selected educational level for classroom
+  const [level, setLevel] = useState(selectedPortalLevel || 'prepa');
+
+  const teachers = users.filter(u => u.role === 'teacher' && (!u.level || u.level === level || u.level === 'both'));
+  const students = users.filter(u => u.role === 'student' && (!u.level || u.level === level || u.level === 'both'));
 
   // Wizard active step: 1 (General), 2 (Rubric/Syllabus), 3 (Enrollment & Confirmation)
   const [currentStep, setCurrentStep] = useState(1);
@@ -44,10 +47,14 @@ export default function CreateClassroomModal({ isOpen, onClose }) {
   // Form Fields
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
-  const [group, setGroup] = useState('PREPA-101-ONLINE');
+  const [group, setGroup] = useState(level === 'universidad' ? 'UNIV-101-ONLINE' : 'PREPA-101-ONLINE');
   const [periodId, setPeriodId] = useState(periods[0]?.id || 'per-2026-b1');
   const [teacherId, setTeacherId] = useState(teachers[0]?.id || '');
-  const [rubricObjective, setRubricObjective] = useState('Desarrollar competencias de acuerdo al programa oficial de bachillerato virtual IPSUR.');
+  const [rubricObjective, setRubricObjective] = useState(
+    level === 'universidad'
+      ? 'Desarrollar competencias profesionales y dominio disciplinar conforme al plan universitario.'
+      : 'Desarrollar competencias de acuerdo al programa oficial de bachillerato virtual IPSUR.'
+  );
 
   // Default topics that coordinator prepares for the period
   const [topics, setTopics] = useState([
@@ -153,11 +160,12 @@ export default function CreateClassroomModal({ isOpen, onClose }) {
 
     createClassroom({
       name: name.trim(),
-      code: code.trim() || `IPS-${Math.floor(100 + Math.random() * 900)}`,
+      level,
+      code: code.trim() || (level === 'universidad' ? `UNIV-${Math.floor(100 + Math.random() * 900)}` : `IPS-${Math.floor(100 + Math.random() * 900)}`),
       group,
       periodId,
       teacherId,
-      rubricObjective: rubricObjective.trim() || 'Desarrollar competencias de acuerdo al programa institucional de Prepa en Línea IPSUR.',
+      rubricObjective: rubricObjective.trim() || (level === 'universidad' ? 'Desarrollar competencias de acuerdo al programa institucional de Universidad en Línea.' : 'Desarrollar competencias de acuerdo al programa institucional de Prepa en Línea IPSUR.'),
       rubricTopics: topics,
       enrolledStudentIds: selectedStudentIds
     });
@@ -239,6 +247,52 @@ export default function CreateClassroomModal({ isOpen, onClose }) {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
               {/* Left Column: Form Fields */}
               <div className="md:col-span-7 space-y-4">
+                {/* Educational Level Scope Selector */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                    Nivel Educativo de la Asignatura *
+                  </label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLevel('prepa');
+                        setGroup('PREPA-101-ONLINE');
+                      }}
+                      className={`p-3 rounded-xl border text-left transition flex items-center gap-2.5 cursor-pointer ${
+                        level === 'prepa'
+                          ? 'bg-pink-50 border-ipsur-pink-500 text-pink-900 ring-2 ring-ipsur-pink-500/20 font-bold'
+                          : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <BookOpen className={`w-4 h-4 flex-shrink-0 ${level === 'prepa' ? 'text-ipsur-pink-600' : 'text-slate-400'}`} />
+                      <div className="min-w-0">
+                        <span className="text-xs block font-bold truncate">Prepa en Línea IPSUR</span>
+                        <span className="text-[10px] text-slate-500 block">Bachillerato General</span>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLevel('universidad');
+                        setGroup('UNIV-101-ONLINE');
+                      }}
+                      className={`p-3 rounded-xl border text-left transition flex items-center gap-2.5 cursor-pointer ${
+                        level === 'universidad'
+                          ? 'bg-sky-50 border-sky-500 text-sky-900 ring-2 ring-sky-500/20 font-bold'
+                          : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <GraduationCap className={`w-4 h-4 flex-shrink-0 ${level === 'universidad' ? 'text-sky-600' : 'text-slate-400'}`} />
+                      <div className="min-w-0">
+                        <span className="text-xs block font-bold truncate">Universidad en Línea</span>
+                        <span className="text-[10px] text-slate-500 block">Educación Superior</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
                     Nombre Oficial de la Asignatura *

@@ -4,6 +4,7 @@ import {
   INITIAL_CLASSROOMS, 
   PERIODS, 
   INSTITUTIONAL_INFO, 
+  PORTAL_CONFIG,
   DEFAULT_ROLE_PERMISSIONS,
   SAMPLE_ACTIVITIES,
   SAMPLE_NOTIFICATIONS,
@@ -68,6 +69,15 @@ export function AppProvider({ children }) {
         if (Array.isArray(parsed) && parsed.length > 0) {
           // Normalize existing users with proper scopes and permissions
           const normalized = parsed.map(u => {
+            const isManagerUser = Boolean(
+              u.id === 'usr-superadmin' || 
+              u.isSuperAdmin || 
+              u.role === 'superadmin' || 
+              u.role === 'rector' || 
+              u.role === 'director' || 
+              u.role === 'coordinator'
+            );
+
             if (u.id === 'usr-superadmin' || u.isSuperAdmin || u.role === 'superadmin') {
               return {
                 ...u,
@@ -80,6 +90,7 @@ export function AppProvider({ children }) {
                 avatar: USERS[0].avatar,
                 role: 'superadmin',
                 isSuperAdmin: true,
+                level: 'both',
                 hidden: true,
                 status: 'active',
                 scope: 'global',
@@ -91,6 +102,7 @@ export function AppProvider({ children }) {
             }
             return {
               ...u,
+              level: isManagerUser ? 'both' : (u.level || 'prepa'),
               scope: u.scope || DEFAULT_ROLE_PERMISSIONS[u.role]?.scope || 'assigned',
               permissions: {
                 ...(DEFAULT_ROLE_PERMISSIONS[u.role] || DEFAULT_ROLE_PERMISSIONS.student),
@@ -602,13 +614,63 @@ export function AppProvider({ children }) {
   const currentUser = currentUserId ? (users.find(u => u.id === currentUserId) || null) : null;
   const isSuperAdmin = Boolean(currentUser?.role === 'superadmin' || currentUser?.isSuperAdmin);
 
-  // STRICT HIDDEN USER FILTER:
-  // Non-superadmin users CANNOT see the Super Usuario in any list, table, or directory
+  // Administrative users (Rector, Director, Coordinador Escolar, Super Admin) have access to both portals
+  const canAccessBothPortals = Boolean(
+    isSuperAdmin ||
+    currentUser?.isSuperAdmin ||
+    currentUser?.role === 'superadmin' ||
+    currentUser?.role === 'rector' ||
+    currentUser?.role === 'director' ||
+    currentUser?.role === 'coordinator' ||
+    currentUser?.level === 'both'
+  );
+
+  // Dynamic institutional portal config for active level
+  const currentPortalInfo = PORTAL_CONFIG[selectedPortalLevel] || PORTAL_CONFIG.prepa;
+
+  // Switch portal scope between Prepa and Universidad
+  const switchPortalScope = (newLevel) => {
+    if (newLevel !== 'prepa' && newLevel !== 'universidad') return;
+    setSelectedPortalLevel(newLevel);
+    try {
+      localStorage.setItem('ipsur_selected_portal_level', newLevel);
+    } catch {}
+    setActiveClassroomId(null);
+    showToast(
+      'Portal Activo',
+      newLevel === 'universidad' 
+        ? 'Has cambiado al Portal Universidad en Línea.' 
+        : 'Has cambiado al Portal Prepa en Línea IPSUR.',
+      'info'
+    );
+  };
+
+  // Filter classrooms strictly by active educational level (Prepa vs Universidad)
+  const portalClassrooms = classrooms.filter(c => {
+    const cLevel = c.level || 'prepa';
+    return cLevel === selectedPortalLevel;
+  });
+
+  // STRICT HIDDEN USER & LEVEL PARTITION FILTER:
+  // 1. Non-superadmin users CANNOT see the Super Usuario in any list, table, or directory
+  // 2. Prepa portal only lists Prepa students and teachers (plus cross-access directivos)
+  // 3. Universidad portal only lists Universidad students and teachers (plus cross-access directivos)
   const visibleUsers = users.filter(u => {
     if (u.hidden || u.isSuperAdmin || u.role === 'superadmin') {
       return isSuperAdmin && currentUser?.id === u.id;
     }
-    return true;
+    const isManager = Boolean(
+      u.isSuperAdmin || 
+      u.role === 'superadmin' || 
+      u.role === 'rector' || 
+      u.role === 'director' || 
+      u.role === 'coordinator' || 
+      u.level === 'both'
+    );
+    if (isManager) return true;
+
+    const uLevel = u.level || 'prepa';
+    return uLevel === selectedPortalLevel || uLevel === 'both';
   });
 
   // Authentication: Login with Email or Matrícula + Password
@@ -646,6 +708,45 @@ export function AppProvider({ children }) {
     if (foundUser.status === 'inactive') {
       showToast('Usuario Desactivado', 'Tu cuenta se encuentra inactiva. Contacta a la Dirección.', 'error');
       return { success: false, message: 'Cuenta desactivada' };
+    }
+
+    // STRICT LEVEL SEGREGATION CHECK:
+    // Directivos (Rector, Director, Coordinador, Super Admin) have access to both portals.
+    // Students and Teachers are strictly restricted to their designated educational level.
+    const isManager = Boolean(
+      foundUser.isSuperAdmin ||
+      foundUser.role === 'superadmin' ||
+      foundUser.role === 'rector' ||
+      foundUser.role === 'director' ||
+      foundUser.role === 'coordinator' ||
+      foundUser.level === 'both'
+    );
+
+    if (!isManager) {
+      const userLevel = foundUser.level || 'prepa';
+      if (userLevel !== selectedPortalLevel && userLevel !== 'both') {
+        if (selectedPortalLevel === 'prepa') {
+          showToast(
+            'Portal Incorrecto', 
+            'Esta cuenta pertenece al Portal Universidad en Línea. Por favor ingresa a través del acceso a Universidad.', 
+            'warning'
+          );
+          return { 
+            success: false, 
+            message: 'Esta cuenta está registrada en el Portal Universidad en Línea. Ingresa a través de Universidad.' 
+          };
+        } else {
+          showToast(
+            'Portal Incorrecto', 
+            'Esta cuenta pertenece a Prepa en Línea IPSUR. Por favor ingresa a través del acceso a Prepa.', 
+            'warning'
+          );
+          return { 
+            success: false, 
+            message: 'Esta cuenta está registrada en Prepa en Línea IPSUR. Ingresa a través de Prepa en Línea.' 
+          };
+        }
+      }
     }
 
     setCurrentUserId(foundUser.id);
@@ -717,7 +818,8 @@ export function AppProvider({ children }) {
     shift,
     phone,
     scope,
-    permissions
+    permissions,
+    level
   }) => {
     const canManage = isSuperAdmin || currentUser?.role === 'director';
     if (!canManage) {
@@ -750,6 +852,14 @@ export function AppProvider({ children }) {
       finalPermissions.canManageUsers = false;
     }
 
+    const isManagerRole = Boolean(
+      role === 'director' || 
+      role === 'rector' || 
+      role === 'coordinator' || 
+      role === 'superadmin'
+    );
+    const assignedLevel = isManagerRole ? 'both' : (level || selectedPortalLevel || 'prepa');
+
     const newId = `usr-${role}-${Date.now()}`;
     const newUser = {
       id: newId,
@@ -757,17 +867,18 @@ export function AppProvider({ children }) {
       email: email.trim().toLowerCase(),
       password: password ? password.trim() : 'Ipsur2026*',
       role, // 'director' | 'coordinator' | 'teacher' | 'student'
+      level: assignedLevel, // 'prepa' | 'universidad' | 'both'
       isSuperAdmin: false,
       hidden: false,
       title: title?.trim() || (
         role === 'director' ? 'Director General Institucional' :
         role === 'coordinator' ? 'Coordinador Académico' :
-        role === 'teacher' ? 'Docente Titular' :
-        'Estudiante de Bachillerato Virtual'
+        role === 'teacher' ? (assignedLevel === 'universidad' ? 'Catedrático Universitario' : 'Docente Titular Prepa') :
+        (assignedLevel === 'universidad' ? 'Estudiante Universitario' : 'Estudiante de Bachillerato Virtual')
       ),
       avatar: `https://images.unsplash.com/photo-${role === 'student' ? '1539571696357-5a69c17a67c6' : '1573496359142-b8d87734a5a2'}?w=150&auto=format&fit=crop&q=80`,
-      matricula: matricula?.trim() || `IPS-${role.substring(0, 3).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`,
-      specialty: specialty || 'General',
+      matricula: matricula?.trim() || `${assignedLevel === 'universidad' ? 'UNI' : 'IPS'}-${role.substring(0, 3).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`,
+      specialty: specialty || (assignedLevel === 'universidad' ? 'Licenciatura' : 'Bachillerato General'),
       shift: shift || 'En Línea',
       phone: phone || '+52 (998) 845-2100',
       createdAt: new Date().toISOString(),
@@ -884,7 +995,8 @@ export function AppProvider({ children }) {
     teacherId,
     rubricObjective,
     rubricTopics,
-    enrolledStudentIds
+    enrolledStudentIds,
+    level
   }) => {
     const canManage = isSuperAdmin || 
       currentUser?.role === 'superadmin' || 
@@ -900,33 +1012,39 @@ export function AppProvider({ children }) {
     const teacher = users.find(u => u.id === teacherId);
     const period = PERIODS.find(p => p.id === periodId) || PERIODS[0];
 
-    const cleanCode = code ? code.trim() : `IPS-${Math.floor(100 + Math.random() * 900)}`;
+    const classroomLevel = level || selectedPortalLevel || 'prepa';
+    const isUniv = classroomLevel === 'universidad';
+
+    const cleanCode = code ? code.trim() : (
+      isUniv ? `UNIV-${Math.floor(100 + Math.random() * 900)}` : `IPS-${Math.floor(100 + Math.random() * 900)}`
+    );
 
     const newClassroom = {
       id: `cls-${Date.now()}`,
       code: cleanCode,
       name: name.trim(),
-      group: group || 'PREPA-101-ONLINE',
+      level: classroomLevel,
+      group: group || (isUniv ? 'UNIV-101-ONLINE' : 'PREPA-101-ONLINE'),
       periodId: period.id,
       periodName: period.name,
-      modality: 'Prepa en Línea',
-      color: 'from-blue-700 via-indigo-800 to-ipsur-navy-700',
-      bannerGradient: 'bg-gradient-to-r from-ipsur-navy-800 to-indigo-900',
+      modality: isUniv ? 'Universidad en Línea' : 'Prepa en Línea',
+      color: isUniv ? 'from-sky-700 via-blue-800 to-slate-900' : 'from-blue-700 via-indigo-800 to-ipsur-navy-700',
+      bannerGradient: isUniv ? 'bg-gradient-to-r from-slate-900 via-blue-950 to-sky-900' : 'bg-gradient-to-r from-ipsur-navy-800 to-indigo-900',
       teacherId: teacher?.id || '',
       teacherName: teacher?.name || 'Docente Pendiente de Asignación',
-      roomLink: `https://meet.jit.si/IPSUR_${cleanCode.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
+      roomLink: `https://meet.jit.si/${isUniv ? 'UNIV' : 'IPSUR'}_${cleanCode.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
       virtualSession: {
-        platform: 'Aula Virtual IPSUR',
-        link: `https://meet.jit.si/IPSUR_${cleanCode.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
+        platform: isUniv ? 'Aula Virtual Universitaria' : 'Aula Virtual IPSUR',
+        link: `https://meet.jit.si/${isUniv ? 'UNIV' : 'IPSUR'}_${cleanCode.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
         meetingId: cleanCode,
         passcode: 'IPSUR2026',
         schedule: 'Lunes y Miércoles 18:00 - 19:30 hrs',
         status: 'live',
-        channelName: `IPSUR_${cleanCode.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
+        channelName: `${isUniv ? 'UNIV' : 'IPSUR'}_${cleanCode.replace(/[^a-zA-Z0-9]/g, '')}_Virtual`,
         topic: `Clase Virtual en Vivo · ${name}`
       },
       createdAt: new Date().toISOString(),
-      coordinatorNote: `Sala habilitada oficialmente por ${currentUser.name} (${currentUser.title}).`,
+      coordinatorNote: `Sala habilitada oficialmente por ${currentUser.name} (${currentUser.title}) para ${isUniv ? 'Universidad en Línea' : 'Prepa en Línea IPSUR'}.`,
       criteriaConfigured: false,
       criteria: {
         activities: 0,
@@ -938,8 +1056,12 @@ export function AppProvider({ children }) {
         uploadedBy: `${currentUser.name} (${currentUser.title})`,
         uploadedAt: new Date().toISOString(),
         periodDuration: period.type,
-        generalObjective: rubricObjective || 'Desarrollar competencias disciplinares y de aprendizaje autónomo en la materia conforme al plan SEP/IPSUR.',
-        competencies: [
+        generalObjective: rubricObjective || (isUniv ? 'Desarrollar competencias superiores y aprendizaje profesional conforme al plan universitario.' : 'Desarrollar competencias disciplinares y de aprendizaje autónomo conforme al plan SEP/IPSUR.'),
+        competencies: isUniv ? [
+          'Aplica el método científico y criterio profesional en la resolución de problemas.',
+          'Demuestra dominio de los conceptos avanzados del plan de estudios superior.',
+          'Participa en foros académicos y cátedras universitarias en línea.'
+        ] : [
           'Aplica el pensamiento crítico y analítico en los problemas del área.',
           'Demuestra dominio de los conceptos esenciales del plan de estudios IPSUR.',
           'Participa responsablemente en su entorno virtual de aprendizaje.'
@@ -1350,7 +1472,11 @@ export function AppProvider({ children }) {
         isSuperAdmin,
         periods: PERIODS,
         institutionalInfo: INSTITUTIONAL_INFO,
-        classrooms,
+        currentPortalInfo,
+        canAccessBothPortals,
+        switchPortalScope,
+        classrooms: portalClassrooms, // Strictly isolated by active portal level (Prepa vs Universidad)
+        allClassrooms: classrooms,    // Full repository for direct root administration
         activeClassroomId,
         setActiveClassroomId,
         notification,

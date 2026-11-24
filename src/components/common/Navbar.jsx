@@ -60,7 +60,10 @@ export default function Navbar() {
     installPwa,
     isPwaInstalled,
     goToLanding,
-    selectedPortalLevel
+    selectedPortalLevel,
+    currentPortalInfo,
+    canAccessBothPortals,
+    switchPortalScope
   } = useApp();
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -185,6 +188,52 @@ export default function Navbar() {
                   <span>{formattedTime12}</span>
                 </div>
               </div>
+
+              {/* Dynamic Campus Level Badge & Switcher for Directivos (Rector, Director, Coordinador) */}
+              {canAccessBothPortals ? (
+                <div className="hidden lg:flex items-center p-1 rounded-2xl bg-slate-100 border border-slate-300 shadow-xs">
+                  <button
+                    type="button"
+                    onClick={() => switchPortalScope('prepa')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                      selectedPortalLevel === 'prepa'
+                        ? 'bg-gradient-to-r from-ipsur-navy-700 to-ipsur-pink-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+                    }`}
+                    title="Acceder a Prepa en Línea IPSUR"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>Prepa IPSUR</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchPortalScope('universidad')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                      selectedPortalLevel === 'universidad'
+                        ? 'bg-gradient-to-r from-slate-900 to-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+                    }`}
+                    title="Acceder a Universidad en Línea"
+                  >
+                    <GraduationCap className="w-3.5 h-3.5" />
+                    <span>Universidad</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold shadow-xs select-none bg-slate-50 border-slate-200">
+                  {selectedPortalLevel === 'universidad' ? (
+                    <>
+                      <GraduationCap className="w-4 h-4 text-sky-600" />
+                      <span className="text-sky-900 font-extrabold">{currentPortalInfo?.portalTitle || 'Universidad en Línea'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <BookOpen className="w-4 h-4 text-ipsur-pink-600" />
+                      <span className="text-pink-900 font-extrabold">{currentPortalInfo?.portalTitle || 'Prepa en Línea IPSUR'}</span>
+                    </>
+                  )}
+                </div>
+              )}
 
               {activeClassroomId && (
                 <button
@@ -361,6 +410,22 @@ export default function Navbar() {
                         >
                           <Share2 className="w-4 h-4 text-ipsur-pink-600" />
                           <span>Red P2P entre Dispositivos</span>
+                        </button>
+                      )}
+
+                      {/* Dual-Portal Switcher inside dropdown for Directivos */}
+                      {canAccessBothPortals && (
+                        <button
+                          onClick={() => {
+                            setProfileMenuOpen(false);
+                            switchPortalScope(selectedPortalLevel === 'universidad' ? 'prepa' : 'universidad');
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-50 rounded-xl transition cursor-pointer"
+                        >
+                          <Layers className="w-4 h-4 text-indigo-600" />
+                          <span>
+                            {selectedPortalLevel === 'universidad' ? 'Cambiar a Prepa en Línea IPSUR' : 'Cambiar a Universidad en Línea'}
+                          </span>
                         </button>
                       )}
 

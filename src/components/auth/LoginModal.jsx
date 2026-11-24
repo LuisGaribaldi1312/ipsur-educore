@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export default function LoginModal({ isOpen, onClose }) {
-  const { login, institutionalInfo, users } = useApp();
+  const { login, institutionalInfo, users, selectedPortalLevel, currentPortalInfo } = useApp();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -86,7 +86,11 @@ export default function LoginModal({ isOpen, onClose }) {
         </button>
 
         {/* Modal Top Banner */}
-        <div className="bg-gradient-to-r from-[#0A0D1B] via-[#1E1F5C] to-[#800045] p-6 text-center text-white relative">
+        <div className={`p-6 text-center text-white relative ${
+          selectedPortalLevel === 'universidad'
+            ? 'bg-gradient-to-r from-[#060814] via-[#0c1f44] to-[#0369a1]'
+            : 'bg-gradient-to-r from-[#0A0D1B] via-[#1E1F5C] to-[#800045]'
+        }`}>
           <div className="w-20 h-20 mx-auto mb-3 rounded-2xl bg-white p-2.5 flex items-center justify-center border-2 border-white/90 shadow-[0_10px_25px_rgba(230,0,126,0.3)]">
             <img 
               src="/ipsur-logo.png" 
@@ -95,10 +99,10 @@ export default function LoginModal({ isOpen, onClose }) {
             />
           </div>
           <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white font-display">
-            Acceso al Campus Virtual
+            {selectedPortalLevel === 'universidad' ? 'Portal Universidad en Línea' : 'Portal Prepa en Línea IPSUR'}
           </h2>
           <p className="text-[11px] text-pink-200/90 font-semibold tracking-wider uppercase mt-0.5">
-            Instituto Peninsular del Sur · IPSUR EDUCORE
+            {selectedPortalLevel === 'universidad' ? 'Educación Superior · Licenciaturas y Posgrados' : 'Instituto Peninsular del Sur · IPSUR EDUCORE'}
           </p>
         </div>
 

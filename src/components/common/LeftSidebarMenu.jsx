@@ -35,6 +35,7 @@ import {
   Sparkles, 
   Calendar,
   Compass,
+  Layers, 
   Menu,
   X,
   ExternalLink,
@@ -59,7 +60,11 @@ export default function LeftSidebarMenu() {
     showToast,
     installPwa,
     isPwaInstalled,
-    goToLanding
+    goToLanding,
+    selectedPortalLevel,
+    currentPortalInfo,
+    canAccessBothPortals,
+    switchPortalScope
   } = useApp();
 
   // Expanded menu state (defaults to expanded on desktop)
@@ -154,6 +159,16 @@ export default function LeftSidebarMenu() {
       },
       visible: true
     },
+    ...(canAccessBothPortals ? [{
+      id: 'switch_portal',
+      label: selectedPortalLevel === 'universidad' ? 'Prepa en Línea' : 'Universidad',
+      icon: Layers,
+      tooltip: selectedPortalLevel === 'universidad' ? 'Cambiar a Portal Prepa en Línea IPSUR' : 'Cambiar a Portal Universidad en Línea',
+      action: () => {
+        switchPortalScope(selectedPortalLevel === 'universidad' ? 'prepa' : 'universidad');
+      },
+      visible: true
+    }] : []),
     {
       id: 'rectoria',
       label: 'Rectoría',
@@ -348,15 +363,31 @@ export default function LeftSidebarMenu() {
                       className="w-full h-full object-contain filter drop-shadow" 
                     />
                   </div>
-                  <h2 className="font-display text-xl font-black tracking-tight text-white leading-none">
-                    IPSUR <span className="text-ipsur-pink-500">EDUCORE</span>
-                  </h2>
-                  <span className="font-display text-[10px] font-bold text-indigo-200 tracking-widest uppercase mt-1">
-                    Academic Management System
-                  </span>
-                  <p className="italic text-[10px] text-pink-300/90 font-light mt-1 max-w-[200px]">
-                    "La educación es el camino"
-                  </p>
+                  {selectedPortalLevel === 'universidad' ? (
+                    <>
+                      <h2 className="font-display text-lg font-black tracking-tight text-white leading-none">
+                        UNIVERSIDAD <span className="text-sky-400">EN LÍNEA</span>
+                      </h2>
+                      <span className="font-display text-[10px] font-bold text-sky-200 tracking-widest uppercase mt-1">
+                        Portal Universidad en Línea
+                      </span>
+                      <p className="italic text-[10px] text-sky-300/90 font-light mt-1 max-w-[200px]">
+                        Educación Superior & Posgrados
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="font-display text-xl font-black tracking-tight text-white leading-none">
+                        IPSUR <span className="text-ipsur-pink-500">EDUCORE</span>
+                      </h2>
+                      <span className="font-display text-[10px] font-bold text-pink-200 tracking-widest uppercase mt-1">
+                        Portal Prepa en Línea IPSUR
+                      </span>
+                      <p className="italic text-[10px] text-pink-300/90 font-light mt-1 max-w-[200px]">
+                        "La educación es el camino"
+                      </p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div
@@ -436,19 +467,25 @@ export default function LeftSidebarMenu() {
             </nav>
           </div>
 
-          {/* Bottom Sidebar Card: IPSUR Official Palette Card */}
+          {/* Bottom Sidebar Card: Educational Level Official Palette Card */}
           {isExpanded ? (
             <div className="mt-6 pt-3 border-t border-white/10">
-              <div className="relative rounded-2xl overflow-hidden border border-white/15 bg-gradient-to-br from-[#0A0D1B] via-[#141B41] to-[#750042] shadow-lg p-3.5 text-center group">
+              <div className={`relative rounded-2xl overflow-hidden border border-white/15 shadow-lg p-3.5 text-center group ${
+                selectedPortalLevel === 'universidad'
+                  ? 'bg-gradient-to-br from-[#060814] via-[#0c1f44] to-[#0369a1]'
+                  : 'bg-gradient-to-br from-[#0A0D1B] via-[#141B41] to-[#750042]'
+              }`}>
                 <div className="relative z-10">
                   <p className="font-display font-black text-white text-xs leading-snug">
-                    IPSUR EDUCORE
+                    {selectedPortalLevel === 'universidad' ? 'UNIVERSIDAD EN LÍNEA' : 'IPSUR EDUCORE'}
                   </p>
-                  <p className="text-[10px] text-pink-200 font-medium leading-tight mt-0.5 italic">
-                    "La educación es el camino"
+                  <p className={`text-[10px] font-medium leading-tight mt-0.5 italic ${
+                    selectedPortalLevel === 'universidad' ? 'text-sky-200' : 'text-pink-200'
+                  }`}>
+                    {selectedPortalLevel === 'universidad' ? 'Educación Superior y Posgrados' : '"La educación es el camino"'}
                   </p>
                   <p className="text-[9px] text-slate-300 font-light mt-1">
-                    Bachillerato en Línea SEP
+                    {selectedPortalLevel === 'universidad' ? 'Campus Virtual Universitario' : 'Prepa en Línea Oficial SEP'}
                   </p>
                 </div>
               </div>

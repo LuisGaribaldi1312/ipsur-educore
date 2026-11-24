@@ -40,7 +40,8 @@ export default function UserManagerModal({ isOpen, onClose }) {
     deleteUser, 
     toggleUserStatus, 
     isSuperAdmin,
-    showToast 
+    showToast,
+    selectedPortalLevel
   } = useApp();
 
   const [activeAreaTab, setActiveAreaTab] = useState('all'); // 'all' | 'director' | 'coordinator' | 'teacher' | 'student'
@@ -57,6 +58,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
     email: '',
     password: '',
     role: 'teacher',
+    level: selectedPortalLevel || 'prepa', // 'prepa' | 'universidad' | 'both'
     matricula: '',
     title: '',
     specialty: 'Bachillerato General',
@@ -186,11 +188,19 @@ export default function UserManagerModal({ isOpen, onClose }) {
     setEditingUser(user);
     const roleDefaults = DEFAULT_ROLE_PERMISSIONS[user.role] || DEFAULT_ROLE_PERMISSIONS.student;
 
+    const isManagerRole = Boolean(
+      user.role === 'director' || 
+      user.role === 'coordinator' || 
+      user.role === 'rector' || 
+      user.role === 'superadmin'
+    );
+
     setFormData({
       name: user.name || '',
       email: user.email || '',
       password: user.password || '',
       role: user.role || 'student',
+      level: isManagerRole ? 'both' : (user.level || 'prepa'),
       matricula: user.matricula || '',
       title: user.title || '',
       specialty: user.specialty || 'General',
@@ -225,6 +235,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
         name: formData.name.trim(),
         email: formData.email.trim(),
         role: formData.role,
+        level: formData.level,
         matricula: formData.matricula.trim(),
         title: formData.title.trim(),
         specialty: formData.specialty,
@@ -242,6 +253,7 @@ export default function UserManagerModal({ isOpen, onClose }) {
         email: formData.email.trim(),
         password: formData.password.trim() || 'Ipsur2026*',
         role: formData.role,
+        level: formData.level,
         matricula: formData.matricula.trim(),
         title: formData.title.trim(),
         specialty: formData.specialty,
@@ -403,6 +415,28 @@ export default function UserManagerModal({ isOpen, onClose }) {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[11px]">
+                  Nivel Educativo Asignado *
+                </label>
+                {['director', 'coordinator', 'rector', 'superadmin'].includes(formData.role) ? (
+                  <div className="w-full px-3 py-2 bg-purple-50 border border-purple-200 rounded-xl text-purple-900 font-bold text-xs flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                    <span className="truncate">Acceso Dual: Prepa y Universidad</span>
+                  </div>
+                ) : (
+                  <select
+                    value={formData.level || 'prepa'}
+                    onChange={e => setFormData({ ...formData, level: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-ipsur-navy-500 outline-none text-slate-900 font-bold"
+                  >
+                    <option value="prepa">Prepa en Línea IPSUR (Bachillerato)</option>
+                    <option value="universidad">Universidad en Línea (Educación Superior)</option>
+                    <option value="both">Ambos Portales (Acceso Completo)</option>
+                  </select>
+                )}
               </div>
 
               <div>
@@ -673,9 +707,26 @@ export default function UserManagerModal({ isOpen, onClose }) {
                         </td>
 
                         <td className="py-3.5 px-4">
-                          <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${badge.bg}`}>
-                            {badge.label}
-                          </span>
+                          <div className="space-y-1">
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${badge.bg}`}>
+                              {badge.label}
+                            </span>
+                            <div>
+                              {u.level === 'universidad' ? (
+                                <span className="inline-block text-[9px] font-bold px-1.5 py-0.2 rounded bg-sky-100 text-sky-800 border border-sky-200">
+                                  Universidad
+                                </span>
+                              ) : u.level === 'both' || isSecret || ['director', 'coordinator', 'rector'].includes(u.role) ? (
+                                <span className="inline-block text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-100 text-purple-800 border border-purple-200">
+                                  Prepa + Univ
+                                </span>
+                              ) : (
+                                <span className="inline-block text-[9px] font-bold px-1.5 py-0.2 rounded bg-pink-100 text-pink-800 border border-pink-200">
+                                  Prepa IPSUR
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </td>
 
                         <td className="py-3.5 px-4">

@@ -245,26 +245,45 @@ export default function LoginScreen() {
             
             {/* Accreditation Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md w-fit">
-              <div className="w-2 h-2 rounded-full bg-ipsur-pink-500 animate-pulse" />
-              <span className="text-xs font-bold text-pink-200 uppercase tracking-widest">
-                Plataforma Académica de Nueva Generación
+              <div className={`w-2 h-2 rounded-full animate-pulse ${selectedPortalLevel === 'universidad' ? 'bg-sky-400' : 'bg-ipsur-pink-500'}`} />
+              <span className={`text-xs font-bold uppercase tracking-widest ${selectedPortalLevel === 'universidad' ? 'text-sky-300' : 'text-pink-200'}`}>
+                {selectedPortalLevel === 'universidad' ? 'Portal Universidad en Línea' : 'Portal Prepa en Línea IPSUR'}
               </span>
               <span className="text-white/30">•</span>
               <span className="text-xs text-slate-400 font-mono">
-                {institutionalInfo?.rvoe || 'RVOE-SEP-DGB-2024-09882'}
+                {selectedPortalLevel === 'universidad' ? 'Campus Digital Universitario' : (institutionalInfo?.rvoe || 'RVOE-SEP-DGB-2024-09882')}
               </span>
             </div>
 
             {/* Main Headline */}
             <div className="space-y-3">
               <h1 className="font-display text-4xl xl:text-5xl 2xl:text-6xl font-black text-white tracking-tight leading-[1.1]">
-                Aprende, Colabora y <br />
-                <span className="bg-gradient-to-r from-pink-400 via-rose-300 to-indigo-300 bg-clip-text text-transparent">
-                  Construye tu Futuro
-                </span>
+                {selectedPortalLevel === 'universidad' ? (
+                  <>
+                    Formación Superior y <br />
+                    <span className="bg-gradient-to-r from-sky-400 via-blue-300 to-indigo-300 bg-clip-text text-transparent">
+                      Liderazgo Profesional
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Aprende, Colabora y <br />
+                    <span className="bg-gradient-to-r from-pink-400 via-rose-300 to-indigo-300 bg-clip-text text-transparent">
+                      Construye tu Futuro
+                    </span>
+                  </>
+                )}
               </h1>
               <p className="text-base xl:text-lg text-slate-300/90 font-normal max-w-2xl leading-relaxed">
-                Bienvenido al ecosistema educativo digital del <strong className="text-white font-bold">Instituto Peninsular del Sur</strong>. Gestiona tus materias, participa en clases virtuales en vivo y consulta tu progreso formativo en tiempo real.
+                {selectedPortalLevel === 'universidad' ? (
+                  <>
+                    Bienvenido al <strong className="text-white font-bold">Portal Universidad en Línea</strong>. Accede a tus asignaturas superiores, videoconferencias con docentes titulares, proyectos de titulación y expediente académico universitario.
+                  </>
+                ) : (
+                  <>
+                    Bienvenido al <strong className="text-white font-bold">Portal Prepa en Línea IPSUR</strong>. Gestiona tus materias de bachillerato, participa en clases virtuales en vivo y consulta tu progreso formativo en tiempo real.
+                  </>
+                )}
               </p>
             </div>
 

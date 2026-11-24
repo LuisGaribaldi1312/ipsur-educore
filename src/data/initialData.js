@@ -112,6 +112,7 @@ export const USERS = [
     password: 'ipsurSuperAdmin2026*',
     role: 'superadmin',
     isSuperAdmin: true,
+    level: 'both', // Rector / Superadmin tiene acceso pleno a Prepa y Universidad
     hidden: true, // STRICT SECURITY: Oculto para todos los demás roles
     title: 'Rector & Super Administrador',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
@@ -141,6 +142,37 @@ export const PERIODS = [
 
 // Zero demo data: Starts clean and empty as requested
 export const INITIAL_CLASSROOMS = [];
+
+export const PORTAL_CONFIG = {
+  prepa: {
+    id: 'prepa',
+    portalName: 'Portal Prepa en Línea IPSUR',
+    portalTitle: 'Portal Prepa en IPSUR',
+    shortName: 'Prepa en Línea IPSUR',
+    institutionName: 'Instituto Peninsular del Sur',
+    systemName: 'IPSUR EDUCORE',
+    levelLabel: 'Bachillerato General en Línea',
+    subTitle: 'Nivel Medio Superior · Bachillerato Virtual Oficial SEP',
+    primaryColor: '#E6007E',
+    badgeText: 'Prepa en Línea IPSUR',
+    rvoe: 'RVOE-SEP-DGB-2024-09882',
+    accentColor: 'ipsur-pink'
+  },
+  universidad: {
+    id: 'universidad',
+    portalName: 'Portal Universidad en Línea',
+    portalTitle: 'Portal Universidad en Línea',
+    shortName: 'Universidad en Línea',
+    institutionName: 'Universidad en Línea',
+    systemName: 'UNIVERSIDAD DIGITAL EDUCORE',
+    levelLabel: 'Educación Superior · Licenciaturas & Posgrados',
+    subTitle: 'Nivel Superior · Campus Digital Universitario',
+    primaryColor: '#0284C7',
+    badgeText: 'Universidad en Línea',
+    rvoe: 'RVOE-SEP-DGESU-2026-UNIV',
+    accentColor: 'sky'
+  }
+};
 
 export const INSTITUTIONAL_INFO = {
   name: 'IPSUR EDUCORE',
