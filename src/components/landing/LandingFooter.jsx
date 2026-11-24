@@ -188,6 +188,13 @@ export default function LandingFooter() {
               <span>Entrar al Portal</span>
             </button>
 
+            <a
+              href="#preinscripcion"
+              className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-[11px] transition flex items-center justify-center gap-1.5 shadow-sm text-center"
+            >
+              <span>Ficha de Preinscripción Online</span>
+            </a>
+
             <button
               onClick={installPwa}
               className="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold text-[11px] transition flex items-center justify-center gap-1.5 border border-slate-700 cursor-pointer"

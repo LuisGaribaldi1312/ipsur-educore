@@ -106,11 +106,19 @@ export default function HeroSection() {
                 </button>
 
                 <a
+                  href="#preinscripcion"
+                  className="px-6 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white font-black text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-sky-600/25 ring-2 ring-white/10 transform hover:-translate-y-0.5"
+                >
+                  <Sparkles className="w-4 h-4 text-sky-200" />
+                  <span>Preinscribirme en Línea</span>
+                </a>
+
+                <a
                   href="#oferta"
-                  className="px-6 py-3.5 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-600/80 text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer shadow-md"
+                  className="px-5 py-3.5 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-600/80 text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer shadow-md"
                 >
                   <BookOpen className="w-4 h-4 text-sky-400" />
-                  <span>Ver Oferta Académica (19 Carreras & 4 Bachilleratos)</span>
+                  <span>Oferta Académica (19 Carreras & 4 Bachilleratos)</span>
                 </a>
 
                 <a

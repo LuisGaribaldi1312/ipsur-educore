@@ -30,11 +30,11 @@ export default function LandingNavbar() {
 
   const navLinks = [
     { label: 'Inicio', href: '#inicio' },
-    { label: 'Prepa IPSUR', href: '#prepa', badge: 'Bachillerato' },
-    { label: 'IUPS Universidad', href: '#universidad', badge: 'Superior' },
+    { label: 'Quiénes Somos', href: '#nosotros' },
+    { label: 'Oferta Académica', href: '#oferta' },
     { label: 'Modelo Educativo', href: '#modelo' },
-    { label: 'Admisiones & Becas', href: '#admisiones' },
-    { label: 'Campus & Contacto', href: '#contacto' }
+    { label: 'Preinscripción', href: '#preinscripcion', badge: 'En Línea' },
+    { label: 'Admisiones & Becas', href: '#admisiones' }
   ];
 
   const handleLinkClick = (e, href) => {

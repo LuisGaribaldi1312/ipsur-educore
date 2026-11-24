@@ -190,6 +190,22 @@ export const IUPS_DATA = {
 
   description: 'El Instituto Universitario Peninsular del Sur (IUPS) representa la evolución de la educación superior en Playa del Carmen y la Riviera Maya. Brindamos carreras universitarias y maestrías con validez oficial SEP, respaldadas por un modelo educativo flexible diseñado para estudiantes y profesionistas en activo.',
 
+  mision: 'Formar profesionistas e investigadores íntegros, competitivos y éticos, con sentido de responsabilidad social y excelencia científica, dotados de herramientas prácticas para liderar organizaciones y transformar positivamente el entorno productivo de la Riviera Maya y México.',
+  
+  vision: 'Consolidarnos como la institución universitaria y de posgrados de mayor prestigio en Quintana Roo y el sureste mexicano, reconocida por la pertinencia laboral de sus egresados, la flexibilidad ejecutiva para quienes trabajan y el respaldo oficial SEP.',
+
+  philosophy: 'Ciencia con Valores: La formación profesional de vanguardia adquiere verdadero sentido cuando se orienta al beneficio de la sociedad, la justicia, la verdad y el bienestar colectivo.',
+
+  history: 'Fundada para responder al dinamismo de Playa del Carmen y la Península de Yucatán, IUPS nace para garantizar que cualquier persona con aspiraciones de superación pueda cursar una licenciatura, ingeniería o maestría oficial SEP sin sacrificar su empleo o familia.',
+
+  values: [
+    { title: 'Ética y Honestidad', desc: 'Rigor moral y transparencia en cada decisión académica y profesional.' },
+    { title: 'Excelencia y Rigor', desc: 'Cátedra universitaria de alto nivel con profesores de posgrado.' },
+    { title: 'Responsabilidad Social', desc: 'Compromiso con el desarrollo comunitario y sustentable de la Riviera Maya.' },
+    { title: 'Flexibilidad e Innovación', desc: 'Adaptación a las necesidades reales del estudiante que trabaja.' },
+    { title: 'Liderazgo con Humanismo', desc: 'Formamos líderes conscientes del impacto de sus decisiones.' }
+  ],
+
   welcomeDirector: {
     title: 'Mensaje de Dirección Universitaria',
     quote: 'Elegir dónde formarte es decidir quién quieres ser. En el Instituto Universitario Peninsular del Sur (IUPS) no solo abrimos aulas; abrimos puertas al éxito profesional en perfecto equilibrio con tu vida laboral y familiar.',
