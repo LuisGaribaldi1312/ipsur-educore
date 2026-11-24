@@ -34,7 +34,8 @@ import {
   Share2,
   Wifi,
   Smartphone,
-  Download
+  Download,
+  Globe
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -57,7 +58,9 @@ export default function Navbar() {
     p2pPeersCount,
     setP2PModalOpen,
     installPwa,
-    isPwaInstalled
+    isPwaInstalled,
+    goToLanding,
+    selectedPortalLevel
   } = useApp();
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -198,6 +201,18 @@ export default function Navbar() {
             {/* Right Header Section: Cloud Sync + Notifications + Divider + Profile Info */}
             <div className="flex items-center gap-2.5 sm:gap-4">
               
+              {/* Return to Institutional Landing Page */}
+              <button
+                type="button"
+                onClick={() => goToLanding()}
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer border bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300"
+                title="Ir a la Página Principal Informativa (Prepa y Universidad)"
+              >
+                <Globe className="w-3.5 h-3.5 text-ipsur-pink-600" />
+                <span className="hidden md:inline">Página Principal</span>
+                <span className="md:hidden">Web</span>
+              </button>
+
               {/* PWA Mobile App Install Button */}
               {!isPwaInstalled && (
                 <button

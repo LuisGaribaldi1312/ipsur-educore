@@ -211,6 +211,64 @@ export function AppProvider({ children }) {
     setMsnAlerts(prev => prev.filter(a => a.id !== id));
   };
 
+  // View Navigation: 'landing' (Página Principal Informativa) | 'portal-select' (Selector Prepa / Universidad) | 'portal-app' (Campus Virtual EDUCORE)
+  const [currentView, setCurrentView] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash || '';
+      if (hash.includes('portal')) return 'portal-select';
+    }
+    return 'landing';
+  });
+
+  // Selected educational level for portal: 'prepa' | 'universidad'
+  const [selectedPortalLevel, setSelectedPortalLevel] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('ipsur_selected_portal_level') || 'prepa';
+    }
+    return 'prepa';
+  });
+
+  const goToLanding = (targetSectionId = null) => {
+    setCurrentView('landing');
+    if (typeof window !== 'undefined') {
+      if (targetSectionId) {
+        window.location.hash = targetSectionId;
+        setTimeout(() => {
+          const el = document.getElementById(targetSectionId.replace('#', ''));
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 80);
+      } else {
+        window.history.pushState(null, '', window.location.pathname);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
+
+  const goToPortalSelector = () => {
+    if (currentUserId && currentUser) {
+      setCurrentView('portal-app');
+      if (typeof window !== 'undefined') window.location.hash = 'portal';
+      return;
+    }
+    setCurrentView('portal-select');
+    if (typeof window !== 'undefined') {
+      window.location.hash = 'portal';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const goToPortalApp = (level = 'prepa') => {
+    setSelectedPortalLevel(level);
+    try {
+      localStorage.setItem('ipsur_selected_portal_level', level);
+    } catch {}
+    setCurrentView('portal-app');
+    if (typeof window !== 'undefined') {
+      window.location.hash = `portal-${level}`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // Keep fresh references for async listeners (Firebase RTDB & P2P)
   const currentUserIdRef = useRef(currentUserId);
   useEffect(() => {
@@ -612,7 +670,10 @@ export function AppProvider({ children }) {
   const logout = () => {
     setCurrentUserId(null);
     setActiveClassroomId(null);
-    setLoginModalOpen(true);
+    setCurrentView('landing');
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', window.location.pathname);
+    }
     showToast('Sesión Concluida', 'Has salido del sistema de forma segura.', 'info');
   };
 
@@ -1337,7 +1398,14 @@ export function AppProvider({ children }) {
         setPwaModalOpen,
         deferredPrompt,
         isPwaInstalled,
-        installPwa
+        installPwa,
+        currentView,
+        setCurrentView,
+        selectedPortalLevel,
+        setSelectedPortalLevel,
+        goToLanding,
+        goToPortalSelector,
+        goToPortalApp
       }}
     >
       {children}

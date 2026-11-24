@@ -10,6 +10,7 @@ import {
   ShieldCheck, 
   Sparkles, 
   ArrowRight,
+  ArrowLeft,
   School,
   AlertCircle,
   CheckCircle2,
@@ -34,7 +35,17 @@ import { USERS } from '../../data/initialData';
 import LoginWelcomeScreen from './LoginWelcomeScreen';
 
 export default function LoginScreen() {
-  const { login, institutionalInfo, users, allUsers, installPwa, isPwaInstalled } = useApp();
+  const { 
+    login, 
+    institutionalInfo, 
+    users, 
+    allUsers, 
+    installPwa, 
+    isPwaInstalled,
+    goToLanding,
+    goToPortalSelector,
+    selectedPortalLevel
+  } = useApp();
 
   // Combine active user pool with seed data to guarantee root superadmin is always available
   const userPool = (allUsers && allUsers.length > 0) ? allUsers : (users && users.length > 0 ? users : USERS);
@@ -173,7 +184,29 @@ export default function LoginScreen() {
           </div>
 
           {/* Right Live Indicators */}
-          <div className="flex items-center gap-2.5 sm:gap-4 ml-auto text-xs">
+          <div className="flex items-center gap-2.5 sm:gap-3 ml-auto text-xs">
+            {/* Return to Institutional Landing Page */}
+            <button
+              type="button"
+              onClick={() => goToLanding()}
+              className="inline-flex items-center gap-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer group"
+              title="Volver a la Página Principal Informativa"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-ipsur-pink-400 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Sitio Web</span>
+            </button>
+
+            {/* Switch between Prepa IPSUR and Universidad */}
+            <button
+              type="button"
+              onClick={() => goToPortalSelector()}
+              className="hidden sm:inline-flex items-center gap-1.5 bg-ipsur-pink-950/70 hover:bg-ipsur-pink-900/80 text-pink-200 border border-ipsur-pink-800/80 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer"
+              title="Cambiar entre Portal Prepa IPSUR y Universidad en Línea"
+            >
+              <Layers className="w-3.5 h-3.5 text-ipsur-pink-400" />
+              <span>{selectedPortalLevel === 'universidad' ? 'Portal Universidad' : 'Portal Prepa IPSUR'}</span>
+            </button>
+
             {/* PWA Mobile App Install Pill */}
             {!isPwaInstalled && (
               <button
@@ -183,18 +216,18 @@ export default function LoginScreen() {
                 title="Descargar e instalar IPSUR EDUCORE como aplicación en Android o iPhone"
               >
                 <Smartphone className="w-3.5 h-3.5 text-pink-300 group-hover:scale-110 transition-transform" />
-                <span>Instalar App Móvil</span>
+                <span>Instalar App</span>
               </button>
             )}
 
-            <LiveClock variant="topbar" className="hidden sm:flex" />
+            <LiveClock variant="topbar" className="hidden lg:flex" />
 
-            <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full text-emerald-300 text-[11px] font-bold">
+            <div className="hidden md:flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full text-emerald-300 text-[11px] font-bold">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span>Campus Virtual Activo</span>
+              <span>Campus Activo</span>
             </div>
           </div>
 
@@ -306,7 +339,7 @@ export default function LoginScreen() {
               <div className="relative text-center mb-6">
                 
                 {/* Floating Institutional Logo */}
-                <div className="inline-block relative mb-3">
+                <div className="inline-block relative mb-2">
                   <div className="w-20 h-20 sm:w-22 sm:h-22 mx-auto rounded-3xl bg-white p-2.5 flex items-center justify-center shadow-[0_15px_35px_rgba(230,0,126,0.25)] border-2 border-white/90 transform transition-transform duration-300 hover:scale-105">
                     <img 
                       src="/ipsur-logo.png" 
@@ -317,6 +350,35 @@ export default function LoginScreen() {
                   <span className="absolute -bottom-1 -right-1 p-1 bg-gradient-to-r from-ipsur-pink-500 to-rose-600 rounded-full text-white shadow-md">
                     <Sparkles className="w-3.5 h-3.5" />
                   </span>
+                </div>
+
+                {/* Selected Portal Level Badge */}
+                <div className="mb-2">
+                  <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border shadow-xs ${
+                    selectedPortalLevel === 'universidad'
+                      ? 'bg-sky-950/80 border-sky-600/60 text-sky-300'
+                      : 'bg-pink-950/80 border-pink-600/60 text-pink-300'
+                  }`}>
+                    {selectedPortalLevel === 'universidad' ? (
+                      <>
+                        <GraduationCap className="w-3.5 h-3.5 text-sky-400" />
+                        <span>Portal Universidad en Línea</span>
+                      </>
+                    ) : (
+                      <>
+                        <BookOpen className="w-3.5 h-3.5 text-ipsur-pink-400" />
+                        <span>Portal Prepa en Línea IPSUR</span>
+                      </>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => goToPortalSelector()}
+                      className="ml-1 text-[10px] text-slate-400 hover:text-white underline cursor-pointer"
+                      title="Cambiar entre Prepa y Universidad"
+                    >
+                      (Cambiar)
+                    </button>
+                  </div>
                 </div>
 
                 <h2 className="font-display text-2xl sm:text-3xl font-black text-white tracking-tight">

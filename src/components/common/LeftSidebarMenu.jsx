@@ -39,7 +39,8 @@ import {
   X,
   ExternalLink,
   Smartphone,
-  Download
+  Download,
+  Globe
 } from 'lucide-react';
 
 export default function LeftSidebarMenu() {
@@ -57,7 +58,8 @@ export default function LeftSidebarMenu() {
     isSuperAdmin,
     showToast,
     installPwa,
-    isPwaInstalled
+    isPwaInstalled,
+    goToLanding
   } = useApp();
 
   // Expanded menu state (defaults to expanded on desktop)
@@ -139,6 +141,16 @@ export default function LeftSidebarMenu() {
         setActiveTab('inicio');
         setActiveClassroomId(null);
         showToast('Inicio', 'Panel Principal · Campus Virtual IPSUR', 'info');
+      },
+      visible: true
+    },
+    {
+      id: 'sitio_web',
+      label: 'Página Web',
+      icon: Globe,
+      tooltip: 'Visitar la Página Principal Informativa (Prepa y Universidad)',
+      action: () => {
+        goToLanding();
       },
       visible: true
     },

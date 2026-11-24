@@ -12,6 +12,8 @@ import PwaInstallModal from './components/common/PwaInstallModal';
 import AppSplashScreen from './components/common/AppSplashScreen';
 import DoubleBackExitToast from './components/common/DoubleBackExitToast';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import LandingPage from './components/landing/LandingPage';
+import PortalSelectorScreen from './components/landing/PortalSelectorScreen';
 import { INSTITUTIONAL_INFO } from './data/initialData';
 
 function MainLayout() {
@@ -89,7 +91,11 @@ function AppContent() {
     setPwaModalOpen, 
     deferredPrompt, 
     isPwaInstalled,
-    logout
+    logout,
+    currentView,
+    setCurrentView,
+    goToLanding,
+    goToPortalSelector
   } = useApp();
 
   // 1. Initial Application Boot Splash Screen (shows every time app is opened from mobile icon)
@@ -101,12 +107,7 @@ function AppContent() {
   const backToastTimerRef = useRef(null);
 
   useEffect(() => {
-    // Only intercept when authenticated on mobile/standalone or browser
-    if (!currentUserId || !currentUser) return;
-
-    // Seed history state so system Back triggers popstate instead of immediately closing
-    window.history.pushState({ app: 'ipsur-home' }, '');
-
+    // Intercept back navigation
     const handlePopState = () => {
       // Step A: If inside a classroom detail view, close classroom first
       if (activeClassroomId) {
@@ -122,23 +123,37 @@ function AppContent() {
         return;
       }
 
-      // Step C: Root View - Double press detection within 2.5 seconds
-      const now = Date.now();
-      if (now - lastBackPressRef.current < 2500) {
-        // Second press: Exit session / logout
-        if (backToastTimerRef.current) clearTimeout(backToastTimerRef.current);
-        setDoubleBackToast(false);
-        logout();
-      } else {
-        // First press: warn user and retain session
-        lastBackPressRef.current = now;
-        window.history.pushState({ app: 'ipsur-home' }, '');
-        setDoubleBackToast(true);
+      // Step C: If in portal-app without active user session, go back to portal-select
+      if (currentView === 'portal-app' && (!currentUserId || !currentUser)) {
+        setCurrentView('portal-select');
+        return;
+      }
 
-        if (backToastTimerRef.current) clearTimeout(backToastTimerRef.current);
-        backToastTimerRef.current = setTimeout(() => {
+      // Step D: If in portal-select, go back to landing page
+      if (currentView === 'portal-select') {
+        setCurrentView('landing');
+        return;
+      }
+
+      // Step E: Root View while authenticated - Double press detection within 2.5 seconds
+      if (currentUserId && currentUser) {
+        const now = Date.now();
+        if (now - lastBackPressRef.current < 2500) {
+          // Second press: Exit session / logout
+          if (backToastTimerRef.current) clearTimeout(backToastTimerRef.current);
           setDoubleBackToast(false);
-        }, 2500);
+          logout();
+        } else {
+          // First press: warn user and retain session
+          lastBackPressRef.current = now;
+          window.history.pushState({ app: 'ipsur-home' }, '');
+          setDoubleBackToast(true);
+
+          if (backToastTimerRef.current) clearTimeout(backToastTimerRef.current);
+          backToastTimerRef.current = setTimeout(() => {
+            setDoubleBackToast(false);
+          }, 2500);
+        }
       }
     };
 
@@ -147,7 +162,17 @@ function AppContent() {
       window.removeEventListener('popstate', handlePopState);
       if (backToastTimerRef.current) clearTimeout(backToastTimerRef.current);
     };
-  }, [currentUserId, currentUser, activeClassroomId, pwaModalOpen, setActiveClassroomId, setPwaModalOpen, logout]);
+  }, [
+    currentUserId, 
+    currentUser, 
+    activeClassroomId, 
+    pwaModalOpen, 
+    setActiveClassroomId, 
+    setPwaModalOpen, 
+    logout,
+    currentView,
+    setCurrentView
+  ]);
 
   // If still in boot splash loading sequence, exclusively render the animated splash screen
   if (showSplash) {
@@ -156,8 +181,16 @@ function AppContent() {
 
   return (
     <>
-      {/* Main App Screens: Directly displays Login Screen upon loading completion */}
-      {!currentUserId || !currentUser ? <LoginScreen /> : <MainLayout />}
+      {/* 1. View: Página Principal Informativa (Default) */}
+      {currentView === 'landing' && <LandingPage />}
+
+      {/* 2. View: Selector de Portal Institucional (Prepa en Línea IPSUR vs Universidad en Línea) */}
+      {currentView === 'portal-select' && <PortalSelectorScreen />}
+
+      {/* 3. View: Campus Virtual EDUCORE (Login o Plataforma Autenticada) */}
+      {currentView === 'portal-app' && (
+        !currentUserId || !currentUser ? <LoginScreen /> : <MainLayout />
+      )}
 
       {/* Mobile Double-Back Exit Warning Toast */}
       <DoubleBackExitToast visible={doubleBackToast} />
