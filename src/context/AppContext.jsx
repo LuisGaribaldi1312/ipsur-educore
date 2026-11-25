@@ -12,6 +12,7 @@ import {
   SAMPLE_PAYMENTS,
   ACADEMIC_STATS
 } from '../data/initialData';
+import { INITIAL_PREREGISTRATIONS } from '../data/initialPreregistrations';
 import { validateCriteria } from '../utils/calculations';
 import { getDeadlineStatus } from '../utils/dateFormatter';
 import { 
@@ -367,6 +368,23 @@ export function AppProvider({ children }) {
     }
   });
 
+  // Pre-registrations repository (Landing applicants tracked by Coordinator, Director & Rector)
+  const [preregistrations, setPreregistrations] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ipsur_preregistrations');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return INITIAL_PREREGISTRATIONS;
+    } catch {
+      return INITIAL_PREREGISTRATIONS;
+    }
+  });
+
+  const [preinscriptionsModalOpen, setPreinscriptionsModalOpen] = useState(false);
+  const [selectedFolioForReview, setSelectedFolioForReview] = useState(null);
+
   // Sync to localStorage
   useEffect(() => {
     try {
@@ -374,10 +392,129 @@ export function AppProvider({ children }) {
       localStorage.setItem('ipsur_educore_notifications_clean', JSON.stringify(notificationsList));
       localStorage.setItem('ipsur_educore_procedures_clean', JSON.stringify(procedures));
       localStorage.setItem('ipsur_educore_payments_clean', JSON.stringify(payments));
+      localStorage.setItem('ipsur_preregistrations', JSON.stringify(preregistrations));
     } catch (e) {
       // Ignore
     }
-  }, [activities, notificationsList, procedures, payments]);
+  }, [activities, notificationsList, procedures, payments, preregistrations]);
+
+  const addPreregistration = (newVoucher) => {
+    setPreregistrations(prev => [newVoucher, ...(prev || [])]);
+    const notifItem = {
+      id: `notif-prereg-${Date.now()}`,
+      title: `Nueva Solicitud: ${newVoucher.formData.studentName}`,
+      message: `Folio ${newVoucher.folio} · ${newVoucher.levelTitle} (${newVoucher.formData.program})`,
+      time: 'Hace un momento',
+      read: false,
+      type: 'preregistration'
+    };
+    setNotificationsList(prev => [notifItem, ...(prev || [])]);
+    addActivity({
+      type: 'enrollment',
+      title: 'Prerregistro recibido',
+      subtitle: `${newVoucher.formData.studentName} · ${newVoucher.folio}`,
+      badge: newVoucher.level === 'prepa' ? 'Prepa IPSUR' : 'IUPS Universidad',
+      color: newVoucher.level === 'prepa' ? 'pink' : 'sky'
+    });
+  };
+
+  const updatePreregistration = (folio, updates) => {
+    setPreregistrations(prev => prev.map(p => {
+      if (p.folio === folio) {
+        return { ...p, ...updates };
+      }
+      return p;
+    }));
+  };
+
+  const updatePreregistrationDocStatus = (folio, docId, newStatus) => {
+    setPreregistrations(prev => prev.map(p => {
+      if (p.folio === folio) {
+        const updatedDocs = (p.uploadedDocs || []).map(d => {
+          if (d.docId === docId) {
+            return { ...d, status: newStatus };
+          }
+          return d;
+        });
+        return { ...p, uploadedDocs: updatedDocs };
+      }
+      return p;
+    }));
+  };
+
+  const enrollApplicantToUser = (folio) => {
+    const applicant = preregistrations.find(p => p.folio === folio);
+    if (!applicant) {
+      showToast('Error', 'No se encontró la solicitud con ese folio.', 'error');
+      return null;
+    }
+
+    // Generate official student matricula and credentials
+    const year = new Date().getFullYear();
+    const randomMat = Math.floor(100 + Math.random() * 900);
+    const prefix = applicant.level === 'prepa' ? 'IPS' : 'IUPS';
+    const matricula = `${prefix}-${year}-${randomMat}`;
+    const cleanFirstName = applicant.formData.studentName.split(' ')[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const cleanLastName = (applicant.formData.studentName.split(' ')[1] || 'alumno').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const generatedEmail = `${cleanFirstName}.${cleanLastName}@ipsur.edu.mx`;
+    const defaultPassword = `${applicant.level === 'prepa' ? 'ipsur' : 'iups'}Alumno2026*`;
+
+    const newStudentUser = {
+      id: `usr-student-${Date.now()}`,
+      name: applicant.formData.studentName,
+      email: generatedEmail,
+      password: defaultPassword,
+      role: 'student',
+      isSuperAdmin: false,
+      level: applicant.level, // 'prepa' | 'universidad'
+      hidden: false,
+      title: `Estudiante (${applicant.formData.program})`,
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      matricula,
+      phone: applicant.formData.studentPhone,
+      curp: applicant.formData.curp,
+      tutor: applicant.formData.tutorName || null,
+      tutorPhone: applicant.formData.tutorPhone || null,
+      address: applicant.formData.street ? `${applicant.formData.street}, ${applicant.formData.city}` : null,
+      program: applicant.formData.program,
+      modality: applicant.formData.modality,
+      folio: applicant.folio,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      permissions: {
+        canViewBoletas: true,
+        canSubmitTasks: true
+      }
+    };
+
+    // Add student to official users list
+    setUsers(prev => [newStudentUser, ...prev]);
+    syncUserToCloud(newStudentUser);
+
+    // Update preregistration record
+    updatePreregistration(folio, {
+      status: 'Inscrito',
+      enrolledStudentId: newStudentUser.id,
+      assignedMatricula: matricula,
+      enrolledAt: new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })
+    });
+
+    addActivity({
+      type: 'enrollment',
+      title: 'Alumno inscrito formalmente',
+      subtitle: `${applicant.formData.studentName} · Matrícula: ${matricula}`,
+      badge: 'Control Escolar',
+      color: 'emerald'
+    });
+
+    showToast(
+      '¡Alumno Inscrito con Éxito!',
+      `Se generó la matrícula oficial ${matricula} para ${applicant.formData.studentName}.`,
+      'success'
+    );
+
+    return newStudentUser;
+  };
 
   const addActivity = (act) => {
     const newAct = { id: `act-${Date.now()}`, time: 'Hoy, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' h', ...act };
@@ -1518,6 +1655,15 @@ export function AppProvider({ children }) {
         updateProcedureStatus,
         payments,
         addPayment,
+        preregistrations,
+        addPreregistration,
+        updatePreregistration,
+        updatePreregistrationDocStatus,
+        enrollApplicantToUser,
+        preinscriptionsModalOpen,
+        setPreinscriptionsModalOpen,
+        selectedFolioForReview,
+        setSelectedFolioForReview,
         academicStats: ACADEMIC_STATS,
         p2pModalOpen,
         setP2PModalOpen,

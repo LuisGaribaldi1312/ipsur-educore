@@ -14,6 +14,7 @@ import RectoriaDirectivaModal from '../services/RectoriaDirectivaModal';
 import CoordinacionEscolarModal from '../services/CoordinacionEscolarModal';
 import DocentesModal from '../services/DocentesModal';
 import AlumnosModal from '../services/AlumnosModal';
+import PreinscriptionsManagerModal from '../services/PreinscriptionsManagerModal';
 import CreateClassroomModal from '../coordinator/CreateClassroomModal';
 import EditClassroomModal from '../coordinator/EditClassroomModal';
 import RubricModal from '../coordinator/RubricModal';
@@ -41,7 +42,8 @@ import {
   ExternalLink,
   Smartphone,
   Download,
-  Globe
+  Globe,
+  FileCheck
 } from 'lucide-react';
 
 export default function LeftSidebarMenu() {
@@ -64,7 +66,10 @@ export default function LeftSidebarMenu() {
     selectedPortalLevel,
     currentPortalInfo,
     canAccessBothPortals,
-    switchPortalScope
+    switchPortalScope,
+    preinscriptionsModalOpen,
+    setPreinscriptionsModalOpen,
+    preregistrations
   } = useApp();
 
   // Expanded menu state (defaults to expanded on desktop)
@@ -133,6 +138,13 @@ export default function LeftSidebarMenu() {
   const totalStudents = (users || []).filter(u => u.role === 'student').length;
   const totalTeachers = (users || []).filter(u => u.role === 'teacher').length;
   const pendingProceduresCount = (procedures || []).filter(p => p.status === 'Pendiente').length;
+  const pendingPreregistrationsCount = (preregistrations || []).filter(p => {
+    if (!canAccessBothPortals) {
+      if (selectedPortalLevel === 'universidad' && p.level !== 'universidad') return false;
+      if (selectedPortalLevel === 'prepa' && p.level !== 'prepa') return false;
+    }
+    return p.status === 'Pendiente' || p.status === 'En Revisión';
+  }).length;
 
   // Menu items list matching the official IPSUR EDUCORE architecture with strict role permissions
   const menuItems = [
@@ -205,6 +217,19 @@ export default function LeftSidebarMenu() {
         setProceduresModalOpen(true);
       },
       visible: true
+    },
+    {
+      id: 'preinscripciones',
+      label: 'Preinscripciones',
+      icon: FileCheck,
+      hasChevron: true,
+      badge: pendingPreregistrationsCount > 0 ? String(pendingPreregistrationsCount) : null,
+      tooltip: 'Aspirantes en línea, revisión de documentación y escáner de fichas QR',
+      action: () => {
+        setActiveTab('preinscripciones');
+        setPreinscriptionsModalOpen(true);
+      },
+      visible: ['superadmin', 'rector', 'director', 'coordinator'].includes(currentUser.role)
     },
     {
       id: 'coordinacion',
@@ -662,6 +687,12 @@ export default function LeftSidebarMenu() {
       <StudentGeneralBoletaModal
         isOpen={boletaModalOpen}
         onClose={() => setBoletaModalOpen(false)}
+      />
+
+      {/* 9. Preinscripciones y Fichas QR Modal */}
+      <PreinscriptionsManagerModal
+        isOpen={preinscriptionsModalOpen}
+        onClose={() => setPreinscriptionsModalOpen(false)}
       />
     </>
   );

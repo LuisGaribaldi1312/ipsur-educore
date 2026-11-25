@@ -40,7 +40,9 @@ import {
   Building,
   Laptop,
   Edit,
-  Trash2
+  Trash2,
+  FileCheck,
+  QrCode
 } from 'lucide-react';
 
 export default function CoordinatorDashboard({ onSelectClassroom }) {
@@ -55,7 +57,10 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
     setUserManagerModalOpen,
     isSuperAdmin,
     deleteClassroom,
-    showToast 
+    showToast,
+    preregistrations,
+    setPreinscriptionsModalOpen,
+    selectedPortalLevel 
   } = useApp();
 
   const canManageClassrooms = isSuperAdmin || 
@@ -98,6 +103,15 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
   const totalTeachers = (users || []).filter(u => u.role === 'teacher').length;
   const totalGroups = classrooms.length;
   const pendingProceduresCount = (procedures || []).filter(p => p.status === 'Pendiente').length;
+  
+  const relevantPreregistrations = (preregistrations || []).filter(p => {
+    if (selectedPortalLevel === 'universidad') return p.level === 'universidad';
+    return p.level === 'prepa';
+  });
+  const pendingPreregistrationsCount = relevantPreregistrations.filter(
+    p => p.status === 'Pendiente' || p.status === 'En Revisión'
+  ).length;
+
   const activePeriod = periods.find(p => p.status === 'Activo') || periods[0];
 
   const filteredClassrooms = classrooms.filter(cls => {
@@ -329,6 +343,53 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
           </div>
         </div>
 
+      </div>
+
+      {/* 2.5 Dedicated Section: Control de Preinscripciones y Fichas QR */}
+      <div className="bg-gradient-to-r from-[#0A0D1B] via-[#141B41] to-[#1E293B] rounded-2xl p-4 sm:p-5 text-white shadow-md border border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-ipsur-pink-500 to-rose-600 flex items-center justify-center shadow-lg text-white shrink-0">
+            <FileCheck className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider bg-ipsur-pink-600/30 text-pink-300 px-2 py-0.5 rounded-full border border-pink-500/30">
+                Módulo de Ingreso & Aspirantes
+              </span>
+              <span className="text-[11px] text-slate-400 font-medium">
+                {selectedPortalLevel === 'universidad' ? 'Universidad IUPS' : 'Prepa IPSUR'}
+              </span>
+            </div>
+            <h3 className="font-display text-base sm:text-lg font-black text-white mt-1">
+              Control de Preinscripciones & Fichas QR
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Seguimiento a aspirantes web, cotejo de documentación y búsqueda inmediata con lector de QR o folio.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+          <div className="bg-white/10 backdrop-blur-xs rounded-xl px-3 py-1.5 border border-white/15 text-center min-w-[70px]">
+            <span className="text-[10px] font-bold text-slate-300 block uppercase">Aspirantes</span>
+            <span className="font-display text-lg font-black text-white">{relevantPreregistrations.length}</span>
+          </div>
+          {pendingPreregistrationsCount > 0 && (
+            <div className="bg-amber-500/20 rounded-xl px-3 py-1.5 border border-amber-500/30 text-center min-w-[70px]">
+              <span className="text-[10px] font-bold text-amber-300 block uppercase">Por Validar</span>
+              <span className="font-display text-lg font-black text-amber-400">{pendingPreregistrationsCount}</span>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setPreinscriptionsModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-ipsur-pink-500 to-rose-600 hover:from-ipsur-pink-600 hover:to-rose-700 text-white font-bold text-xs shadow-md transition active:scale-95 cursor-pointer ml-auto md:ml-0"
+            title="Abrir módulo de preinscripciones para escanear QR o buscar por folio"
+          >
+            <QrCode className="w-4 h-4" />
+            <span>Escanear QR / Revisar</span>
+          </button>
+        </div>
       </div>
 
       {/* 3. Middle Section: Estadísticas Académicas + Accesos Rápidos (6 Actions) + Actividad Reciente */}

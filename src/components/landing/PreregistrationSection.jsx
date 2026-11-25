@@ -33,7 +33,7 @@ import { PREPA_DATA, IUPS_DATA, INSTITUTIONAL_CAMPUS } from '../../data/institut
 import { useApp } from '../../context/AppContext';
 
 export default function PreregistrationSection() {
-  const { showToast } = useApp();
+  const { showToast, addPreregistration } = useApp();
 
   // Selected level: 'prepa' | 'universidad'
   const [level, setLevel] = useState('prepa');
@@ -242,7 +242,10 @@ export default function PreregistrationSection() {
       hasUploadedDocs: uploadedDocs.length > 0
     };
 
-    // Save to localStorage for administrative auditing
+    // Save to AppContext & localStorage for administrative auditing
+    if (addPreregistration) {
+      addPreregistration(newVoucher);
+    }
     try {
       const existing = JSON.parse(localStorage.getItem('ipsur_preregistrations') || '[]');
       existing.unshift(newVoucher);
