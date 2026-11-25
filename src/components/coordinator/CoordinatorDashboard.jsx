@@ -104,10 +104,7 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
   const totalGroups = classrooms.length;
   const pendingProceduresCount = (procedures || []).filter(p => p.status === 'Pendiente').length;
   
-  const relevantPreregistrations = (preregistrations || []).filter(p => {
-    if (selectedPortalLevel === 'universidad') return p.level === 'universidad';
-    return p.level === 'prepa';
-  });
+  const relevantPreregistrations = preregistrations || [];
   const pendingPreregistrationsCount = relevantPreregistrations.filter(
     p => p.status === 'Pendiente' || p.status === 'En Revisión'
   ).length;
@@ -346,25 +343,41 @@ export default function CoordinatorDashboard({ onSelectClassroom }) {
       </div>
 
       {/* 2.5 Dedicated Section: Control de Preinscripciones y Fichas QR */}
-      <div className="bg-gradient-to-r from-[#0A0D1B] via-[#141B41] to-[#1E293B] rounded-2xl p-4 sm:p-5 text-white shadow-md border border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className={`rounded-2xl p-4 sm:p-5 text-white shadow-md border flex flex-col md:flex-row items-center justify-between gap-4 ${
+        selectedPortalLevel === 'universidad'
+          ? 'bg-gradient-to-r from-[#070D1B] via-[#0C2340] to-[#1E293B] border-sky-900/60'
+          : 'bg-gradient-to-r from-[#0A0D1B] via-[#141B41] to-[#1E293B] border-slate-700/50'
+      }`}>
         <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-ipsur-pink-500 to-rose-600 flex items-center justify-center shadow-lg text-white shrink-0">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg text-white shrink-0 ${
+            selectedPortalLevel === 'universidad'
+              ? 'bg-gradient-to-br from-sky-500 to-blue-600'
+              : 'bg-gradient-to-br from-ipsur-pink-500 to-rose-600'
+          }`}>
             <FileCheck className="w-6 h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider bg-ipsur-pink-600/30 text-pink-300 px-2 py-0.5 rounded-full border border-pink-500/30">
-                Módulo de Ingreso & Aspirantes
+              <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                selectedPortalLevel === 'universidad'
+                  ? 'bg-sky-600/30 text-sky-300 border-sky-500/30'
+                  : 'bg-ipsur-pink-600/30 text-pink-300 border-pink-500/30'
+              }`}>
+                {selectedPortalLevel === 'universidad' ? 'Padrón Exclusivo: Universidad IUPS' : 'Padrón Exclusivo: Prepa IPSUR'}
               </span>
               <span className="text-[11px] text-slate-400 font-medium">
-                {selectedPortalLevel === 'universidad' ? 'Universidad IUPS' : 'Prepa IPSUR'}
+                Sin mezcla de portales
               </span>
             </div>
             <h3 className="font-display text-base sm:text-lg font-black text-white mt-1">
-              Control de Preinscripciones & Fichas QR
+              {selectedPortalLevel === 'universidad'
+                ? 'Preinscripciones & Fichas QR · Universidad en Línea'
+                : 'Preinscripciones & Fichas QR · Prepa en Línea IPSUR'}
             </h3>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Seguimiento a aspirantes web, cotejo de documentación y búsqueda inmediata con lector de QR o folio.
+              {selectedPortalLevel === 'universidad'
+                ? 'Seguimiento a aspirantes de Licenciaturas e Ingenierías, cotejo de documentación y lector QR oficial.'
+                : 'Seguimiento a aspirantes de Bachillerato General SEP, cotejo de documentación y lector QR oficial.'}
             </p>
           </div>
         </div>

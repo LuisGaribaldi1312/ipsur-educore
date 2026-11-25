@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { CreditCard, DollarSign, Plus, CheckCircle, FileText, Search, ArrowUpRight, ShieldCheck, Download } from 'lucide-react';
 
 export default function PaymentsAccountingModal({ isOpen, onClose }) {
-  const { payments, addPayment, showToast, currentUser, isSuperAdmin } = useApp();
+  const { payments, addPayment, showToast, currentUser, isSuperAdmin, selectedPortalLevel } = useApp();
 
   const isStudent = currentUser?.role === 'student';
   const isTeacher = currentUser?.role === 'teacher';
@@ -64,17 +64,24 @@ export default function PaymentsAccountingModal({ isOpen, onClose }) {
       concept,
       student: student.trim(),
       amount: `$${Number(amount).toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`,
-      method
+      method,
+      level: selectedPortalLevel || 'prepa'
     });
 
     setStudent('');
     setIsAdding(false);
   };
 
+  // Strictly filter payments by active portal level (Prepa vs Universidad)
+  const portalScopedPayments = (payments || []).filter(p => {
+    if (!p.level) return true;
+    return p.level === selectedPortalLevel;
+  });
+
   // If student, strictly only show their own payments
   const basePayments = isStudent 
-    ? (payments || []).filter(p => p.student?.toLowerCase() === currentUser?.name?.toLowerCase())
-    : (payments || []);
+    ? portalScopedPayments.filter(p => p.student?.toLowerCase() === currentUser?.name?.toLowerCase())
+    : portalScopedPayments;
 
   const filteredPayments = basePayments.filter(p => 
     p.student?.toLowerCase().includes(searchTerm.toLowerCase()) ||

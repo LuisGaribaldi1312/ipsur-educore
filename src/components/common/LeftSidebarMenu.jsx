@@ -138,13 +138,9 @@ export default function LeftSidebarMenu() {
   const totalStudents = (users || []).filter(u => u.role === 'student').length;
   const totalTeachers = (users || []).filter(u => u.role === 'teacher').length;
   const pendingProceduresCount = (procedures || []).filter(p => p.status === 'Pendiente').length;
-  const pendingPreregistrationsCount = (preregistrations || []).filter(p => {
-    if (!canAccessBothPortals) {
-      if (selectedPortalLevel === 'universidad' && p.level !== 'universidad') return false;
-      if (selectedPortalLevel === 'prepa' && p.level !== 'prepa') return false;
-    }
-    return p.status === 'Pendiente' || p.status === 'En Revisión';
-  }).length;
+  const pendingPreregistrationsCount = (preregistrations || []).filter(
+    p => p.status === 'Pendiente' || p.status === 'En Revisión'
+  ).length;
 
   // Menu items list matching the official IPSUR EDUCORE architecture with strict role permissions
   const menuItems = [

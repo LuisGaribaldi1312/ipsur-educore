@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { UserPlus, User, Mail, Phone, BookOpen, School, CheckCircle2, ShieldCheck, Hash } from 'lucide-react';
 
 export default function RegisterStudentModal({ isOpen, onClose }) {
-  const { currentUser, isSuperAdmin, createUser, showToast, addActivity } = useApp();
+  const { currentUser, isSuperAdmin, createUser, showToast, addActivity, selectedPortalLevel } = useApp();
 
   const isStudent = currentUser?.role === 'student';
   const canEnroll = !isStudent && (
@@ -14,13 +14,15 @@ export default function RegisterStudentModal({ isOpen, onClose }) {
     currentUser?.role === 'coordinator'
   );
 
+  const isUniv = selectedPortalLevel === 'universidad';
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [matricula, setMatricula] = useState(`IPS-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`);
-  const [group, setGroup] = useState('Grupo 2° B');
+  const [matricula, setMatricula] = useState(`${isUniv ? 'IUPS' : 'IPS'}-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`);
+  const [group, setGroup] = useState(isUniv ? 'Grupo UNIV-101' : 'Grupo 2° B');
   const [phone, setPhone] = useState('');
-  const [gradeLevel, setGradeLevel] = useState('Bachillerato General - 2do Semestre');
-  const [password, setPassword] = useState('Ipsur2026*');
+  const [gradeLevel, setGradeLevel] = useState(isUniv ? 'Licenciatura - 1er Cuatrimestre' : 'Bachillerato General - 2do Semestre');
+  const [password, setPassword] = useState(isUniv ? 'iupsAlumno2026*' : 'ipsurAlumno2026*');
 
   if (!isOpen) return null;
 
@@ -63,13 +65,14 @@ export default function RegisterStudentModal({ isOpen, onClose }) {
     const newStudent = {
       name: name.trim(),
       email: email.trim().toLowerCase(),
-      password: password || 'Ipsur2026*',
+      password: password || (isUniv ? 'iupsAlumno2026*' : 'ipsurAlumno2026*'),
       role: 'student',
+      level: selectedPortalLevel || 'prepa', // strictly scoped to active portal
       matricula: matricula.trim(),
       grupo: group,
       gradeLevel: gradeLevel,
       phone: phone.trim() || '+52 (998) 000-0000',
-      title: 'Estudiante de Bachillerato en Línea',
+      title: isUniv ? 'Estudiante de Universidad en Línea' : 'Estudiante de Bachillerato en Línea',
       avatar: `https://images.unsplash.com/photo-${1534528741775 + Math.floor(Math.random() * 1000)}?w=150&auto=format&fit=crop&q=80`
     };
 

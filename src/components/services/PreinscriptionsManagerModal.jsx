@@ -40,6 +40,7 @@ export default function PreinscriptionsManagerModal({ isOpen, onClose }) {
   const { 
     currentUser, 
     preregistrations, 
+    allPreregistrations,
     updatePreregistration, 
     updatePreregistrationDocStatus, 
     enrollApplicantToUser,
@@ -49,8 +50,7 @@ export default function PreinscriptionsManagerModal({ isOpen, onClose }) {
     setSelectedFolioForReview
   } = useApp();
 
-  // Local filter states
-  const [levelFilter, setLevelFilter] = useState('all'); // 'all' | 'prepa' | 'universidad'
+  // Local filter states (Level is strictly locked to selectedPortalLevel)
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'Pendiente' | 'En Revisión' | 'Documentación Completa' | 'Inscrito'
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -62,6 +62,7 @@ export default function PreinscriptionsManagerModal({ isOpen, onClose }) {
   const [manualFolioInput, setManualFolioInput] = useState('');
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState(null);
+  const [crossPortalAlert, setCrossPortalAlert] = useState(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
@@ -71,15 +72,10 @@ export default function PreinscriptionsManagerModal({ isOpen, onClose }) {
   // Notes state for active applicant
   const [adminNotes, setAdminNotes] = useState('');
 
-  // Initialize level filter based on active portal context
+  // Reset selected applicant when switching portal level or opening modal
   useEffect(() => {
-    if (selectedPortalLevel === 'prepa') {
-      setLevelFilter('prepa');
-    } else if (selectedPortalLevel === 'universidad') {
-      setLevelFilter('universidad');
-    } else {
-      setLevelFilter('all');
-    }
+    setSelectedApplicant(null);
+    setCrossPortalAlert(null);
   }, [selectedPortalLevel, isOpen]);
 
   // If a folio was pre-selected (e.g. from QR scan on landing or notification)
@@ -114,10 +110,8 @@ export default function PreinscriptionsManagerModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  // Filter applications
+  // Filter applications (Strictly level-scoped by selectedPortalLevel)
   const filteredList = (preregistrations || []).filter((item) => {
-    // Level filter
-    if (levelFilter !== 'all' && item.level !== levelFilter) return false;
     // Status filter
     if (statusFilter !== 'all' && item.status !== statusFilter) return false;
     // Search query
@@ -133,31 +127,53 @@ export default function PreinscriptionsManagerModal({ isOpen, onClose }) {
     return true;
   });
 
-  // KPI counters
+  // KPI counters (strictly reflecting the active portal level)
   const totalCount = (preregistrations || []).length;
   const pendingCount = (preregistrations || []).filter(p => p.status === 'Pendiente').length;
   const inReviewCount = (preregistrations || []).filter(p => p.status === 'En Revisión').length;
   const completedDocsCount = (preregistrations || []).filter(p => p.status === 'Documentación Completa').length;
   const enrolledCount = (preregistrations || []).filter(p => p.status === 'Inscrito').length;
 
-  // Handle manual folio search
+  // Handle manual folio search with strict cross-portal guard
   const handleFolioSearch = (folioToFind) => {
+    setCrossPortalAlert(null);
     const clean = (folioToFind || manualFolioInput).trim().toUpperCase();
     if (!clean) {
       showToast('Ingresa un Folio', 'Escribe el número de folio oficial para buscar el expediente.', 'info');
       return;
     }
 
+    // 1. Search in the active portal scope first
     const found = (preregistrations || []).find(p => p.folio.toUpperCase() === clean);
     if (found) {
       setSelectedApplicant(found);
       setAdminNotes(found.notes || '');
       setScannerOpen(false);
       setManualFolioInput('');
+      setCrossPortalAlert(null);
       showToast('Expediente Encontrado', `Mostrando datos de ${found.formData.studentName}`, 'success');
-    } else {
-      showToast('Folio no encontrado', `No existe solicitud con el folio ${clean}.`, 'error');
+      return;
     }
+
+    // 2. Strict Cross-Portal Check: Does this folio belong to the other educational level?
+    const foundInOther = (allPreregistrations || []).find(p => p.folio.toUpperCase() === clean);
+    if (foundInOther) {
+      const otherLevelName = foundInOther.level === 'universidad' ? 'Universidad en Línea IUPS' : 'Prepa en Línea IPSUR';
+      const currentLevelName = selectedPortalLevel === 'universidad' ? 'Universidad en Línea IUPS' : 'Prepa en Línea IPSUR';
+      const targetPortal = foundInOther.level === 'universidad' ? 'Universidad' : 'Prepa';
+
+      const alertMsg = `El folio "${clean}" pertenece a ${otherLevelName} (${foundInOther.formData.program}). Por regla institucional, Prepa y Universidad no se pueden mezclar. Para revisarlo debes cambiar al Portal de ${targetPortal}.`;
+
+      setCrossPortalAlert(alertMsg);
+      showToast(
+        'Acceso Restringido por Nivel', 
+        `El folio pertenece a ${otherLevelName}. No se puede consultar desde ${currentLevelName}.`, 
+        'warning'
+      );
+      return;
+    }
+
+    showToast('Folio no encontrado', `No existe solicitud registrada con el folio ${clean}.`, 'error');
   };
 
   // Start Camera for live QR scanning
@@ -256,15 +272,27 @@ export default function PreinscriptionsManagerModal({ isOpen, onClose }) {
         {/* ======================================================== */}
         {/* HEADER BAR                                               */}
         {/* ======================================================== */}
-        <div className="bg-gradient-to-r from-[#070D1B] via-ipsur-navy-900 to-[#180922] text-white p-5 sm:p-6 border-b border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className={`text-white p-5 sm:p-6 border-b border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+          selectedPortalLevel === 'universidad'
+            ? 'bg-gradient-to-r from-[#070D1B] via-[#0C2340] to-[#0369A1]'
+            : 'bg-gradient-to-r from-[#070D1B] via-ipsur-navy-900 to-[#750042]'
+        }`}>
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-ipsur-pink-600 to-rose-500 text-white flex items-center justify-center shadow-lg shadow-pink-600/30 flex-shrink-0">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 text-white ${
+              selectedPortalLevel === 'universidad'
+                ? 'bg-gradient-to-tr from-sky-600 to-blue-500 shadow-sky-600/30'
+                : 'bg-gradient-to-tr from-ipsur-pink-600 to-rose-500 shadow-pink-600/30'
+            }`}>
               <FileCheck className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-pink-300 bg-pink-950/80 border border-pink-700/80 px-2.5 py-0.5 rounded-full">
-                  Módulo de Control Escolar
+                <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                  selectedPortalLevel === 'universidad'
+                    ? 'text-sky-300 bg-sky-950/80 border-sky-600/80'
+                    : 'text-pink-300 bg-pink-950/80 border-pink-700/80'
+                }`}>
+                  {selectedPortalLevel === 'universidad' ? 'Portal Universidad en Línea IUPS' : 'Portal Prepa en Línea IPSUR'}
                 </span>
                 <span className="text-[10px] font-mono text-emerald-300 bg-emerald-950/80 border border-emerald-700/80 px-2 py-0.5 rounded-full flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-emerald-400" />
@@ -272,10 +300,14 @@ export default function PreinscriptionsManagerModal({ isOpen, onClose }) {
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white font-display tracking-tight mt-1">
-                Aspirantes y Solicitudes de Preinscripción
+                {selectedPortalLevel === 'universidad'
+                  ? 'Aspirantes y Solicitudes · Universidad en Línea IUPS'
+                  : 'Aspirantes y Solicitudes · Prepa en Línea IPSUR'}
               </h2>
               <p className="text-xs text-slate-300">
-                Seguimiento documental, validación de expedientes y escaneo de Código QR / Folio oficial.
+                {selectedPortalLevel === 'universidad'
+                  ? 'Padrón exclusivo de Educación Superior y Posgrados. Cotejo de documentos y lector de fichas QR.'
+                  : 'Padrón exclusivo de Bachillerato General SEP. Cotejo de documentos y lector de fichas QR.'}
               </p>
             </div>
           </div>
@@ -351,35 +383,20 @@ export default function PreinscriptionsManagerModal({ isOpen, onClose }) {
           {/* Filter Pills */}
           <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
             
-            {/* Level Filter */}
-            <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-bold">
-              <button
-                type="button"
-                onClick={() => setLevelFilter('all')}
-                className={`py-1 px-2.5 rounded-lg transition cursor-pointer ${
-                  levelFilter === 'all' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                Todos
-              </button>
-              <button
-                type="button"
-                onClick={() => setLevelFilter('prepa')}
-                className={`py-1 px-2.5 rounded-lg transition cursor-pointer ${
-                  levelFilter === 'prepa' ? 'bg-ipsur-pink-600 text-white shadow-2xs' : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                Prepa IPSUR
-              </button>
-              <button
-                type="button"
-                onClick={() => setLevelFilter('universidad')}
-                className={`py-1 px-2.5 rounded-lg transition cursor-pointer ${
-                  levelFilter === 'universidad' ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                IUPS Universidad
-              </button>
+            {/* Strict Portal Scope Indicator (No Mixing Allowed) */}
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold shadow-2xs ${
+              selectedPortalLevel === 'universidad'
+                ? 'bg-sky-50 border-sky-200 text-sky-800'
+                : 'bg-pink-50 border-pink-200 text-pink-800'
+            }`}>
+              <span className={`w-2 h-2 rounded-full animate-pulse ${
+                selectedPortalLevel === 'universidad' ? 'bg-sky-500' : 'bg-ipsur-pink-500'
+              }`} />
+              <span>
+                {selectedPortalLevel === 'universidad' 
+                  ? 'Padrón Exclusivo: Universidad en Línea IUPS' 
+                  : 'Padrón Exclusivo: Prepa en Línea IPSUR'}
+              </span>
             </div>
 
             {/* Status Filter */}
@@ -826,6 +843,19 @@ export default function PreinscriptionsManagerModal({ isOpen, onClose }) {
               <p className="text-xs text-amber-300 bg-amber-950/60 p-2.5 rounded-xl border border-amber-800">
                 {cameraError}
               </p>
+            )}
+
+            {/* Strict Cross-Portal Block Banner */}
+            {crossPortalAlert && (
+              <div className="p-3.5 bg-rose-950/90 border-2 border-rose-500 rounded-2xl text-xs text-rose-200 leading-relaxed flex items-start gap-2.5 animate-fadeIn">
+                <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="block font-bold text-rose-100 mb-0.5 uppercase tracking-wide">
+                    Folio Bloqueado · Separación Estricta de Portales
+                  </strong>
+                  <span>{crossPortalAlert}</span>
+                </div>
+              </div>
             )}
 
             {/* Manual Folio Entry Bar */}

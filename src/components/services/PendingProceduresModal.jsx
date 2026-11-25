@@ -4,16 +4,21 @@ import { useApp } from '../../context/AppContext';
 import { FileText, CheckCircle2, Clock, AlertCircle, Search, Download, Check, X, ShieldCheck } from 'lucide-react';
 
 export default function PendingProceduresModal({ isOpen, onClose }) {
-  const { procedures, updateProcedureStatus, showToast } = useApp();
+  const { procedures, updateProcedureStatus, showToast, selectedPortalLevel } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
 
   if (!isOpen) return null;
 
-  const filtered = (procedures || []).filter(p =>
-    p.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.matricula.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = (procedures || []).filter(p => {
+    const isUniv = p.level === 'universidad' || p.matricula?.toUpperCase().startsWith('IUPS') || p.matricula?.toUpperCase().startsWith('UNI');
+    if (selectedPortalLevel === 'universidad' && !isUniv) return false;
+    if (selectedPortalLevel === 'prepa' && isUniv) return false;
+    return (
+      p.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.matricula.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Servicios Escolares · Trámites y Solicitudes de Alumnos" size="lg">

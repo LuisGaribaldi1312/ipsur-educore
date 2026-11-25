@@ -814,6 +814,14 @@ export function AppProvider({ children }) {
     return true;
   });
 
+  // STRICT PRE-REGISTRATIONS SEPARATION:
+  // Prepa applicants are ONLY visible in Prepa portal.
+  // Universidad applicants are ONLY visible in Universidad portal.
+  const portalPreregistrations = (preregistrations || []).filter(p => {
+    const pLevel = p.level || 'prepa';
+    return pLevel === selectedPortalLevel;
+  });
+
   // Authentication: Login with Email or Matrícula + Password
   const login = (identifier, password) => {
     if (!identifier || !password) {
@@ -1655,7 +1663,8 @@ export function AppProvider({ children }) {
         updateProcedureStatus,
         payments,
         addPayment,
-        preregistrations,
+        preregistrations: portalPreregistrations, // Strictly isolated by active portal level (Prepa vs Universidad)
+        allPreregistrations: preregistrations,    // Full repository for cross-portal verification guards
         addPreregistration,
         updatePreregistration,
         updatePreregistrationDocStatus,
