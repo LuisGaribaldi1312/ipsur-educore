@@ -19,7 +19,7 @@ import {
 import { INSTITUTIONAL_CAMPUS } from '../../data/institutionalLandingData';
 
 export default function EducationalModelSection() {
-  const { goToPortalSelector, installPwa, isPwaInstalled } = useApp();
+  const { goToPortalApp, installPwa, isPwaInstalled } = useApp();
 
   const pillars = [
     {
@@ -125,18 +125,30 @@ export default function EducationalModelSection() {
         {/* Bottom CTA within section */}
         <div className="mt-12 sm:mt-16 bg-gradient-to-r from-slate-800/90 via-slate-800/60 to-slate-800/90 border border-slate-700 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 max-w-5xl mx-auto shadow-xl">
           <div className="space-y-1 text-center sm:text-left">
-            <h4 className="text-base sm:text-lg font-bold text-white">¿Listo para iniciar tus estudios?</h4>
+            <h4 className="text-base sm:text-lg font-bold text-white">¿Ya eres alumno o docente de la institución?</h4>
             <p className="text-xs sm:text-sm text-slate-300">
-              Inscripciones abiertas con becas institucionales de hasta 40% durante todo tu programa.
+              Ingresa directamente a tu aula virtual con tus credenciales asignadas:
             </p>
           </div>
-          <button
-            onClick={() => goToPortalSelector()}
-            className="flex-shrink-0 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-ipsur-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-ipsur-pink-600/30 flex items-center gap-2 cursor-pointer transition transform hover:-translate-y-0.5"
-          >
-            <span>Seleccionar Mi Portal</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => goToPortalApp('prepa')}
+              className="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-ipsur-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition"
+            >
+              <span>Iniciar Sesión en Prepa</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => goToPortalApp('universidad')}
+              className="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-[#0A1128] via-[#141B41] to-sky-600 hover:from-[#141B41] hover:to-sky-500 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition"
+            >
+              <span>Iniciar Sesión en IUPS</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
       </div>

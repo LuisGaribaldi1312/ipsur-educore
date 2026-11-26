@@ -21,7 +21,7 @@ import { PREPA_DATA, IUPS_DATA, INSTITUTIONAL_CAMPUS } from '../../data/institut
 import { useApp } from '../../context/AppContext';
 
 export default function AboutUsSection() {
-  const { goToPortalApp, goToPortalSelector } = useApp();
+  const { goToPortalApp } = useApp();
   const [activeTab, setActiveTab] = useState('prepa'); // 'prepa' | 'universidad'
 
   return (
@@ -143,12 +143,14 @@ export default function AboutUsSection() {
                   </div>
 
                   <div className="mt-8 pt-4 border-t border-white/20 flex items-center justify-between text-xs text-pink-100">
-                    <span>Bachillerato en 2 Años</span>
+                    <span className="font-semibold">Bachillerato General SEP</span>
                     <button
+                      type="button"
                       onClick={() => goToPortalApp('prepa')}
-                      className="text-white font-bold underline cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-white text-ipsur-pink-700 hover:bg-pink-50 font-bold transition flex items-center gap-1 cursor-pointer shadow-sm text-[11px]"
                     >
-                      Portal Prepa →
+                      <span>Iniciar Sesión en Prepa</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -293,12 +295,14 @@ export default function AboutUsSection() {
                   </div>
 
                   <div className="mt-8 pt-4 border-t border-white/20 flex items-center justify-between text-xs text-sky-100">
-                    <span>19 Carreras & Posgrados</span>
+                    <span className="font-semibold">Educación Superior & Posgrados</span>
                     <button
+                      type="button"
                       onClick={() => goToPortalApp('universidad')}
-                      className="text-white font-bold underline cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-white text-sky-800 hover:bg-sky-50 font-bold transition flex items-center gap-1 cursor-pointer shadow-sm text-[11px]"
                     >
-                      Portal Universidad →
+                      <span>Iniciar Sesión en IUPS</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>

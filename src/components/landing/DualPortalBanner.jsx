@@ -19,155 +19,151 @@ import {
 import { PREPA_DATA, IUPS_DATA } from '../../data/institutionalLandingData';
 
 export default function DualPortalBanner() {
-  const { goToPortalApp, goToPortalSelector } = useApp();
+  const { goToPortalApp } = useApp();
 
   return (
-    <section className="py-16 sm:py-24 bg-gradient-to-b from-white via-slate-50 to-white border-y border-slate-200/80 select-none">
+    <section className="py-16 sm:py-20 bg-white border-b border-slate-200 select-none">
       <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         
         {/* Section Header */}
         <div className="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ipsur-pink-50 border border-ipsur-pink-200 text-ipsur-pink-700 text-xs font-bold mb-3 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-ipsur-pink-600" />
-            <span>Pestaña "Portal" en el Menú Principal</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold mb-3 shadow-2xs">
+            <Layers className="w-3.5 h-3.5 text-ipsur-pink-600" />
+            <span>Portales Institucionales Independientes</span>
           </div>
           
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight font-display">
-            Dos Portales Educativos en un Solo Ecosistema Digital
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#0A1128] tracking-tight font-display">
+            Dos Portales Educativos Especializados
           </h2>
           
           <p className="mt-4 text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto">
-            Nuestra institución cuenta con accesos directos e independientes para cada nivel educativo. Al hacer clic en la pestaña <strong className="text-ipsur-navy-900 font-bold">"Portal"</strong> del menú, los estudiantes, docentes y directivos pueden elegir su campus correspondiente:
+            Por disposición pedagógica y control escolar, la <strong className="text-ipsur-pink-600 font-bold">Prepa en Línea IPSUR</strong> y la <strong className="text-sky-600 font-bold">Universidad en Línea IUPS</strong> cuentan con portales separados. Haz clic en tu nivel educativo para iniciar sesión directamente:
           </p>
         </div>
 
         {/* The Two Distinct Portal Access Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 max-w-5xl mx-auto">
           
           {/* CARD 1: PREPA EN LÍNEA IPSUR */}
-          <div className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-slate-200 hover:border-ipsur-pink-500 transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col justify-between group transform hover:-translate-y-1 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-pink-100/50 rounded-full blur-[60px] pointer-events-none" />
-
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-ipsur-pink-700 bg-pink-50 border border-pink-200 px-3.5 py-1.5 rounded-full shadow-2xs">
-                  Nivel Medio Superior · Bachillerato
+          <div className="bg-slate-50/70 hover:bg-white rounded-3xl p-6 sm:p-9 border-2 border-slate-200 hover:border-ipsur-pink-500 transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between group relative overflow-hidden">
+            <div>
+              <div className="flex items-center justify-between mb-5">
+                <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-ipsur-pink-700 bg-pink-100 border border-pink-200 px-3.5 py-1 rounded-full">
+                  Nivel Medio Superior · Bachillerato SEP
                 </span>
                 <span className="text-xs font-mono font-bold text-slate-400">Portal 01</span>
               </div>
 
               {/* Icon & Title */}
-              <div className="flex items-center gap-4 sm:gap-5 mb-5">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-ipsur-pink-600 to-rose-500 text-white flex items-center justify-center shadow-lg shadow-ipsur-pink-600/30 group-hover:scale-105 transition-transform flex-shrink-0">
-                  <BookOpen className="w-8 h-8 sm:w-10 sm:h-10" />
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-ipsur-pink-600 to-rose-500 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform flex-shrink-0">
+                  <BookOpen className="w-8 h-8" />
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-ipsur-pink-600 uppercase tracking-widest block">
-                    Bachillerato Oficial
+                    Instituto Peninsular del Sur
                   </span>
-                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 group-hover:text-ipsur-pink-600 transition-colors font-display">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-ipsur-pink-600 transition-colors font-display">
                     Prepa en Línea IPSUR
                   </h3>
                 </div>
               </div>
 
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6 font-normal">
-                Espacio virtual exclusivo para alumnos de preparatoria, docentes y directivos del <strong className="text-slate-800">Instituto Peninsular del Sur</strong>. Accede a tus materias por cuatrimestre, guías didácticas oficiales, entregas de actividades, boletas y exámenes en línea.
+                Campus virtual exclusivo para estudiantes, profesores y directivos de preparatoria. Ingresa con tu matrícula y contraseña oficial para consultar tus clases por Meet, entregas y boleta SEP.
               </p>
 
-              <div className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 mb-8 font-medium">
+              <div className="space-y-2.5 pt-4 border-t border-slate-200/80 text-xs text-slate-700 mb-8 font-medium">
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-ipsur-pink-500 flex-shrink-0" />
-                  <span>4 Bachilleratos: Comunicación, Administración, Dibujo y General</span>
+                  <CheckCircle2 className="w-4 h-4 text-ipsur-pink-600 flex-shrink-0" />
+                  <span>4 Especialidades: Comunicación, Administración, Dibujo y General</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-ipsur-pink-500 flex-shrink-0" />
-                  <span>Modalidad Modular Intensiva (1 día/semana), Mixta y 100% en Línea</span>
+                  <CheckCircle2 className="w-4 h-4 text-ipsur-pink-600 flex-shrink-0" />
+                  <span>Modalidad Modular de 1 día/semana y 100% en Línea</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-ipsur-pink-500 flex-shrink-0" />
-                  <span>Certificado oficial SEP con validez nacional para cualquier universidad</span>
+                  <CheckCircle2 className="w-4 h-4 text-ipsur-pink-600 flex-shrink-0" />
+                  <span>Validez oficial SEP en todo México para entrar a cualquier universidad</span>
                 </div>
               </div>
             </div>
 
             <button
+              type="button"
               onClick={() => goToPortalApp('prepa')}
-              className="relative z-10 w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-ipsur-pink-600 via-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-ipsur-pink-600/25 transition cursor-pointer group-hover:gap-3"
+              className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-ipsur-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition cursor-pointer group-hover:gap-2.5"
             >
-              <span>Ingresar a Prepa en Línea IPSUR</span>
+              <LogIn className="w-4 h-4" />
+              <span>Iniciar Sesión en Prepa en Línea</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
           {/* CARD 2: IUPS UNIVERSIDAD */}
-          <div className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-slate-200 hover:border-sky-500 transition-all duration-300 shadow-md hover:shadow-2xl flex flex-col justify-between group transform hover:-translate-y-1 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-sky-100/50 rounded-full blur-[60px] pointer-events-none" />
-
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-sky-800 bg-sky-50 border border-sky-200 px-3.5 py-1.5 rounded-full shadow-2xs">
+          <div className="bg-slate-50/70 hover:bg-white rounded-3xl p-6 sm:p-9 border-2 border-slate-200 hover:border-sky-500 transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between group relative overflow-hidden">
+            <div>
+              <div className="flex items-center justify-between mb-5">
+                <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-sky-800 bg-sky-100 border border-sky-200 px-3.5 py-1 rounded-full">
                   Nivel Superior · Licenciaturas & Posgrados
                 </span>
                 <span className="text-xs font-mono font-bold text-slate-400">Portal 02</span>
               </div>
 
               {/* Icon & Title */}
-              <div className="flex items-center gap-4 sm:gap-5 mb-5">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-ipsur-navy-700 via-blue-600 to-sky-400 text-white flex items-center justify-center shadow-lg shadow-sky-600/30 group-hover:scale-105 transition-transform flex-shrink-0">
-                  <GraduationCap className="w-8 h-8 sm:w-10 sm:h-10" />
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#0A1128] via-[#141B41] to-sky-600 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform flex-shrink-0">
+                  <GraduationCap className="w-8 h-8" />
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-sky-600 uppercase tracking-widest block">
-                    Educación Superior
+                    Instituto Universitario Peninsular del Sur
                   </span>
-                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 group-hover:text-sky-600 transition-colors font-display">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-sky-600 transition-colors font-display">
                     IUPS Universidad en Línea
                   </h3>
                 </div>
               </div>
 
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6 font-normal">
-                Campus virtual del <strong className="text-slate-800">Instituto Universitario Peninsular del Sur (IUPS)</strong>. Creado para estudiar sin dejar de trabajar. Acceso a cátedras con docentes especializados, biblioteca digital, materias cuatrimestrales y titulación ágil.
+                Campus universitario oficial para estudiantes de carreras profesionales, ingenierías y posgrados. Accede a tus cátedras magistrales, biblioteca digital y seguimiento de titulación.
               </p>
 
-              <div className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 mb-8 font-medium">
+              <div className="space-y-2.5 pt-4 border-t border-slate-200/80 text-xs text-slate-700 mb-8 font-medium">
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-500 flex-shrink-0" />
-                  <span>8 Licenciaturas: Derecho, Administración, Contaduría, Pedagogía y más</span>
+                  <CheckCircle2 className="w-4 h-4 text-sky-600 flex-shrink-0" />
+                  <span>8 Licenciaturas (Derecho, Administración, Contaduría, Psicología...)</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-500 flex-shrink-0" />
-                  <span>3 Ingenierías (Civil, Eléctrica, Mecánica) y 8 Maestrías de Posgrado</span>
+                  <CheckCircle2 className="w-4 h-4 text-sky-600 flex-shrink-0" />
+                  <span>3 Ingenierías (Civil, Eléctrica, Mecánica) y 8 Maestrías oficiales</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-500 flex-shrink-0" />
-                  <span>Modalidad Ejecutiva & RVOE SEP Incorporado para cédula profesional</span>
+                  <CheckCircle2 className="w-4 h-4 text-sky-600 flex-shrink-0" />
+                  <span>RVOE SEP Incorporado para emisión de cédula profesional federal</span>
                 </div>
               </div>
             </div>
 
             <button
+              type="button"
               onClick={() => goToPortalApp('universidad')}
-              className="relative z-10 w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-ipsur-navy-700 via-blue-600 to-sky-500 hover:from-ipsur-navy-800 hover:to-sky-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-sky-600/25 transition cursor-pointer group-hover:gap-3"
+              className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-[#0A1128] via-[#141B41] to-sky-600 hover:from-[#141B41] hover:to-sky-500 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition cursor-pointer group-hover:gap-2.5"
             >
-              <span>Ingresar a IUPS Universidad en Línea</span>
+              <LogIn className="w-4 h-4" />
+              <span>Iniciar Sesión en IUPS Universidad</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
         </div>
 
-        {/* Global Access Link */}
-        <div className="mt-12 text-center">
-          <button
-            onClick={() => goToPortalSelector()}
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 hover:text-ipsur-navy-900 bg-white border border-slate-300 px-5 py-2.5 rounded-xl shadow-xs hover:shadow-md transition cursor-pointer"
-          >
-            <Layers className="w-4 h-4 text-ipsur-pink-600" />
-            <span>Ver Pantalla Completa del Selector de Portales</span>
-            <ArrowRight className="w-4 h-4 text-slate-400" />
-          </button>
+        {/* Informative Institutional Notice */}
+        <div className="mt-10 p-4 rounded-2xl bg-slate-100 border border-slate-200 text-center max-w-3xl mx-auto text-xs text-slate-600 flex flex-col sm:flex-row items-center justify-center gap-2">
+          <Lock className="w-4 h-4 text-slate-500 shrink-0" />
+          <span>
+            <strong>Aviso de Seguridad:</strong> Cada portal es independiente. Los alumnos de preparatoria ingresan exclusivamente en el Portal de Prepa y los de universidad en el Portal Universitario.
+          </span>
         </div>
 
       </div>

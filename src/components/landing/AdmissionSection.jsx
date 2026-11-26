@@ -19,7 +19,7 @@ import {
 import { PREPA_DATA, IUPS_DATA, INSTITUTIONAL_CAMPUS } from '../../data/institutionalLandingData';
 
 export default function AdmissionSection() {
-  const { showToast } = useApp();
+  const { showToast, goToPortalApp } = useApp();
 
   const [selectedLevel, setSelectedLevel] = useState('prepa'); // 'prepa' | 'universidad'
   const [formData, setFormData] = useState({
@@ -369,6 +369,35 @@ export default function AdmissionSection() {
 
           </div>
 
+        </div>
+
+        {/* Enrolled Students Fast Portal Access Bar */}
+        <div className="mt-12 bg-white rounded-2xl border border-slate-200 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto shadow-xs text-center sm:text-left">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-pink-50 text-ipsur-pink-600 flex items-center justify-center shrink-0">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-slate-800 block">¿Ya eres alumno o docente matriculado?</span>
+              <span className="text-[11px] text-slate-500">Ingresa directamente al campus virtual para revisar tareas, boletas y clases en vivo:</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => goToPortalApp('prepa')}
+              className="px-4 py-2 rounded-xl bg-ipsur-pink-600 hover:bg-ipsur-pink-700 text-white font-bold text-xs shadow-xs transition cursor-pointer"
+            >
+              Iniciar en Prepa
+            </button>
+            <button
+              type="button"
+              onClick={() => goToPortalApp('universidad')}
+              className="px-4 py-2 rounded-xl bg-[#0A1128] hover:bg-[#141B41] text-white font-bold text-xs shadow-xs transition cursor-pointer"
+            >
+              Iniciar en IUPS
+            </button>
+          </div>
         </div>
 
       </div>

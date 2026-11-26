@@ -16,7 +16,7 @@ import {
 import { PREPA_DATA, IUPS_DATA, INSTITUTIONAL_CAMPUS } from '../../data/institutionalLandingData';
 
 export default function LandingFooter() {
-  const { goToPortalSelector, goToPortalApp, institutionalInfo, installPwa } = useApp();
+  const { goToPortalApp, institutionalInfo, installPwa } = useApp();
 
   return (
     <footer className="bg-[#070D1B] text-slate-400 text-xs border-t border-slate-800 select-none">
@@ -181,11 +181,21 @@ export default function LandingFooter() {
               Ingresa a tus aulas virtuales, boleta cuatrimestral y control escolar:
             </p>
             <button
-              onClick={() => goToPortalSelector()}
+              type="button"
+              onClick={() => goToPortalApp('prepa')}
               className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-ipsur-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Entrar al Portal</span>
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Iniciar Sesión en Prepa</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => goToPortalApp('universidad')}
+              className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#0A1128] via-[#141B41] to-sky-600 hover:from-[#141B41] hover:to-sky-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <GraduationCap className="w-3.5 h-3.5" />
+              <span>Iniciar Sesión en IUPS</span>
             </button>
 
             <a

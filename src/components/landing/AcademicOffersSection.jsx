@@ -136,11 +136,12 @@ export default function AcademicOffersSection() {
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
                 <button
+                  type="button"
                   onClick={() => goToPortalApp('prepa')}
                   className="px-5 py-3 rounded-xl bg-gradient-to-r from-ipsur-pink-600 to-rose-600 hover:from-ipsur-pink-500 hover:to-rose-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <BookOpen className="w-4 h-4" />
-                  <span>Entrar al Portal Prepa IPSUR</span>
+                  <span>Iniciar Sesión · Portal Prepa</span>
                 </button>
                 <a
                   href={`https://wa.me/${PREPA_DATA.whatsapp}?text=${encodeURIComponent('Hola, me interesa inscribirme en Prepa IPSUR.')}`}
@@ -250,10 +251,11 @@ export default function AcademicOffersSection() {
                       <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                         <span className="text-xs font-mono text-emerald-600 font-bold">RVOE SEP Oficial</span>
                         <button
+                          type="button"
                           onClick={() => goToPortalApp('prepa')}
                           className="text-xs font-bold text-ipsur-pink-600 hover:text-ipsur-pink-700 flex items-center gap-1.5 cursor-pointer"
                         >
-                          <span>Ver Materias en el Portal</span>
+                          <span>Iniciar Sesión en Prepa</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -317,11 +319,12 @@ export default function AcademicOffersSection() {
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
                 <button
+                  type="button"
                   onClick={() => goToPortalApp('universidad')}
-                  className="px-5 py-3 rounded-xl bg-gradient-to-r from-ipsur-navy-700 via-blue-600 to-sky-500 hover:from-ipsur-navy-800 hover:to-sky-600 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                  className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#0A1128] via-[#141B41] to-sky-600 hover:from-[#141B41] hover:to-sky-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Entrar al Portal IUPS</span>
+                  <span>Iniciar Sesión · Portal IUPS</span>
                 </button>
                 <a
                   href={`https://wa.me/${IUPS_DATA.whatsapp}?text=${encodeURIComponent('Hola, me interesa solicitar informes para las carreras de IUPS Universidad.')}`}
