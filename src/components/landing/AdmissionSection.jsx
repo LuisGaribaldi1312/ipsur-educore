@@ -175,7 +175,10 @@ export default function AdmissionSection() {
               </div>
 
               <ul className="space-y-2.5 text-xs text-slate-600">
-                {(selectedLevel === 'prepa' ? PREPA_DATA.requirements : IUPS_DATA.requirements).map((req, rIdx) => (
+                {(selectedLevel === 'prepa' 
+                  ? (PREPA_DATA.requirements || []) 
+                  : (IUPS_DATA.requirements || IUPS_DATA.admissionRequirements || [])
+                ).map((req, rIdx) => (
                   <li key={rIdx} className="flex items-start gap-2.5">
                     <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
                       selectedLevel === 'prepa' ? 'text-ipsur-pink-500' : 'text-sky-500'

@@ -409,6 +409,16 @@ export const IUPS_DATA = {
     ]
   },
 
+  requirements: [
+    'Certificado de Bachillerato legalizado (para Licenciatura/Ingeniería)',
+    'Título y Cédula Profesional (para Maestrías y Posgrados)',
+    'Acta de Nacimiento original',
+    'CURP formato oficial actualizado',
+    'Comprobante de domicilio reciente',
+    'Identificación oficial vigente (INE o Pasaporte)',
+    '4 fotografías tamaño título o infantil según el grado a cursar'
+  ],
+
   admissionRequirements: [
     'Certificado de Bachillerato legalizado (para Licenciatura/Ingeniería)',
     'Título y Cédula Profesional (para Maestrías y Posgrados)',
